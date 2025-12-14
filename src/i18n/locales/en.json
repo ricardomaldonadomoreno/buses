@@ -1,0 +1,136 @@
+{
+  "common": {
+    "appName": "Buses.App",
+    "tagline": "Connecting senders, transporters, and receivers",
+    "getStarted": "Get Started",
+    "learnMore": "Learn More",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "dashboard": "Dashboard",
+    "home": "Home",
+    "search": "Search",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "loading": "Loading...",
+    "noResults": "No results",
+    "language": "Language"
+  },
+  "roles": {
+    "sender": "Sender",
+    "transporter": "Transporter",
+    "receiver": "Receiver",
+    "admin": "Administrator",
+    "resolver": "Resolver"
+  },
+  "landing": {
+    "hero": {
+      "title": "Secure intercity shipping",
+      "subtitle": "The platform connecting senders with verified transporters. Escrow protection, mandatory verification, and full tracking.",
+      "cta": "Post a trip",
+      "ctaSecondary": "Send a package"
+    },
+    "howItWorks": {
+      "title": "How does it work?",
+      "step1": {
+        "title": "1. Post or find a trip",
+        "description": "Transporters post their routes. Senders find the perfect trip."
+      },
+      "step2": {
+        "title": "2. Package verification",
+        "description": "The transporter verifies the package at a certified address with photos and report."
+      },
+      "step3": {
+        "title": "3. Escrow deposit",
+        "description": "The receiver deposits funds. Money is released only after confirmed delivery."
+      },
+      "step4": {
+        "title": "4. Secure delivery",
+        "description": "Receiver confirms delivery. Funds released automatically."
+      }
+    },
+    "features": {
+      "title": "Key features",
+      "escrow": {
+        "title": "Secure escrow",
+        "description": "Funds protected until delivery is confirmed"
+      },
+      "verification": {
+        "title": "Mandatory verification",
+        "description": "Every package is verified before transport"
+      },
+      "tracking": {
+        "title": "Full tracking",
+        "description": "Real-time transaction status"
+      },
+      "disputes": {
+        "title": "Dispute resolution",
+        "description": "Fair system to resolve conflicts"
+      }
+    },
+    "roles": {
+      "title": "For all participants",
+      "sender": {
+        "title": "Senders",
+        "description": "Send packages safely with payment guarantee"
+      },
+      "transporter": {
+        "title": "Transporters",
+        "description": "Monetize your trips by transporting verified packages"
+      },
+      "receiver": {
+        "title": "Receivers",
+        "description": "Receive your packages with buyer protection"
+      }
+    }
+  },
+  "trips": {
+    "title": "Available trips",
+    "create": "Create trip",
+    "origin": "Origin",
+    "destination": "Destination",
+    "date": "Date",
+    "maxWeight": "Max weight",
+    "availableWeight": "Available weight",
+    "status": "Status",
+    "scheduled": "Scheduled",
+    "inProgress": "In progress",
+    "completed": "Completed"
+  },
+  "transactions": {
+    "title": "Transactions",
+    "create": "Create transaction",
+    "package": "Package",
+    "description": "Description",
+    "value": "Declared value",
+    "fee": "Transport fee",
+    "total": "Total in escrow",
+    "status": {
+      "created": "Created",
+      "waitingVerification": "Waiting verification",
+      "verified": "Verified",
+      "waitingDeposit": "Waiting deposit",
+      "inTransit": "In transit",
+      "delivered": "Delivered",
+      "completed": "Completed",
+      "inDispute": "In dispute",
+      "canceled": "Canceled"
+    }
+  },
+  "admin": {
+    "title": "Admin panel",
+    "users": "Users",
+    "trips": "Trips",
+    "transactions": "Transactions",
+    "escrow": "Escrow",
+    "disputes": "Disputes",
+    "settings": "Settings"
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "common": {
+    "appName": "Buses.App",
+    "tagline": "Conectamos remitentes, transportistas y receptores",
+    "getStarted": "Comenzar",
+    "learnMore": "Más información",
+    "login": "Iniciar sesión",
+    "signup": "Registrarse",
+    "logout": "Cerrar sesión",
+    "dashboard": "Panel",
+    "home": "Inicio",
+    "search": "Buscar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "view": "Ver",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "loading": "Cargando...",
+    "noResults": "Sin resultados",
+    "language": "Idioma"
+  },
+  "roles": {
+    "sender": "Remitente",
+    "transporter": "Transportista",
+    "receiver": "Receptor",
+    "admin": "Administrador",
+    "resolver": "Solucionador"
+  },
+  "landing": {
+    "hero": {
+      "title": "Envíos seguros entre ciudades",
+      "subtitle": "La plataforma que conecta remitentes con transportistas verificados. Depósito en garantía, verificación obligatoria y seguimiento completo.",
+      "cta": "Publicar un viaje",
+      "ctaSecondary": "Enviar un paquete"
+    },
+    "howItWorks": {
+      "title": "¿Cómo funciona?",
+      "step1": {
+        "title": "1. Publica o busca un viaje",
+        "description": "Los transportistas publican sus rutas. Los remitentes encuentran el viaje ideal."
+      },
+      "step2": {
+        "title": "2. Verificación del paquete",
+        "description": "El transportista verifica el paquete en una dirección certificada con fotos y reporte."
+      },
+      "step3": {
+        "title": "3. Depósito en garantía",
+        "description": "El receptor deposita los fondos. El dinero se libera solo tras la entrega confirmada."
+      },
+      "step4": {
+        "title": "4. Entrega segura",
+        "description": "El receptor confirma la entrega. Fondos liberados automáticamente."
+      }
+    },
+    "features": {
+      "title": "Características principales",
+      "escrow": {
+        "title": "Escrow seguro",
+        "description": "Fondos protegidos hasta confirmar la entrega"
+      },
+      "verification": {
+        "title": "Verificación obligatoria",
+        "description": "Cada paquete se verifica antes del transporte"
+      },
+      "tracking": {
+        "title": "Seguimiento completo",
+        "description": "Estado de la transacción en tiempo real"
+      },
+      "disputes": {
+        "title": "Resolución de disputas",
+        "description": "Sistema justo para resolver conflictos"
+      }
+    },
+    "roles": {
+      "title": "Para todos los participantes",
+      "sender": {
+        "title": "Remitentes",
+        "description": "Envía paquetes de forma segura con garantía de pago"
+      },
+      "transporter": {
+        "title": "Transportistas",
+        "description": "Monetiza tus viajes transportando paquetes verificados"
+      },
+      "receiver": {
+        "title": "Receptores",
+        "description": "Recibe tus paquetes con protección de compra"
+      }
+    }
+  },
+  "trips": {
+    "title": "Viajes disponibles",
+    "create": "Crear viaje",
+    "origin": "Origen",
+    "destination": "Destino",
+    "date": "Fecha",
+    "maxWeight": "Peso máximo",
+    "availableWeight": "Peso disponible",
+    "status": "Estado",
+    "scheduled": "Programado",
+    "inProgress": "En progreso",
+    "completed": "Completado"
+  },
+  "transactions": {
+    "title": "Transacciones",
+    "create": "Crear transacción",
+    "package": "Paquete",
+    "description": "Descripción",
+    "value": "Valor declarado",
+    "fee": "Tarifa de transporte",
+    "total": "Total en escrow",
+    "status": {
+      "created": "Creada",
+      "waitingVerification": "Esperando verificación",
+      "verified": "Verificada",
+      "waitingDeposit": "Esperando depósito",
+      "inTransit": "En tránsito",
+      "delivered": "Entregada",
+      "completed": "Completada",
+      "inDispute": "En disputa",
+      "canceled": "Cancelada"
+    }
+  },
+  "admin": {
+    "title": "Panel de administración",
+    "users": "Usuarios",
+    "trips": "Viajes",
+    "transactions": "Transacciones",
+    "escrow": "Escrow",
+    "disputes": "Disputas",
+    "settings": "Configuración"
+  }
+}
