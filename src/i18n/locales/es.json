@@ -23,7 +23,10 @@
     "noResults": "Sin resultados",
     "language": "Idioma",
     "access": "Acceso",
-    "contact": "Contacto"
+    "contact": "Contacto",
+    "backToHome": "Volver a inicio",
+    "viewDetails": "Ver detalles",
+    "selectDate": "Selecciona una fecha"
   },
   "roles": {
     "sender": "Remitente",
@@ -111,6 +114,43 @@
         "title": "Receptores",
         "description": "Recibe tus paquetes con protección de compra"
       }
+    }
+  },
+  "weMove": {
+    "title": "WeMove",
+    "byBusesApp": "by BusesApp",
+    "subtitle": "Personas que transportan personas",
+    "slogan": "Transporta, gana y crece sin ser empresa",
+    "description": "WeMove es una flota comunitaria donde personas reales transportan personas, con identidad verificada y reputación digital.",
+    "searchTransport": "Buscar transporte",
+    "becomeTransporter": "Ser transportador WeMove",
+    "searchTitle": "Busca tu próximo viaje",
+    "resultsTitle": "Transportes disponibles",
+    "noRoutesFound": "No se encontraron rutas disponibles",
+    "availableSeats": "asientos disponibles",
+    "whyWeMove": {
+      "title": "¿Por qué WeMove?",
+      "realCommunity": {
+        "title": "Comunidad real",
+        "description": "Personas reales conectando con personas reales"
+      },
+      "verifiedPeople": {
+        "title": "Personas verificadas",
+        "description": "Identidad verificada para tu seguridad"
+      },
+      "visibleReputation": {
+        "title": "Reputación visible",
+        "description": "Sistema de calificaciones transparente"
+      },
+      "noBusiness": {
+        "title": "No empresas, personas",
+        "description": "Economía colaborativa de persona a persona"
+      }
+    },
+    "cta": {
+      "title": "Sé parte de la Flota Comunitaria",
+      "description": "No necesitas ser empresa. Solo necesitas una unidad apta y ganas de crecer.",
+      "button": "Registrarme como transportador"
     }
   },
   "footer": {

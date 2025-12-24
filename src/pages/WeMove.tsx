@@ -1,19 +1,52 @@
-import { useTranslation } from 'react-i18next';
-import { LandingHeader } from '@/components/landing/LandingHeader';
+import { useState, useRef } from 'react';
+import { WeMoveHeader } from '@/components/wemove/WeMoveHeader';
+import { WeMoveHero } from '@/components/wemove/WeMoveHero';
+import { WeMoveSearch } from '@/components/wemove/WeMoveSearch';
+import { WeMoveResults } from '@/components/wemove/WeMoveResults';
+import { WhyWeMove } from '@/components/wemove/WhyWeMove';
+import { WeMoveCTA } from '@/components/wemove/WeMoveCTA';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { Users } from 'lucide-react';
+import { useWeMoveRoutes } from '@/hooks/useWeMoveData';
 
 const WeMove = () => {
-  const { t } = useTranslation();
+  const searchRef = useRef<HTMLDivElement>(null);
+  const [searchParams, setSearchParams] = useState<{
+    origin: string;
+    destination: string;
+    date?: Date;
+  }>({ origin: '', destination: '' });
+  const [hasSearched, setHasSearched] = useState(false);
+
+  const { data: routes, isLoading } = useWeMoveRoutes(
+    searchParams.origin || undefined,
+    searchParams.destination || undefined,
+    searchParams.date
+  );
+
+  const handleSearchClick = () => {
+    searchRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleSearch = (origin: string, destination: string, date?: Date) => {
+    setSearchParams({ origin, destination, date });
+    setHasSearched(true);
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <LandingHeader />
-      <main className="flex-1 container py-16 flex flex-col items-center justify-center text-center">
-        <Users className="h-24 w-24 text-primary mb-6" />
-        <h1 className="text-4xl font-black mb-4">{t('landing.weMove.title')}</h1>
-        <p className="text-xl text-muted-foreground">{t('landing.weMove.subtitle')}</p>
-        <p className="mt-8 text-muted-foreground">Próximamente...</p>
+      <WeMoveHeader />
+      <main className="flex-1">
+        <WeMoveHero onSearchClick={handleSearchClick} />
+        <div ref={searchRef}>
+          <WeMoveSearch onSearch={handleSearch} />
+        </div>
+        <WeMoveResults 
+          routes={routes} 
+          isLoading={isLoading} 
+          hasSearched={hasSearched} 
+        />
+        <WhyWeMove />
+        <WeMoveCTA />
       </main>
       <LandingFooter />
     </div>
