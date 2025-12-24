@@ -7,6 +7,9 @@ import Index from "./pages/Index";
 import Trips from "./pages/Trips";
 import Transactions from "./pages/Transactions";
 import Admin from "./pages/Admin";
+import PackService from "./pages/PackService";
+import WeMove from "./pages/WeMove";
+import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +25,10 @@ const App = () => (
           <Route path="/trips" element={<Trips />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/admin/*" element={<Admin />} />
+          <Route path="/packservice" element={<PackService />} />
+          <Route path="/wemove" element={<WeMove />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/auth" element={<NotFound />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

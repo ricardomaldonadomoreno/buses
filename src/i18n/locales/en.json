@@ -1,7 +1,7 @@
 {
   "common": {
-    "appName": "Buses.App",
-    "tagline": "Connecting senders, transporters, and receivers",
+    "appName": "BUSES APP",
+    "tagline": "Your trusted transport platform",
     "getStarted": "Get Started",
     "learnMore": "Learn More",
     "login": "Login",
@@ -21,7 +21,9 @@
     "previous": "Previous",
     "loading": "Loading...",
     "noResults": "No results",
-    "language": "Language"
+    "language": "Language",
+    "access": "Access",
+    "contact": "Contact"
   },
   "roles": {
     "sender": "Sender",
@@ -31,6 +33,26 @@
     "resolver": "Resolver"
   },
   "landing": {
+    "origin": "Origin",
+    "destination": "Destination",
+    "results": "Results",
+    "noResultsYet": "Search for available trips",
+    "packService": {
+      "title": "PackService",
+      "subtitle": "Package Transport"
+    },
+    "weMove": {
+      "title": "WeMove",
+      "subtitle": "People Transport"
+    },
+    "advertising": {
+      "title": "Advertise Your Business Here",
+      "subtitle": "Buses.App"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "empty": "No notifications"
+    },
     "hero": {
       "title": "Secure intercity shipping",
       "subtitle": "The platform connecting senders with verified transporters. Escrow protection, mandatory verification, and full tracking.",
@@ -90,6 +112,14 @@
         "description": "Receive your packages with buyer protection"
       }
     }
+  },
+  "footer": {
+    "terms": "Terms and Conditions",
+    "privacy": "Privacy Policy",
+    "cookies": "Cookies Policy",
+    "about": "About Buses.App",
+    "contact": "Contact",
+    "copyright": "All rights reserved"
   },
   "trips": {
     "title": "Available trips",

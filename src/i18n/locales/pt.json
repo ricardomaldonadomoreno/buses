@@ -1,7 +1,7 @@
 {
   "common": {
-    "appName": "Buses.App",
-    "tagline": "Conectando remetentes, transportadores e destinatários",
+    "appName": "BUSES APP",
+    "tagline": "Sua plataforma de transporte de confiança",
     "getStarted": "Começar",
     "learnMore": "Saiba mais",
     "login": "Entrar",
@@ -21,7 +21,9 @@
     "previous": "Anterior",
     "loading": "Carregando...",
     "noResults": "Sem resultados",
-    "language": "Idioma"
+    "language": "Idioma",
+    "access": "Acesso",
+    "contact": "Contato"
   },
   "roles": {
     "sender": "Remetente",
@@ -31,6 +33,26 @@
     "resolver": "Solucionador"
   },
   "landing": {
+    "origin": "Origem",
+    "destination": "Destino",
+    "results": "Resultados",
+    "noResultsYet": "Busque viagens disponíveis",
+    "packService": {
+      "title": "PackService",
+      "subtitle": "Transporte de Pacotes"
+    },
+    "weMove": {
+      "title": "WeMove",
+      "subtitle": "Transporte de Pessoas"
+    },
+    "advertising": {
+      "title": "Anuncie Sua Empresa Aqui",
+      "subtitle": "Buses.App"
+    },
+    "notifications": {
+      "title": "Notificações",
+      "empty": "Sem notificações"
+    },
     "hero": {
       "title": "Envios seguros entre cidades",
       "subtitle": "A plataforma que conecta remetentes com transportadores verificados. Depósito em garantia, verificação obrigatória e rastreamento completo.",
@@ -90,6 +112,14 @@
         "description": "Receba seus pacotes com proteção ao comprador"
       }
     }
+  },
+  "footer": {
+    "terms": "Termos e Condições",
+    "privacy": "Política de Privacidade",
+    "cookies": "Política de Cookies",
+    "about": "Sobre Buses.App",
+    "contact": "Contato",
+    "copyright": "Todos os direitos reservados"
   },
   "trips": {
     "title": "Viagens disponíveis",
