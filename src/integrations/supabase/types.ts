@@ -38,6 +38,41 @@ export type Database = {
         }
         Relationships: []
       }
+      locations: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          parent_id: string | null
+          type: Database["public"]["Enums"]["location_type"]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          parent_id?: string | null
+          type: Database["public"]["Enums"]["location_type"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          parent_id?: string | null
+          type?: Database["public"]["Enums"]["location_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "locations_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
@@ -62,6 +97,72 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          rating: number | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id: string
+          rating?: number | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          rating?: number | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      routes: {
+        Row: {
+          created_at: string
+          destination_location_id: string
+          id: string
+          is_active: boolean
+          origin_location_id: string
+        }
+        Insert: {
+          created_at?: string
+          destination_location_id: string
+          id?: string
+          is_active?: boolean
+          origin_location_id: string
+        }
+        Update: {
+          created_at?: string
+          destination_location_id?: string
+          id?: string
+          is_active?: boolean
+          origin_location_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "routes_destination_location_id_fkey"
+            columns: ["destination_location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "routes_origin_location_id_fkey"
+            columns: ["origin_location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_settings: {
         Row: {
           created_at: string
@@ -83,6 +184,99 @@ export type Database = {
         }
         Relationships: []
       }
+      transport_units: {
+        Row: {
+          capacity: number
+          created_at: string
+          id: string
+          transporter_id: string
+          type: string
+          verified: boolean
+        }
+        Insert: {
+          capacity: number
+          created_at?: string
+          id?: string
+          transporter_id: string
+          type: string
+          verified?: boolean
+        }
+        Update: {
+          capacity?: number
+          created_at?: string
+          id?: string
+          transporter_id?: string
+          type?: string
+          verified?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transport_units_transporter_id_fkey"
+            columns: ["transporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wemove_routes: {
+        Row: {
+          available_seats: number
+          created_at: string
+          departure_time: string
+          id: string
+          price: number
+          route_id: string
+          status: Database["public"]["Enums"]["wemove_route_status"]
+          transport_unit_id: string
+          transporter_id: string
+        }
+        Insert: {
+          available_seats: number
+          created_at?: string
+          departure_time: string
+          id?: string
+          price: number
+          route_id: string
+          status?: Database["public"]["Enums"]["wemove_route_status"]
+          transport_unit_id: string
+          transporter_id: string
+        }
+        Update: {
+          available_seats?: number
+          created_at?: string
+          departure_time?: string
+          id?: string
+          price?: number
+          route_id?: string
+          status?: Database["public"]["Enums"]["wemove_route_status"]
+          transport_unit_id?: string
+          transporter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wemove_routes_route_id_fkey"
+            columns: ["route_id"]
+            isOneToOne: false
+            referencedRelation: "routes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wemove_routes_transport_unit_id_fkey"
+            columns: ["transport_unit_id"]
+            isOneToOne: false
+            referencedRelation: "transport_units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wemove_routes_transporter_id_fkey"
+            columns: ["transporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -91,7 +285,9 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      location_type: "country" | "city" | "terminal"
+      user_role: "passenger" | "transporter"
+      wemove_route_status: "active" | "completed" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -218,6 +414,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      location_type: ["country", "city", "terminal"],
+      user_role: ["passenger", "transporter"],
+      wemove_route_status: ["active", "completed", "cancelled"],
+    },
   },
 } as const

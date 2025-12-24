@@ -23,7 +23,10 @@
     "noResults": "No results",
     "language": "Language",
     "access": "Access",
-    "contact": "Contact"
+    "contact": "Contact",
+    "backToHome": "Back to home",
+    "viewDetails": "View details",
+    "selectDate": "Select a date"
   },
   "roles": {
     "sender": "Sender",
@@ -111,6 +114,43 @@
         "title": "Receivers",
         "description": "Receive your packages with buyer protection"
       }
+    }
+  },
+  "weMove": {
+    "title": "WeMove",
+    "byBusesApp": "by BusesApp",
+    "subtitle": "People transporting people",
+    "slogan": "Transport, earn and grow without being a company",
+    "description": "WeMove is a community fleet where real people transport people, with verified identity and digital reputation.",
+    "searchTransport": "Search transport",
+    "becomeTransporter": "Become a WeMove transporter",
+    "searchTitle": "Find your next trip",
+    "resultsTitle": "Available transports",
+    "noRoutesFound": "No available routes found",
+    "availableSeats": "available seats",
+    "whyWeMove": {
+      "title": "Why WeMove?",
+      "realCommunity": {
+        "title": "Real community",
+        "description": "Real people connecting with real people"
+      },
+      "verifiedPeople": {
+        "title": "Verified people",
+        "description": "Verified identity for your safety"
+      },
+      "visibleReputation": {
+        "title": "Visible reputation",
+        "description": "Transparent rating system"
+      },
+      "noBusiness": {
+        "title": "No businesses, people",
+        "description": "Person-to-person collaborative economy"
+      }
+    },
+    "cta": {
+      "title": "Be part of the Community Fleet",
+      "description": "You don't need to be a company. You just need a suitable unit and the will to grow.",
+      "button": "Register as transporter"
     }
   },
   "footer": {
