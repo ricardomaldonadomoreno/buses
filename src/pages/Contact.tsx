@@ -2,12 +2,11 @@ import { useTranslation } from 'react-i18next';
 import { LandingHeader } from '@/components/landing/LandingHeader';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { Mail, Phone, MapPin } from 'lucide-react';
-
 const Contact = () => {
-  const { t } = useTranslation();
-
-  return (
-    <div className="flex min-h-screen flex-col bg-background">
+  const {
+    t
+  } = useTranslation();
+  return <div className="flex min-h-screen flex-col bg-background">
       <LandingHeader />
       <main className="flex-1 container py-16">
         <h1 className="text-4xl font-black mb-8 text-center">{t('common.contact')}</h1>
@@ -17,7 +16,7 @@ const Contact = () => {
             <Mail className="h-8 w-8 text-primary" />
             <div>
               <h3 className="font-bold">Email</h3>
-              <p className="text-muted-foreground">contacto@buses.app</p>
+              <p className="text-muted-foreground">buses.app@gmail.com</p>
             </div>
           </div>
           
@@ -33,14 +32,12 @@ const Contact = () => {
             <MapPin className="h-8 w-8 text-primary" />
             <div>
               <h3 className="font-bold">Dirección</h3>
-              <p className="text-muted-foreground">Ciudad, País</p>
+              <p className="text-muted-foreground">PANAMA SC986 - 5555</p>
             </div>
           </div>
         </div>
       </main>
       <LandingFooter />
-    </div>
-  );
+    </div>;
 };
-
 export default Contact;
