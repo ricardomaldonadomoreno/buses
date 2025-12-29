@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Search, UserPlus } from 'lucide-react';
 
@@ -8,6 +9,7 @@ interface WeMoveHeroProps {
 
 export function WeMoveHero({ onSearchClick }: WeMoveHeroProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   return (
     <section className="py-16 text-center">
@@ -35,6 +37,7 @@ export function WeMoveHero({ onSearchClick }: WeMoveHeroProps) {
             size="lg" 
             variant="secondary"
             className="gap-2 border-4 border-foreground"
+            onClick={() => navigate('/wemove/register')}
           >
             <UserPlus className="h-5 w-5" />
             {t('weMove.becomeTransporter')}

@@ -116,7 +116,7 @@
       }
     }
   },
-  "weMove": {
+"weMove": {
     "title": "WeMove",
     "byBusesApp": "by BusesApp",
     "subtitle": "People transporting people",
@@ -152,6 +152,63 @@
       "description": "You don't need to be a company. You just need a suitable unit and the will to grow.",
       "button": "Register as transporter"
     }
+  },
+  "wemoveRegister": {
+    "title": "WeMove Transporter Access",
+    "subtitle": "Be part of the Community Fleet",
+    "tabs": {
+      "signup": "Create new account",
+      "login": "I already have an account"
+    },
+    "sections": {
+      "credentials": "Account credentials",
+      "phone": "Phone number",
+      "identity": "Personal identity"
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "countryCode": "Code",
+      "phoneNumber": "Phone number",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "documentType": "Document type",
+      "documentNumber": "Document number"
+    },
+    "documentTypes": {
+      "idCard": "ID Card",
+      "driverLicense": "Driver License",
+      "passport": "Passport"
+    },
+    "buttons": {
+      "createAccount": "Create WeMove account",
+      "login": "Log in"
+    },
+    "errors": {
+      "passwordMismatch": "Passwords do not match",
+      "passwordTooShort": "Password must be at least 6 characters",
+      "selectCountryCode": "Select a country code",
+      "signupFailed": "Error creating account",
+      "loginFailed": "Error logging in",
+      "notTransporter": "This account is not registered as a WeMove transporter"
+    },
+    "success": {
+      "accountCreated": "Account created successfully",
+      "checkEmail": "Check your email to confirm your account"
+    }
+  },
+  "weMoveDashboard": {
+    "welcome": "Welcome to WeMove",
+    "verificationStatus": "Verification status",
+    "statusPending": "Pending",
+    "infoText": "Complete your profile and publish your first route",
+    "buttons": {
+      "completeProfile": "Complete profile",
+      "publishRoute": "Publish route"
+    },
+    "comingSoon": "Coming soon",
+    "backToWeMove": "Back to WeMove"
   },
   "footer": {
     "terms": "Terms and Conditions",

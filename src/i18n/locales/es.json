@@ -116,7 +116,7 @@
       }
     }
   },
-  "weMove": {
+"weMove": {
     "title": "WeMove",
     "byBusesApp": "by BusesApp",
     "subtitle": "Personas que transportan personas",
@@ -140,11 +140,11 @@
       },
       "visibleReputation": {
         "title": "Reputación visible",
-        "description": "Sistema de calificaciones transparente"
+        "description": "Sistema de calificación transparente"
       },
       "noBusiness": {
         "title": "No empresas, personas",
-        "description": "Economía colaborativa de persona a persona"
+        "description": "Economía colaborativa persona a persona"
       }
     },
     "cta": {
@@ -152,6 +152,63 @@
       "description": "No necesitas ser empresa. Solo necesitas una unidad apta y ganas de crecer.",
       "button": "Registrarme como transportador"
     }
+  },
+  "wemoveRegister": {
+    "title": "Acceso Transportador WeMove",
+    "subtitle": "Forma parte de la Flota Comunitaria",
+    "tabs": {
+      "signup": "Crear cuenta nueva",
+      "login": "Ya tengo cuenta"
+    },
+    "sections": {
+      "credentials": "Credenciales de acceso",
+      "phone": "Número de teléfono",
+      "identity": "Identidad personal"
+    },
+    "fields": {
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "countryCode": "Código",
+      "phoneNumber": "Número de teléfono",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "documentType": "Tipo de documento",
+      "documentNumber": "Número de documento"
+    },
+    "documentTypes": {
+      "idCard": "Cédula de identidad",
+      "driverLicense": "Licencia de conducir",
+      "passport": "Pasaporte"
+    },
+    "buttons": {
+      "createAccount": "Crear cuenta WeMove",
+      "login": "Iniciar sesión"
+    },
+    "errors": {
+      "passwordMismatch": "Las contraseñas no coinciden",
+      "passwordTooShort": "La contraseña debe tener al menos 6 caracteres",
+      "selectCountryCode": "Selecciona un código de país",
+      "signupFailed": "Error al crear la cuenta",
+      "loginFailed": "Error al iniciar sesión",
+      "notTransporter": "Esta cuenta no está registrada como transportador WeMove"
+    },
+    "success": {
+      "accountCreated": "Cuenta creada exitosamente",
+      "checkEmail": "Revisa tu correo para confirmar tu cuenta"
+    }
+  },
+  "weMoveDashboard": {
+    "welcome": "Bienvenido a WeMove",
+    "verificationStatus": "Estado de verificación",
+    "statusPending": "Pendiente",
+    "infoText": "Completa tu perfil y publica tu primera ruta",
+    "buttons": {
+      "completeProfile": "Completar perfil",
+      "publishRoute": "Publicar ruta"
+    },
+    "comingSoon": "Próximamente",
+    "backToWeMove": "Volver a WeMove"
   },
   "footer": {
     "terms": "Términos y Condiciones",

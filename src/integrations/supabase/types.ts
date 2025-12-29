@@ -38,6 +38,33 @@ export type Database = {
         }
         Relationships: []
       }
+      country_codes: {
+        Row: {
+          country_iso: string
+          country_name: string
+          created_at: string
+          dial_code: string
+          id: string
+          is_active: boolean
+        }
+        Insert: {
+          country_iso: string
+          country_name: string
+          created_at?: string
+          dial_code: string
+          id?: string
+          is_active?: boolean
+        }
+        Update: {
+          country_iso?: string
+          country_name?: string
+          created_at?: string
+          dial_code?: string
+          id?: string
+          is_active?: boolean
+        }
+        Relationships: []
+      }
       locations: {
         Row: {
           created_at: string
@@ -219,6 +246,66 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["wemove_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["wemove_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["wemove_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      users: {
+        Row: {
+          created_at: string
+          document_number: string | null
+          document_type: Database["public"]["Enums"]["document_type"] | null
+          email: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone_full: string | null
+          status: Database["public"]["Enums"]["user_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          document_number?: string | null
+          document_type?: Database["public"]["Enums"]["document_type"] | null
+          email: string
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          phone_full?: string | null
+          status?: Database["public"]["Enums"]["user_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          document_number?: string | null
+          document_type?: Database["public"]["Enums"]["document_type"] | null
+          email?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone_full?: string | null
+          status?: Database["public"]["Enums"]["user_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       wemove_routes: {
         Row: {
           available_seats: number
@@ -277,16 +364,67 @@ export type Database = {
           },
         ]
       }
+      wemove_transporters: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          rating: number | null
+          total_trips: number
+          updated_at: string
+          user_id: string
+          verification_status: Database["public"]["Enums"]["verification_status"]
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          rating?: number | null
+          total_trips?: number
+          updated_at?: string
+          user_id: string
+          verification_status?: Database["public"]["Enums"]["verification_status"]
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          rating?: number | null
+          total_trips?: number
+          updated_at?: string
+          user_id?: string
+          verification_status?: Database["public"]["Enums"]["verification_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wemove_transporters_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_wemove_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["wemove_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      document_type: "id_card" | "driver_license" | "passport"
       location_type: "country" | "city" | "terminal"
       user_role: "passenger" | "transporter"
+      user_status: "active" | "pending" | "blocked"
+      verification_status: "pending" | "verified" | "rejected"
+      wemove_role: "wemove_transporter"
       wemove_route_status: "active" | "completed" | "cancelled"
     }
     CompositeTypes: {
@@ -415,8 +553,12 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      document_type: ["id_card", "driver_license", "passport"],
       location_type: ["country", "city", "terminal"],
       user_role: ["passenger", "transporter"],
+      user_status: ["active", "pending", "blocked"],
+      verification_status: ["pending", "verified", "rejected"],
+      wemove_role: ["wemove_transporter"],
       wemove_route_status: ["active", "completed", "cancelled"],
     },
   },

@@ -116,7 +116,7 @@
       }
     }
   },
-  "weMove": {
+"weMove": {
     "title": "WeMove",
     "byBusesApp": "by BusesApp",
     "subtitle": "Pessoas que transportam pessoas",
@@ -152,6 +152,63 @@
       "description": "Você não precisa ser uma empresa. Você só precisa de uma unidade adequada e vontade de crescer.",
       "button": "Registrar-se como transportador"
     }
+  },
+  "wemoveRegister": {
+    "title": "Acesso Transportador WeMove",
+    "subtitle": "Faça parte da Frota Comunitária",
+    "tabs": {
+      "signup": "Criar conta nova",
+      "login": "Já tenho conta"
+    },
+    "sections": {
+      "credentials": "Credenciais de acesso",
+      "phone": "Número de telefone",
+      "identity": "Identidade pessoal"
+    },
+    "fields": {
+      "email": "E-mail",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha",
+      "countryCode": "Código",
+      "phoneNumber": "Número de telefone",
+      "firstName": "Nome",
+      "lastName": "Sobrenome",
+      "documentType": "Tipo de documento",
+      "documentNumber": "Número do documento"
+    },
+    "documentTypes": {
+      "idCard": "Carteira de identidade",
+      "driverLicense": "Carteira de motorista",
+      "passport": "Passaporte"
+    },
+    "buttons": {
+      "createAccount": "Criar conta WeMove",
+      "login": "Entrar"
+    },
+    "errors": {
+      "passwordMismatch": "As senhas não coincidem",
+      "passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
+      "selectCountryCode": "Selecione um código de país",
+      "signupFailed": "Erro ao criar a conta",
+      "loginFailed": "Erro ao entrar",
+      "notTransporter": "Esta conta não está registrada como transportador WeMove"
+    },
+    "success": {
+      "accountCreated": "Conta criada com sucesso",
+      "checkEmail": "Verifique seu e-mail para confirmar sua conta"
+    }
+  },
+  "weMoveDashboard": {
+    "welcome": "Bem-vindo ao WeMove",
+    "verificationStatus": "Status de verificação",
+    "statusPending": "Pendente",
+    "infoText": "Complete seu perfil e publique sua primeira rota",
+    "buttons": {
+      "completeProfile": "Completar perfil",
+      "publishRoute": "Publicar rota"
+    },
+    "comingSoon": "Em breve",
+    "backToWeMove": "Voltar ao WeMove"
   },
   "footer": {
     "terms": "Termos e Condições",
