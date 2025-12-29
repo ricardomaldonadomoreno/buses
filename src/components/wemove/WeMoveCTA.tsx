@@ -1,9 +1,11 @@
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { UserPlus } from 'lucide-react';
 
 export function WeMoveCTA() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   return (
     <section className="py-16">
@@ -19,6 +21,7 @@ export function WeMoveCTA() {
             size="lg" 
             variant="secondary"
             className="gap-2 border-4 border-foreground font-bold"
+            onClick={() => navigate('/wemove/register')}
           >
             <UserPlus className="h-5 w-5" />
             {t('weMove.cta.button')}

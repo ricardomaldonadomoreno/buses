@@ -9,6 +9,8 @@ import Transactions from "./pages/Transactions";
 import Admin from "./pages/Admin";
 import PackService from "./pages/PackService";
 import WeMove from "./pages/WeMove";
+import WeMoveRegister from "./pages/WeMoveRegister";
+import WeMoveDashboard from "./pages/WeMoveDashboard";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
@@ -27,6 +29,8 @@ const App = () => (
           <Route path="/admin/*" element={<Admin />} />
           <Route path="/packservice" element={<PackService />} />
           <Route path="/wemove" element={<WeMove />} />
+          <Route path="/wemove/register" element={<WeMoveRegister />} />
+          <Route path="/wemove/dashboard" element={<WeMoveDashboard />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/auth" element={<NotFound />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
