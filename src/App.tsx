@@ -10,6 +10,8 @@ import Admin from "./pages/Admin";
 import PackService from "./pages/PackService";
 import WeMove from "./pages/WeMove";
 import WeMoveRegister from "./pages/WeMoveRegister";
+import WeMoveAuthCallback from "./pages/WeMoveAuthCallback";
+import WeMoveVerifyEmail from "./pages/WeMoveVerifyEmail";
 import WeMoveDashboard from "./pages/WeMoveDashboard";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
@@ -30,6 +32,8 @@ const App = () => (
           <Route path="/packservice" element={<PackService />} />
           <Route path="/wemove" element={<WeMove />} />
           <Route path="/wemove/register" element={<WeMoveRegister />} />
+          <Route path="/wemove/auth/callback" element={<WeMoveAuthCallback />} />
+          <Route path="/wemove/verify-email" element={<WeMoveVerifyEmail />} />
           <Route path="/wemove/dashboard" element={<WeMoveDashboard />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/auth" element={<NotFound />} />

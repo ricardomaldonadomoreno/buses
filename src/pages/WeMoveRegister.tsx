@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,8 +16,12 @@ import { Link } from 'react-router-dom';
 export default function WeMoveRegister() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { user, loading, countryCodes, signUp, signIn } = useWeMoveAuth();
+  
+  // Get tab from query param
+  const defaultTab = searchParams.get('tab') === 'login' ? 'login' : 'signup';
 
   // Signup form state
   const [signupEmail, setSignupEmail] = useState('');
@@ -98,7 +102,8 @@ export default function WeMoveRegister() {
       description: t('wemoveRegister.success.checkEmail'),
     });
 
-    navigate('/wemove/dashboard');
+    // Navigate to verify email page instead of dashboard
+    navigate(`/wemove/verify-email?email=${encodeURIComponent(signupEmail)}`);
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -170,7 +175,7 @@ export default function WeMoveRegister() {
 
           <Card className="border-4 border-foreground shadow-[8px_8px_0px_0px_hsl(var(--foreground))]">
             <CardHeader className="pb-4">
-              <Tabs defaultValue="signup" className="w-full">
+              <Tabs defaultValue={defaultTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="signup" className="gap-2">
                     <UserPlus className="h-4 w-4" />

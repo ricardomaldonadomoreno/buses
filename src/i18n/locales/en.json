@@ -205,6 +205,19 @@
       "checkEmail": "Check your email to confirm your account"
     }
   },
+  "wemoveAuth": {
+    "callback": {
+      "processing": "Verifying your account...",
+      "success": "Account verified successfully",
+      "error": "Error verifying account"
+    },
+    "verifyEmail": {
+      "title": "Verify your email",
+      "message": "We've sent you a verification email. Click the link to activate your account.",
+      "checkSpam": "If you don't see it, check your spam folder.",
+      "goToLogin": "Go to login"
+    }
+  },
   "weMoveDashboard": {
     "welcome": "Welcome to WeMove",
     "verificationStatus": "Verification status",
