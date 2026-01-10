@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { LandingHeader } from '@/components/landing/LandingHeader';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { SearchBox } from '@/components/landing/SearchBox';
-import { ServiceButtons } from '@/components/landing/ServiceButtons';
+import { ServiceButtons, ServiceType } from '@/components/landing/ServiceButtons';
 import { ResultsPlaceholder } from '@/components/landing/ResultsPlaceholder';
 import { AdvertisingBanner } from '@/components/landing/AdvertisingBanner';
 import { NotificationsPanel } from '@/components/landing/NotificationsPanel';
@@ -11,6 +11,7 @@ import { useLandingData } from '@/hooks/useLandingData';
 const Index = () => {
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
+  const [activeService, setActiveService] = useState<ServiceType>('packservice');
   const { notifications, ads, loading } = useLandingData();
 
   return (
@@ -26,11 +27,15 @@ const Index = () => {
               destination={destination}
               onOriginChange={setOrigin}
               onDestinationChange={setDestination}
+              service={activeService}
             />
             
-            <ServiceButtons />
+            <ServiceButtons 
+              activeService={activeService} 
+              onServiceChange={setActiveService} 
+            />
             
-            <ResultsPlaceholder />
+            <ResultsPlaceholder service={activeService} />
           </div>
           
           {/* Right Section */}
