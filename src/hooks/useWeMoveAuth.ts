@@ -61,10 +61,11 @@ export function useWeMoveAuth() {
     documentType: 'id_card' | 'driver_license' | 'passport',
     documentNumber: string
   ) => {
-    const redirectUrl = `${window.location.origin}/wemove/dashboard`;
+    const redirectUrl = `${window.location.origin}/wemove/auth/callback`;
     const phoneFull = `${dialCode}${phoneNumber.replace(/\D/g, '')}`;
 
-    // Create user in Supabase Auth
+    // Create user in Supabase Auth with metadata
+    // The trigger will handle creating records in users, profiles, and wemove_transporters
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -73,6 +74,9 @@ export function useWeMoveAuth() {
         data: {
           first_name: firstName,
           last_name: lastName,
+          phone_full: phoneFull,
+          document_type: documentType,
+          document_number: documentNumber,
         }
       }
     });
@@ -85,37 +89,7 @@ export function useWeMoveAuth() {
       return { error: new Error('User creation failed') };
     }
 
-    // Create user record
-    const { error: userError } = await supabase
-      .from('users')
-      .insert({
-        id: authData.user.id,
-        email,
-        phone_full: phoneFull,
-        first_name: firstName,
-        last_name: lastName,
-        document_type: documentType,
-        document_number: documentNumber,
-        status: 'pending'
-      });
-
-    if (userError) {
-      return { error: userError };
-    }
-
-    // Create wemove_transporters record
-    const { error: transporterError } = await supabase
-      .from('wemove_transporters')
-      .insert({
-        user_id: authData.user.id,
-        verification_status: 'pending',
-        active: false
-      });
-
-    if (transporterError) {
-      return { error: transporterError };
-    }
-
+    // No client-side inserts - the trigger handles everything
     return { data: authData, error: null };
   };
 
@@ -133,10 +107,10 @@ export function useWeMoveAuth() {
       return { error: new Error('Login failed') };
     }
 
-    // Check if user has wemove_transporter role by checking wemove_transporters table
+    // Check if user has wemove_transporter record
     const { data: transporterData, error: transporterError } = await supabase
       .from('wemove_transporters')
-      .select('id')
+      .select('id, verification_status, active')
       .eq('user_id', data.user.id)
       .maybeSingle();
 
