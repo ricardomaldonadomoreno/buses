@@ -46,7 +46,14 @@
     },
     "weMove": {
       "title": "WeMove",
-      "subtitle": "Transporte de Pessoas"
+      "subtitle": "Pessoas que transportam pessoas",
+      "origin": "De onde você está saindo?",
+      "destination": "Para onde você vai?",
+      "resultsTitle": "WeMove – Frota Comunitária",
+      "noResultsYet": "Digite sua origem e destino para ver opções da Frota Comunitária.",
+      "slogan": "Transporte, ganhe e cresça sem ser empresa",
+      "ctaSearch": "Buscar viagens",
+      "ctaJoin": "Sou transportador"
     },
     "advertising": {
       "title": "Anuncie Sua Empresa Aqui",

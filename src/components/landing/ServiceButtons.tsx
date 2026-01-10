@@ -2,8 +2,16 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Package, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
-export function ServiceButtons() {
+export type ServiceType = 'packservice' | 'wemove';
+
+interface ServiceButtonsProps {
+  activeService?: ServiceType;
+  onServiceChange?: (service: ServiceType) => void;
+}
+
+export function ServiceButtons({ activeService, onServiceChange }: ServiceButtonsProps) {
   const { t } = useTranslation();
 
   return (
@@ -11,7 +19,11 @@ export function ServiceButtons() {
       <Button
         asChild
         size="lg"
-        className="h-auto py-4 flex-col gap-1 border-4 border-foreground bg-primary hover:bg-primary/90"
+        className={cn(
+          "h-auto py-4 flex-col gap-1 border-4 border-foreground bg-primary hover:bg-primary/90",
+          activeService === 'packservice' && "ring-4 ring-foreground/30"
+        )}
+        onClick={() => onServiceChange?.('packservice')}
       >
         <Link to="/packservice">
           <Package className="h-6 w-6" />
@@ -23,7 +35,11 @@ export function ServiceButtons() {
       <Button
         asChild
         size="lg"
-        className="h-auto py-4 flex-col gap-1 border-4 border-foreground bg-secondary text-secondary-foreground hover:bg-secondary/90"
+        className={cn(
+          "h-auto py-4 flex-col gap-1 border-4 border-foreground bg-secondary text-secondary-foreground hover:bg-secondary/90",
+          activeService === 'wemove' && "ring-4 ring-foreground/30"
+        )}
+        onClick={() => onServiceChange?.('wemove')}
       >
         <Link to="/wemove">
           <Users className="h-6 w-6" />

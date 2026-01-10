@@ -46,7 +46,14 @@
     },
     "weMove": {
       "title": "WeMove",
-      "subtitle": "People Transport"
+      "subtitle": "People transporting people",
+      "origin": "Where are you moving from?",
+      "destination": "Where are you going?",
+      "resultsTitle": "WeMove – Community Fleet",
+      "noResultsYet": "Enter your origin and destination to see Community Fleet options.",
+      "slogan": "Transport, earn and grow without being a company",
+      "ctaSearch": "Search trips",
+      "ctaJoin": "I'm a transporter"
     },
     "advertising": {
       "title": "Advertise Your Business Here",
