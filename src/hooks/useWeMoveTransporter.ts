@@ -45,7 +45,6 @@ export interface MyWeMoveRoute {
   };
 }
 
-// Fetch current transporter record
 export function useMyWeMoveTransporter(userId?: string) {
   return useQuery({
     queryKey: ['my-wemove-transporter', userId],
@@ -63,7 +62,6 @@ export function useMyWeMoveTransporter(userId?: string) {
   });
 }
 
-// Fetch transporter profile
 export function useMyProfile(userId?: string) {
   return useQuery({
     queryKey: ['my-profile', userId],
@@ -81,7 +79,6 @@ export function useMyProfile(userId?: string) {
   });
 }
 
-// Fetch user extended info
 export function useMyUserData(userId?: string) {
   return useQuery({
     queryKey: ['my-user-data', userId],
@@ -99,7 +96,6 @@ export function useMyUserData(userId?: string) {
   });
 }
 
-// Fetch my transport units
 export function useMyTransportUnits(userId?: string) {
   return useQuery({
     queryKey: ['my-transport-units', userId],
@@ -117,7 +113,6 @@ export function useMyTransportUnits(userId?: string) {
   });
 }
 
-// Fetch my published routes
 export function useMyWeMoveRoutes(userId?: string) {
   return useQuery({
     queryKey: ['my-wemove-routes', userId],
@@ -153,7 +148,6 @@ export function useMyWeMoveRoutes(userId?: string) {
   });
 }
 
-// Update profile name
 export function useUpdateProfile() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -170,7 +164,6 @@ export function useUpdateProfile() {
   });
 }
 
-// Create or update transport unit
 export function useUpsertTransportUnit() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -210,7 +203,6 @@ export function useUpsertTransportUnit() {
   });
 }
 
-// Delete transport unit
 export function useDeleteTransportUnit() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -228,7 +220,6 @@ export function useDeleteTransportUnit() {
   });
 }
 
-// Publish a new wemove route
 export function usePublishWeMoveRoute() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -249,7 +240,6 @@ export function usePublishWeMoveRoute() {
       availableSeats: number;
       price: number;
     }) => {
-      // 1. Find or create route
       let routeId: string;
 
       const { data: existingRoute, error: routeError } = await supabase
@@ -278,7 +268,6 @@ export function usePublishWeMoveRoute() {
         routeId = newRoute.id;
       }
 
-      // 2. Create wemove_route
       const { data, error } = await supabase
         .from('wemove_routes')
         .insert({
@@ -303,7 +292,6 @@ export function usePublishWeMoveRoute() {
   });
 }
 
-// Cancel a route
 export function useCancelWeMoveRoute() {
   const queryClient = useQueryClient();
   return useMutation({
