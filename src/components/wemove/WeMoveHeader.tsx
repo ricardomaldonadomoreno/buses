@@ -12,34 +12,34 @@ export function WeMoveHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 backdrop-blur-md">
-      {/* ── Thin gold line on top ── */}
-      <div className="h-0.5 w-full bg-gold-gradient" />
+      {/* Gold top line */}
+      <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-primary to-transparent" />
 
       <div className="container flex h-16 items-center justify-between gap-4">
 
-        {/* ── Logo ── */}
+        {/* Logo */}
         <Link
           to="/wemove"
-          className="flex items-center gap-3 shrink-0 group no-tap-highlight"
+          className="flex items-center gap-3 shrink-0 group"
           aria-label="WeMove"
         >
           <img
             src="/logo.png"
-            alt="BusesApp logo"
+            alt="BusesApp"
             className="h-9 w-auto object-contain transition-opacity group-hover:opacity-80"
             loading="eager"
           />
           <div className="hidden sm:block leading-none">
-            <span className="font-display text-xl font-semibold text-foreground tracking-wide">
-              We<span className="text-gold-500">Move</span>
+            <span className="font-serif text-xl font-semibold text-foreground tracking-wide">
+              We<span className="text-primary">Move</span>
             </span>
-            <p className="text-[10px] text-muted-foreground font-sans tracking-luxury uppercase">
+            <p className="text-[10px] text-muted-foreground font-sans tracking-widest uppercase mt-0.5">
               by BusesApp
             </p>
           </div>
         </Link>
 
-        {/* ── Desktop nav ── */}
+        {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-2">
           <LanguageSelector />
 
@@ -47,7 +47,7 @@ export function WeMoveHeader() {
             asChild
             variant="ghost"
             size="sm"
-            className="font-medium text-foreground hover:text-primary hover:bg-primary/8"
+            className="font-medium text-foreground hover:text-primary"
           >
             <Link to="/">
               {t('common.backToHome')}
@@ -57,7 +57,7 @@ export function WeMoveHeader() {
           <Button
             asChild
             size="sm"
-            className="btn-gold font-semibold gap-2"
+            className="gap-2 font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
           >
             <Link to="/auth">
               <UserCircle className="h-4 w-4" />
@@ -66,12 +66,12 @@ export function WeMoveHeader() {
           </Button>
         </nav>
 
-        {/* ── Mobile: lang selector + hamburger ── */}
+        {/* Mobile: lang + hamburger */}
         <div className="flex md:hidden items-center gap-2">
           <LanguageSelector />
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="p-2 rounded-lg text-foreground hover:bg-muted transition-colors no-tap-highlight"
+            className="p-2 rounded-lg text-foreground hover:bg-muted transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label={mobileOpen ? 'Cerrar menú' : 'Abrir menú'}
             aria-expanded={mobileOpen}
           >
@@ -83,11 +83,10 @@ export function WeMoveHeader() {
         </div>
       </div>
 
-      {/* ── Mobile menu ── */}
+      {/* Mobile dropdown menu */}
       <div
         className={cn(
-          'md:hidden border-t border-border/60 bg-background/98 backdrop-blur-md',
-          'overflow-hidden transition-all duration-300 ease-in-out',
+          'md:hidden border-t border-border/60 bg-background overflow-hidden transition-all duration-300 ease-in-out',
           mobileOpen ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'
         )}
       >
@@ -95,15 +94,16 @@ export function WeMoveHeader() {
           <Link
             to="/"
             onClick={() => setMobileOpen(false)}
-            className="px-4 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors"
+            className="px-4 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors min-h-[44px] flex items-center"
           >
             {t('common.backToHome')}
           </Link>
           <Link
             to="/auth"
             onClick={() => setMobileOpen(false)}
-            className="btn-gold text-center px-4 py-3 rounded-xl text-sm font-semibold"
+            className="px-4 py-3 rounded-xl text-sm font-semibold text-center bg-primary text-primary-foreground hover:bg-primary/90 transition-colors min-h-[44px] flex items-center justify-center gap-2"
           >
+            <UserCircle className="h-4 w-4" />
             {t('common.access')}
           </Link>
         </nav>
