@@ -20,7 +20,7 @@ export function LandingHeader() {
         <Link to="/" className="flex items-center gap-3 shrink-0 group">
           <img
             src="/logo.png"
-            alt="buses.app"
+            alt="Buses.app"
             className="h-10 w-auto object-contain transition-opacity group-hover:opacity-80"
             loading="eager"
           />
