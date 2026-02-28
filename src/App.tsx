@@ -3,10 +3,12 @@
 // NEW IMPORTS TO ADD:
 import WeMoveCompleteProfile from "./pages/WeMoveCompleteProfile";
 import WeMovePublishRoute from "./pages/WeMovePublishRoute";
+import WeMoveBooking from "./pages/WeMoveBooking";
 
 // NEW ROUTES TO ADD inside <Routes>:
 // <Route path="/wemove/profile" element={<WeMoveCompleteProfile />} />
 // <Route path="/wemove/publish-route" element={<WeMovePublishRoute />} />
+// <Route path="/wemove/booking/:routeId" element={<WeMoveBooking />} />
 
 // Full updated App.tsx:
 import { Toaster } from "@/components/ui/toaster";
