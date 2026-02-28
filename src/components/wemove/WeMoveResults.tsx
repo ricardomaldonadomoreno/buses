@@ -9,6 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { WeMoveRoute } from '@/hooks/useWeMoveData';
+import { Link } from 'react-router-dom';
 
 interface WeMoveResultsProps {
   routes: WeMoveRoute[] | undefined;
@@ -211,11 +212,21 @@ function RouteCard({ route }: { route: WeMoveRoute }) {
 
           <Button
             disabled={isFull}
+            asChild={!isFull}
             className="border-2 border-foreground gap-2 font-bold shadow-[3px_3px_0px_0px_hsl(var(--foreground))] hover:shadow-[1px_1px_0px_0px_hsl(var(--foreground))] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Ticket className="h-4 w-4" />
-            {isFull ? t('weMove.results.noSeats') : t('weMove.results.reserve')}
-          </Button>
+            {isFull ? (
+              <>
+                <Ticket className="h-4 w-4" />
+                {t('weMove.results.noSeats')}
+              </>
+            ) : (
+              <Link to={`/wemove/booking/${route.id}`}>
+                <Ticket className="h-4 w-4 mr-2 inline" />
+                {t('weMove.results.reserve')}
+              </Link>
+            )}
+          </Button>          
         </div>
       </div>
     </article>
