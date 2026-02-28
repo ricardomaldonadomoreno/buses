@@ -1,16 +1,3 @@
-// Updated App.tsx - add these imports and routes
-
-// NEW IMPORTS TO ADD:
-import WeMoveCompleteProfile from "./pages/WeMoveCompleteProfile";
-import WeMovePublishRoute from "./pages/WeMovePublishRoute";
-import WeMoveBooking from "./pages/WeMoveBooking";
-
-// NEW ROUTES TO ADD inside <Routes>:
-// <Route path="/wemove/profile" element={<WeMoveCompleteProfile />} />
-// <Route path="/wemove/publish-route" element={<WeMovePublishRoute />} />
-// <Route path="/wemove/booking/:routeId" element={<WeMoveBooking />} />
-
-// Full updated App.tsx:
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -28,6 +15,7 @@ import WeMoveVerifyEmail from "./pages/WeMoveVerifyEmail";
 import WeMoveDashboard from "./pages/WeMoveDashboard";
 import WeMoveCompleteProfile from "./pages/WeMoveCompleteProfile";
 import WeMovePublishRoute from "./pages/WeMovePublishRoute";
+import WeMoveBooking from "./pages/WeMoveBooking";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
@@ -52,9 +40,9 @@ const App = () => (
           <Route path="/wemove/dashboard" element={<WeMoveDashboard />} />
           <Route path="/wemove/profile" element={<WeMoveCompleteProfile />} />
           <Route path="/wemove/publish-route" element={<WeMovePublishRoute />} />
+          <Route path="/wemove/booking/:routeId" element={<WeMoveBooking />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/auth" element={<NotFound />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
