@@ -1,7 +1,7 @@
 {
   "common": {
     "appName": "BUSES APP",
-    "tagline": "Tu plataforma de transportes de confianza",
+    "tagline": "Tu plataforma de transporte de confianza",
     "getStarted": "Comenzar",
     "learnMore": "Más información",
     "login": "Iniciar sesión",
@@ -40,13 +40,39 @@
     "destination": "Destino",
     "results": "Resultados",
     "noResultsYet": "Busca viajes disponibles",
-    "packService": {
-      "title": "PackService",
-      "subtitle": "Transporte de Paquetes"
+    "packService": { "title": "PackService", "subtitle": "Transporte de Paquetes" },
+    "advertising": { "title": "Publica Tu Empresa Aquí", "subtitle": "Buses.App" },
+    "notifications": { "title": "Notificaciones", "empty": "No hay notificaciones" },
+    "hero": {
+      "title": "Envíos seguros entre ciudades",
+      "subtitle": "La plataforma que conecta remitentes con transportistas verificados.",
+      "cta": "Publicar un viaje",
+      "ctaSecondary": "Enviar un paquete"
     },
-    "weMove": {
+    "howItWorks": {
+      "title": "¿Cómo funciona?",
+      "step1": { "title": "1. Publica o busca un viaje", "description": "Los transportistas publican sus rutas. Los remitentes encuentran el viaje ideal." },
+      "step2": { "title": "2. Verificación del paquete", "description": "El transportista verifica el paquete en una dirección certificada con fotos y reporte." },
+      "step3": { "title": "3. Depósito en garantía", "description": "El receptor deposita los fondos. El dinero se libera solo tras la entrega confirmada." },
+      "step4": { "title": "4. Entrega segura", "description": "El receptor confirma la entrega. Fondos liberados automáticamente." }
+    },
+    "features": {
+      "title": "Características principales",
+      "escrow": { "title": "Escrow seguro", "description": "Fondos protegidos hasta confirmar la entrega" },
+      "verification": { "title": "Verificación obligatoria", "description": "Cada paquete se verifica antes del transporte" },
+      "tracking": { "title": "Seguimiento completo", "description": "Estado de la transacción en tiempo real" },
+      "disputes": { "title": "Resolución de disputas", "description": "Sistema justo para resolver conflictos" }
+    },
+    "roles": {
+      "title": "Para todos los participantes",
+      "sender": { "title": "Remitentes", "description": "Envía paquetes de forma segura con garantía de pago" },
+      "transporter": { "title": "Transportistas", "description": "Monetiza tus viajes transportando paquetes verificados" },
+      "receiver": { "title": "Receptores", "description": "Recibe tus paquetes con protección de compra" }
+    }
+  },
+  "weMove": {
     "title": "WeMove",
-    "byBusesApp": "by BUSES App",
+    "byBusesApp": "by BusesApp",
     "subtitle": "Personas que transportan personas",
     "slogan": "Transporta, gana y crece sin ser empresa",
     "description": "WeMove es una flota comunitaria donde personas reales transportan personas, con identidad verificada y reputación digital.",
@@ -57,7 +83,7 @@
     "noRoutesFound": "No se encontraron rutas disponibles",
     "availableSeats": "asientos disponibles",
     "hero": {
-      "tag": "Flota Comunitaria · Buses",
+      "tag": "Flota Comunitaria · BusesApp",
       "from": "Desde",
       "to": "Hasta",
       "when": "Cuándo",
@@ -93,126 +119,27 @@
       "howBtn":  "Ver cómo funciona",
       "perk1":   "Publica viajes en minutos, sin papeleos",
       "perk2":   "Gestiona reservas y pasajeros en tiempo real",
-      "perk3":   "Grupo de viaje automático",
+      "perk3":   "Grupo de WhatsApp por viaje automático",
       "perk4":   "Construye tu reputación en la comunidad"
     },
     "whyWeMove": {
       "title": "¿Por qué WeMove?",
-      "realCommunity":   { "title": "Comunidad real",        "description": "Personas reales conectando con personas reales" },
-      "verifiedPeople":  { "title": "Personas verificadas",  "description": "Identidad verificada para tu seguridad" },
-      "visibleReputation":{ "title": "Reputación visible",   "description": "Sistema de calificación transparente" },
-      "noBusiness":      { "title": "No empresas, Personas", "description": "Economía colaborativa persona a persona" }
-    },
-    "results": {
-      "reserve": "Reservar" }
-    },
-    "advertising": {
-      "title": "Publica Tu Empresa Aquí",
-      "subtitle": "Buses.App"
-    },
-    "notifications": {
-      "title": "Notificaciones",
-      "empty": "No hay notificaciones"
-    },
-    "hero": {
-      "title": "Envíos seguros entre ciudades",
-      "subtitle": "La plataforma que conecta remitentes con transportistas verificados.",
-      "cta": "Publicar un viaje",
-      "ctaSecondary": "Enviar un paquete"
-    },
-    "howItWorks": {
-      "title": "¿Cómo funciona?",
-      "step1": { "title": "1. Publica o busca un viaje", "description": "Los transportistas publican sus rutas. Los remitentes encuentran el viaje ideal." },
-      "step2": { "title": "2. Verificación del paquete", "description": "El transportista verifica el paquete en una dirección certificada." },
-      "step3": { "title": "3. Depósito en garantía", "description": "El receptor deposita los fondos. El dinero se libera solo tras la entrega confirmada." },
-      "step4": { "title": "4. Entrega segura", "description": "El receptor confirma la entrega. Fondos liberados automáticamente." }
-    },
-    "features": {
-      "title": "Características principales",
-      "escrow": { "title": "Escrow seguro", "description": "Fondos protegidos hasta confirmar la entrega" },
-      "verification": { "title": "Verificación obligatoria", "description": "Cada paquete se verifica antes del transporte" },
-      "tracking": { "title": "Seguimiento completo", "description": "Estado de la transacción en tiempo real" },
-      "disputes": { "title": "Resolución de disputas", "description": "Sistema justo para resolver conflictos" }
-    },
-    "roles": {
-      "title": "Para todos los participantes",
-      "sender": { "title": "Remitentes", "description": "Envía paquetes de forma segura con garantía de pago" },
-      "transporter": { "title": "Transportistas", "description": "Monetiza tus viajes transportando paquetes verificados" },
-      "receiver": { "title": "Receptores", "description": "Recibe tus paquetes con protección de compra" }
-    }
-  },
-  "weMove": {
-    "title": "WeMove",
-    "byBusesApp": "by BusesApp",
-    "subtitle": "Personas que transportan personas",
-    "slogan": "Transporta, gana y crece sin ser empresa",
-    "description": "WeMove es una flota comunitaria donde personas reales transportan personas, con identidad verificada y reputación digital.",
-    "searchTransport": "Buscar transporte",
-    "becomeTransporter": "Ser transportador WeMove",
-    "searchTitle": "Busca tu próximo viaje",
-    "resultsTitle": "Transportes disponibles",
-    "noRoutesFound": "No se encontraron rutas disponibles",
-    "availableSeats": "asientos disponibles",
-    "hero": {
-      "tag": "Flota Comunitaria · BusesApp",
-      "searchLabel": "Busca tu transporte",
-      "from": "Desde",
-      "to": "Hasta",
-      "when": "Cuándo",
-      "selectOrigin": "Ciudad de origen",
-      "selectDestination": "Ciudad de destino",
-      "anyDay": "Cualquier día",
-      "trust1": "Identidad verificada",
-      "trust2": "Sistema de reputación",
-      "trust3": "Flota comunitaria",
-      "transporterCta": "¿Tienes un vehículo y quieres generar ingresos?"
+      "realCommunity":    { "title": "Comunidad real",        "description": "Personas reales conectando con personas reales" },
+      "verifiedPeople":   { "title": "Personas verificadas",  "description": "Identidad verificada para tu seguridad" },
+      "visibleReputation":{ "title": "Reputación visible",    "description": "Sistema de calificación transparente" },
+      "noBusiness":       { "title": "No empresas, personas", "description": "Economía colaborativa persona a persona" }
     },
     "results": {
       "today": "Hoy",
       "tomorrow": "Mañana",
       "verified": "Verificado",
       "unknown": "Transportador",
-      "perSeat": "Por asiento",
-      "reserve": "Reservar asiento",
+      "perSeat": "por asiento",
+      "reserve": "Reservar",
       "noSeats": "Sin asientos",
-      "trip": "viaje",
-      "trips": "viajes",
-      "tripFound": "transporte disponible",
-      "tripsFound": "transportes disponibles",
       "almostFull": "¡Últimos {{seats}} asientos!",
-      "full": "Unidad completa",
-      "tryOtherDate": "Intenta con otra fecha o revisa otros destinos disponibles."
-    },
-    "how": {
-      "eyebrow": "¿Cómo funciona?",
-      "title": "Tu viaje en 4 pasos",
-      "s1": { "title": "Busca tu ruta", "desc": "Ingresa origen, destino y fecha para ver los transportes disponibles." },
-      "s2": { "title": "Elige tu unidad", "desc": "Ve el tipo de vehículo, horario, asientos y precio por asiento." },
-      "s3": { "title": "Reserva tu asiento", "desc": "Confirma tu reserva directamente con el transportador." },
-      "s4": { "title": "Viaja y califica", "desc": "Viaja con confianza y deja tu calificación para construir la comunidad." }
-    },
-    "trust": {
-      "id": "Identidad verificada",
-      "rep": "Reputación digital",
-      "safe": "Seguridad básica",
-      "trace": "Trazabilidad del viaje"
-    },
-    "cta": {
-      "eyebrow": "Para transportadores",
-      "title": "Genera ingresos sin ser empresa",
-      "desc": "Si tienes un vehículo, únete a la Flota Comunitaria WeMove. Publica tus rutas, gestiona tus reservas y construye tu reputación digital.",
-      "btn": "Registrarme como transportador",
-      "perk1": "Opera con tu propio vehículo",
-      "perk2": "Incrementa tus ingresos",
-      "perk3": "Gestiona todo desde el celular",
-      "perk4": "Sé parte de la comunidad WeMove"
-    },
-    "whyWeMove": {
-      "title": "¿Por qué WeMove?",
-      "realCommunity": { "title": "Comunidad real", "description": "Personas reales conectando con personas reales" },
-      "verifiedPeople": { "title": "Personas verificadas", "description": "Identidad verificada para tu seguridad" },
-      "visibleReputation": { "title": "Reputación visible", "description": "Sistema de calificación transparente" },
-      "noBusiness": { "title": "No empresas, personas", "description": "Economía colaborativa persona a persona" }
+      "full": "Unidad llena",
+      "tryOtherDate": "Prueba otra fecha o revisa otros destinos disponibles."
     }
   },
   "wemoveRegister": {
@@ -314,14 +241,12 @@
     "invalidCapacity": "La capacidad debe ser un número válido mayor a 0",
     "vehicleTypes": {
       "bus": "Bus", "microbus": "Microbus", "van": "Van",
-      "minibus": "Minibús", "coaster": "Coaster", "sedan": "Sedan", "suv": "SUV"
+      "minibus": "Minibus", "coaster": "Coaster", "sedan": "Sedan", "suv": "SUV"
     }
   },
   "wemovePublish": {
     "title": "Publicar ruta",
     "subtitle": "Define los detalles de tu próximo viaje",
-    "routeDetails": "Detalles del viaje",
-    "routeDetailsDesc": "Completa toda la información para publicar tu ruta",
     "sectionRoute": "Ruta",
     "origin": "Ciudad de origen",
     "selectOrigin": "Selecciona ciudad de origen",
@@ -333,15 +258,7 @@
     "sectionUnit": "Unidad de transporte",
     "selectUnit": "Vehículo a usar",
     "selectUnitPlaceholder": "Selecciona tu vehículo",
-    "sectionSeatsPrice": "Asientos y precio",
-    "availableSeats": "Asientos disponibles",
-    "maxSeatsHint": "Máximo {{max}} según tu unidad",
     "pricePerSeat": "Precio por asiento",
-    "preview": "Vista previa del viaje",
-    "route": "Ruta",
-    "departure": "Salida",
-    "seats": "Asientos",
-    "price": "Precio",
     "publishButton": "Publicar ruta",
     "noUnitsTitle": "Sin unidades registradas",
     "noUnitsDesc": "Debes registrar al menos una unidad antes de publicar rutas",
@@ -354,7 +271,7 @@
     "errorInvalidSeats": "Ingresa un número válido de asientos",
     "errorInvalidPrice": "Ingresa un precio válido",
     "errorSelectUnit": "Selecciona una unidad de transporte",
-    "errorPastDate": "La fecha y hora de salida debe ser futura"
+    "errorPastDate": "La fecha y hora de salida debe ser en el futuro"
   },
   "footer": {
     "terms": "Términos y Condiciones",
@@ -370,8 +287,6 @@
     "origin": "Origen",
     "destination": "Destino",
     "date": "Fecha",
-    "maxWeight": "Peso máximo",
-    "availableWeight": "Peso disponible",
     "status": "Estado",
     "scheduled": "Programado",
     "inProgress": "En progreso",
@@ -384,7 +299,7 @@
     "description": "Descripción",
     "value": "Valor declarado",
     "fee": "Tarifa de transporte",
-    "total": "Total en escrow",
+    "total": "Total en garantía",
     "status": {
       "created": "Creada",
       "waitingVerification": "Esperando verificación",
@@ -402,7 +317,7 @@
     "users": "Usuarios",
     "trips": "Viajes",
     "transactions": "Transacciones",
-    "escrow": "Escrow",
+    "escrow": "Garantía",
     "disputes": "Disputas",
     "settings": "Configuración"
   }
