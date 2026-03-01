@@ -45,15 +45,66 @@
       "subtitle": "Transporte de Pacotes"
     },
     "weMove": {
-      "title": "WeMove",
-      "subtitle": "Pessoas que transportam pessoas",
-      "origin": "De onde você está saindo?",
-      "destination": "Para onde você vai?",
-      "resultsTitle": "WeMove – Frota Comunitária",
-      "noResultsYet": "Digite sua origem e destino para ver opções da Frota Comunitária.",
-      "slogan": "Transporte, ganhe e cresça sem ser empresa",
-      "ctaSearch": "Buscar viagens",
-      "ctaJoin": "Sou transportador"
+    "title": "WeMove",
+    "byBusesApp": "by BusesApp",
+    "subtitle": "Pessoas que transportam pessoas",
+    "slogan": "Transporte, ganhe e cresça sem ser empresa",
+    "description": "WeMove é uma frota comunitária onde pessoas reais transportam pessoas, com identidade verificada e reputação digital.",
+    "searchTransport": "Buscar transporte",
+    "becomeTransporter": "Ser transportador WeMove",
+    "searchTitle": "Encontre sua próxima viagem",
+    "resultsTitle": "Transportes disponíveis",
+    "noRoutesFound": "Nenhuma rota disponível encontrada",
+    "availableSeats": "assentos disponíveis",
+    "hero": {
+      "tag": "Frota Comunitária · BusesApp",
+      "from": "De",
+      "to": "Para",
+      "when": "Quando",
+      "selectOrigin": "Cidade de origem...",
+      "selectDestination": "Cidade de destino...",
+      "anyDay": "Qualquer dia",
+      "searchLabel": "Encontre seu transporte",
+      "trust1": "Identidade verificada",
+      "trust2": "Sistema de reputação",
+      "trust3": "Frota comunitária",
+      "transporterCta": "É transportador? Entre grátis e publique viagens hoje",
+      "registerFree": "Cadastre-se Grátis"
+    },
+    "how": {
+      "eyebrow": "Como funciona?",
+      "title": "Sua viagem em 4 etapas",
+      "s1": { "title": "Busque sua rota",    "desc": "Insira origem, destino e data para ver os transportes disponíveis." },
+      "s2": { "title": "Escolha sua unidade","desc": "Veja tipo de veículo, horário, assentos disponíveis e preço por assento." },
+      "s3": { "title": "Reserve seu assento","desc": "Confirme sua reserva diretamente com o transportador via WhatsApp ou app." },
+      "s4": { "title": "Viaje e avalie",     "desc": "Viaje com confiança e deixe sua avaliação para construir a comunidade." }
+    },
+    "trust": {
+      "id":    "Identidade verificada",
+      "rep":   "Reputação digital",
+      "safe":  "Segurança básica",
+      "trace": "Rastreabilidade da viagem"
+    },
+    "cta": {
+      "eyebrow": "Para transportadores",
+      "title":   "Transporte, GANHE<br/>e cresça sem<br/><span class='text-primary'>ser uma empresa</span>",
+      "desc":    "WeMove é a plataforma para pessoas reais que querem transportar pessoas. Sem intermediários, com identidade verificada e reputação digital.",
+      "btn":     "Entre grátis",
+      "howBtn":  "Ver como funciona",
+      "perk1":   "Publique viagens em minutos, sem burocracia",
+      "perk2":   "Gerencie reservas e passageiros em tempo real",
+      "perk3":   "Grupo de WhatsApp por viagem automático",
+      "perk4":   "Construa sua reputação na comunidade"
+    },
+    "whyWeMove": {
+      "title": "Por que WeMove?",
+      "realCommunity":    { "title": "Comunidade real",       "description": "Pessoas reais conectando com pessoas reais" },
+      "verifiedPeople":   { "title": "Pessoas verificadas",   "description": "Identidade verificada para sua segurança" },
+      "visibleReputation":{ "title": "Reputação visível",     "description": "Sistema de avaliação transparente" },
+      "noBusiness":       { "title": "Sem empresas, pessoas", "description": "Economia colaborativa pessoa a pessoa" }
+    },
+    "results": {
+      "reserve": "Reservar"
     },
     "advertising": {
       "title": "Anuncie Sua Empresa Aqui",
