@@ -18,14 +18,8 @@ export interface WeMoveRoute {
   available_seats: number;
   price: number;
   status: 'active' | 'completed' | 'cancelled';
-  transporter?: {
-    full_name: string;
-    rating: number;
-  };
-  route?: {
-    origin: Location;
-    destination: Location;
-  };
+  transporter?: { full_name: string; rating: number };
+  route?: { origin: Location; destination: Location };
 }
 
 export function useLocations() {
@@ -36,8 +30,8 @@ export function useLocations() {
         .from('locations')
         .select('*')
         .eq('type', 'city')
+        .eq('is_active', true)
         .order('name');
-      
       if (error) throw error;
       return data as Location[];
     },
@@ -47,77 +41,79 @@ export function useLocations() {
 export function useWeMoveRoutes(originId?: string, destinationId?: string, date?: Date) {
   return useQuery({
     queryKey: ['wemove-routes', originId, destinationId, date?.toISOString()],
+    enabled: !!(originId && destinationId), // ← solo busca cuando hay origen Y destino
     queryFn: async () => {
-      // First get routes that match origin and destination
-      let routeQuery = supabase
-        .from('routes')
-        .select('id, origin_location_id, destination_location_id');
-
-      if (originId) {
-        routeQuery = routeQuery.eq('origin_location_id', originId);
-      }
-      if (destinationId) {
-        routeQuery = routeQuery.eq('destination_location_id', destinationId);
-      }
-
-      const { data: routes, error: routesError } = await routeQuery;
-      if (routesError) throw routesError;
-
-      if (!routes || routes.length === 0) {
-        return [];
-      }
-
-      const routeIds = routes.map(r => r.id);
-
-      // Get wemove_routes for these routes
-      let wemoveQuery = supabase
+      // ── Query directa sin pasos intermedios ──────────────────
+      // Une wemove_routes con routes en un solo query para evitar
+      // problemas de RLS en la tabla routes
+      let query = supabase
         .from('wemove_routes')
         .select(`
           *,
           profiles:transporter_id (full_name, rating),
           routes:route_id (
             id,
-            origin:origin_location_id (id, name, type),
-            destination:destination_location_id (id, name, type)
+            origin_location_id,
+            destination_location_id,
+            origin:origin_location_id (id, name, type, parent_id, is_active),
+            destination:destination_location_id (id, name, type, parent_id, is_active)
           )
         `)
-        .in('route_id', routeIds)
-        .eq('status', 'active');
+        .eq('status', 'active')
+        .gt('available_seats', 0);  // ← solo viajes con asientos libres
 
+      // Filtro de fecha: si hay fecha busca ese día, sino busca desde ahora
       if (date) {
-        const startOfDay = new Date(date);
-        startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date(date);
-        endOfDay.setHours(23, 59, 59, 999);
-        
-        wemoveQuery = wemoveQuery
-          .gte('departure_time', startOfDay.toISOString())
-          .lte('departure_time', endOfDay.toISOString());
+        const start = new Date(date);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(date);
+        end.setHours(23, 59, 59, 999);
+        query = query
+          .gte('departure_time', start.toISOString())
+          .lte('departure_time', end.toISOString());
+      } else {
+        // Sin fecha: muestra próximos 30 días
+        const now = new Date();
+        const in30 = new Date();
+        in30.setDate(now.getDate() + 30);
+        query = query
+          .gte('departure_time', now.toISOString())
+          .lte('departure_time', in30.toISOString());
       }
 
-      const { data, error } = await wemoveQuery.order('departure_time');
-      
+      query = query.order('departure_time');
+
+      const { data, error } = await query;
       if (error) throw error;
-      
-      return data?.map(item => ({
-        id: item.id,
-        transporter_id: item.transporter_id,
-        transport_unit_id: item.transport_unit_id,
-        route_id: item.route_id,
-        departure_time: item.departure_time,
-        available_seats: item.available_seats,
-        price: item.price,
-        status: item.status,
-        transporter: item.profiles ? {
-          full_name: (item.profiles as any).full_name || 'Unknown',
-          rating: (item.profiles as any).rating || 0
-        } : undefined,
-        route: item.routes ? {
-          origin: (item.routes as any).origin,
-          destination: (item.routes as any).destination
-        } : undefined
-      })) as WeMoveRoute[];
+      if (!data || data.length === 0) return [];
+
+      // Filtrar por origen y destino en memoria (más simple y confiable)
+      return data
+        .filter(item => {
+          const r = item.routes as any;
+          if (!r) return false;
+          const matchOrigin      = r.origin_location_id === originId;
+          const matchDestination = r.destination_location_id === destinationId;
+          return matchOrigin && matchDestination;
+        })
+        .map(item => ({
+          id:               item.id,
+          transporter_id:   item.transporter_id,
+          transport_unit_id: item.transport_unit_id,
+          route_id:         item.route_id,
+          departure_time:   item.departure_time,
+          available_seats:  item.available_seats,
+          price:            item.price,
+          status:           item.status,
+          transporter: (item.profiles as any) ? {
+            full_name: (item.profiles as any).full_name || 'Transportador',
+            rating:    (item.profiles as any).rating    || 0,
+          } : undefined,
+          route: (item.routes as any) ? {
+            origin:      (item.routes as any).origin,
+            destination: (item.routes as any).destination,
+          } : undefined,
+        })) as WeMoveRoute[];
     },
-    enabled: true,
   });
 }
