@@ -45,15 +45,66 @@
       "subtitle": "Package Transport"
     },
     "weMove": {
-      "title": "WeMove",
-      "subtitle": "People transporting people",
-      "origin": "Where are you moving from?",
-      "destination": "Where are you going?",
-      "resultsTitle": "WeMove – Community Fleet",
-      "noResultsYet": "Enter your origin and destination to see Community Fleet options.",
-      "slogan": "Transport, earn and grow without being a company",
-      "ctaSearch": "Search trips",
-      "ctaJoin": "I'm a transporter"
+    "title": "WeMove",
+    "byBusesApp": "by BusesApp",
+    "subtitle": "People transporting people",
+    "slogan": "Transport, earn and grow without being a company",
+    "description": "WeMove is a community fleet where real people transport people, with verified identity and digital reputation.",
+    "searchTransport": "Search transport",
+    "becomeTransporter": "Become a WeMove transporter",
+    "searchTitle": "Find your next trip",
+    "resultsTitle": "Available transports",
+    "noRoutesFound": "No available routes found",
+    "availableSeats": "available seats",
+    "hero": {
+      "tag": "Community Fleet · BusesApp",
+      "from": "From",
+      "to": "To",
+      "when": "When",
+      "selectOrigin": "Origin city...",
+      "selectDestination": "Destination city...",
+      "anyDay": "Any day",
+      "searchLabel": "Find your transport",
+      "trust1": "Verified identity",
+      "trust2": "Reputation system",
+      "trust3": "Community fleet",
+      "transporterCta": "Are you a transporter? Join free and publish trips today",
+      "registerFree": "Sign Up Free"
+    },
+    "how": {
+      "eyebrow": "How does it work?",
+      "title": "Your trip in 4 steps",
+      "s1": { "title": "Find your route",    "desc": "Enter origin, destination and date to see available transports." },
+      "s2": { "title": "Choose your unit",   "desc": "See vehicle type, schedule, available seats and price per seat." },
+      "s3": { "title": "Book your seat",     "desc": "Confirm your booking directly with the transporter via WhatsApp or the app." },
+      "s4": { "title": "Travel and rate",    "desc": "Travel with confidence and leave your rating to build the community." }
+    },
+    "trust": {
+      "id":    "Verified identity",
+      "rep":   "Digital reputation",
+      "safe":  "Basic safety",
+      "trace": "Trip traceability"
+    },
+    "cta": {
+      "eyebrow": "For transporters",
+      "title":   "Transport, EARN<br/>and grow without<br/><span class='text-primary'>being a company</span>",
+      "desc":    "WeMove is the platform for real people who want to transport people. No middlemen, with verified identity and digital reputation.",
+      "btn":     "Join free",
+      "howBtn":  "See how it works",
+      "perk1":   "Publish trips in minutes, no paperwork",
+      "perk2":   "Manage bookings and passengers in real time",
+      "perk3":   "Automatic WhatsApp group per trip",
+      "perk4":   "Build your reputation in the community"
+    },
+    "whyWeMove": {
+      "title": "Why WeMove?",
+      "realCommunity":    { "title": "Real community",       "description": "Real people connecting with real people" },
+      "verifiedPeople":   { "title": "Verified people",      "description": "Verified identity for your safety" },
+      "visibleReputation":{ "title": "Visible reputation",   "description": "Transparent rating system" },
+      "noBusiness":       { "title": "No businesses, people","description": "Person-to-person collaborative economy" }
+    },
+    "results": {
+      "reserve": "Book"
     },
     "advertising": {
       "title": "Advertise Your Business Here",
