@@ -44,68 +44,6 @@
       "title": "PackService",
       "subtitle": "Package Transport"
     },
-    "weMove": {
-    "title": "WeMove",
-    "byBusesApp": "by BusesApp",
-    "subtitle": "People transporting people",
-    "slogan": "Transport, earn and grow without being a company",
-    "description": "WeMove is a community fleet where real people transport people, with verified identity and digital reputation.",
-    "searchTransport": "Search transport",
-    "becomeTransporter": "Become a WeMove transporter",
-    "searchTitle": "Find your next trip",
-    "resultsTitle": "Available transports",
-    "noRoutesFound": "No available routes found",
-    "availableSeats": "available seats",
-    "hero": {
-      "tag": "Community Fleet · BusesApp",
-      "from": "From",
-      "to": "To",
-      "when": "When",
-      "selectOrigin": "Origin city...",
-      "selectDestination": "Destination city...",
-      "anyDay": "Any day",
-      "searchLabel": "Find your transport",
-      "trust1": "Verified identity",
-      "trust2": "Reputation system",
-      "trust3": "Community fleet",
-      "transporterCta": "Are you a transporter? Join free and publish trips today",
-      "registerFree": "Sign Up Free"
-    },
-    "how": {
-      "eyebrow": "How does it work?",
-      "title": "Your trip in 4 steps",
-      "s1": { "title": "Find your route",    "desc": "Enter origin, destination and date to see available transports." },
-      "s2": { "title": "Choose your unit",   "desc": "See vehicle type, schedule, available seats and price per seat." },
-      "s3": { "title": "Book your seat",     "desc": "Confirm your booking directly with the transporter via WhatsApp or the app." },
-      "s4": { "title": "Travel and rate",    "desc": "Travel with confidence and leave your rating to build the community." }
-    },
-    "trust": {
-      "id":    "Verified identity",
-      "rep":   "Digital reputation",
-      "safe":  "Basic safety",
-      "trace": "Trip traceability"
-    },
-    "cta": {
-      "eyebrow": "For transporters",
-      "title":   "Transport, EARN<br/>and grow without<br/><span class='text-primary'>being a company</span>",
-      "desc":    "WeMove is the platform for real people who want to transport people. No middlemen, with verified identity and digital reputation.",
-      "btn":     "Join free",
-      "howBtn":  "See how it works",
-      "perk1":   "Publish trips in minutes, no paperwork",
-      "perk2":   "Manage bookings and passengers in real time",
-      "perk3":   "Automatic WhatsApp group per trip",
-      "perk4":   "Build your reputation in the community"
-    },
-    "whyWeMove": {
-      "title": "Why WeMove?",
-      "realCommunity":    { "title": "Real community",       "description": "Real people connecting with real people" },
-      "verifiedPeople":   { "title": "Verified people",      "description": "Verified identity for your safety" },
-      "visibleReputation":{ "title": "Visible reputation",   "description": "Transparent rating system" },
-      "noBusiness":       { "title": "No businesses, people","description": "Person-to-person collaborative economy" }
-    },
-    "results": {
-      "reserve": "Book"
-    },
     "advertising": {
       "title": "Advertise Your Business Here",
       "subtitle": "Buses.App"
@@ -155,17 +93,50 @@
     "availableSeats": "available seats",
     "hero": {
       "tag": "Community Fleet · BusesApp",
-      "searchLabel": "Find your transport",
       "from": "From",
       "to": "To",
       "when": "When",
-      "selectOrigin": "Origin city",
-      "selectDestination": "Destination city",
+      "selectOrigin": "Origin city...",
+      "selectDestination": "Destination city...",
       "anyDay": "Any day",
+      "searchLabel": "Find your transport",
       "trust1": "Verified identity",
       "trust2": "Reputation system",
       "trust3": "Community fleet",
-      "transporterCta": "Have a vehicle and want to earn income?"
+      "transporterCta": "Are you a transporter? Join free and publish trips today",
+      "registerFree": "Sign Up Free"
+    },
+    "how": {
+      "eyebrow": "How does it work?",
+      "title": "Your trip in 4 steps",
+      "s1": { "title": "Find your route",  "desc": "Enter origin, destination and date to see available transports." },
+      "s2": { "title": "Choose your unit", "desc": "See vehicle type, schedule, available seats and price per seat." },
+      "s3": { "title": "Book your seat",   "desc": "Confirm your booking directly with the transporter via WhatsApp or the app." },
+      "s4": { "title": "Travel and rate",  "desc": "Travel with confidence and leave your rating to build the community." }
+    },
+    "trust": {
+      "id":    "Verified identity",
+      "rep":   "Digital reputation",
+      "safe":  "Basic safety",
+      "trace": "Trip traceability"
+    },
+    "cta": {
+      "eyebrow": "For transporters",
+      "title":   "Transport, EARN<br/>and grow without<br/><span class='text-primary'>being a company</span>",
+      "desc":    "WeMove is the platform for real people who want to transport people. No middlemen, with verified identity and digital reputation.",
+      "btn":     "Join free",
+      "howBtn":  "See how it works",
+      "perk1":   "Publish trips in minutes, no paperwork",
+      "perk2":   "Manage bookings and passengers in real time",
+      "perk3":   "Automatic WhatsApp group per trip",
+      "perk4":   "Build your reputation in the community"
+    },
+    "whyWeMove": {
+      "title": "Why WeMove?",
+      "realCommunity":     { "title": "Real community",        "description": "Real people connecting with real people" },
+      "verifiedPeople":    { "title": "Verified people",       "description": "Verified identity for your safety" },
+      "visibleReputation": { "title": "Visible reputation",    "description": "Transparent rating system" },
+      "noBusiness":        { "title": "No businesses, people", "description": "Person-to-person collaborative economy" }
     },
     "results": {
       "today": "Today",
@@ -173,46 +144,11 @@
       "verified": "Verified",
       "unknown": "Transporter",
       "perSeat": "Per seat",
-      "reserve": "Reserve seat",
+      "reserve": "Book",
       "noSeats": "No seats",
-      "trip": "trip",
-      "trips": "trips",
-      "tripFound": "transport available",
-      "tripsFound": "transports available",
       "almostFull": "Last {{seats}} seats!",
       "full": "Unit full",
       "tryOtherDate": "Try another date or check other available destinations."
-    },
-    "how": {
-      "eyebrow": "How does it work?",
-      "title": "Your trip in 4 steps",
-      "s1": { "title": "Search your route", "desc": "Enter origin, destination and date to see available transport." },
-      "s2": { "title": "Choose your unit", "desc": "See vehicle type, schedule, seats and price per seat." },
-      "s3": { "title": "Reserve your seat", "desc": "Confirm your reservation directly with the transporter." },
-      "s4": { "title": "Travel and rate", "desc": "Travel with confidence and rate your experience." }
-    },
-    "trust": {
-      "id": "Verified identity",
-      "rep": "Digital reputation",
-      "safe": "Basic safety",
-      "trace": "Trip traceability"
-    },
-    "cta": {
-      "eyebrow": "For transporters",
-      "title": "Earn income without being a company",
-      "desc": "If you have a vehicle, join the WeMove Community Fleet. Publish your routes, manage reservations and build your digital reputation.",
-      "btn": "Register as transporter",
-      "perk1": "Operate with your own vehicle",
-      "perk2": "Increase your income",
-      "perk3": "Manage everything from your phone",
-      "perk4": "Be part of the WeMove community"
-    },
-    "whyWeMove": {
-      "title": "Why WeMove?",
-      "realCommunity": { "title": "Real community", "description": "Real people connecting with real people" },
-      "verifiedPeople": { "title": "Verified people", "description": "Verified identity for your safety" },
-      "visibleReputation": { "title": "Visible reputation", "description": "Transparent rating system" },
-      "noBusiness": { "title": "No businesses, people", "description": "Person-to-person collaborative economy" }
     }
   },
   "wemoveRegister": {
@@ -320,8 +256,6 @@
   "wemovePublish": {
     "title": "Publish route",
     "subtitle": "Define the details of your next trip",
-    "routeDetails": "Trip details",
-    "routeDetailsDesc": "Fill in all the information to publish your route",
     "sectionRoute": "Route",
     "origin": "Origin city",
     "selectOrigin": "Select origin city",
@@ -333,15 +267,7 @@
     "sectionUnit": "Transport unit",
     "selectUnit": "Vehicle to use",
     "selectUnitPlaceholder": "Select your vehicle",
-    "sectionSeatsPrice": "Seats and price",
-    "availableSeats": "Available seats",
-    "maxSeatsHint": "Maximum {{max}} based on your unit",
     "pricePerSeat": "Price per seat",
-    "preview": "Trip preview",
-    "route": "Route",
-    "departure": "Departure",
-    "seats": "Seats",
-    "price": "Price",
     "publishButton": "Publish route",
     "noUnitsTitle": "No registered units",
     "noUnitsDesc": "You must register at least one unit before publishing routes",
@@ -370,8 +296,6 @@
     "origin": "Origin",
     "destination": "Destination",
     "date": "Date",
-    "maxWeight": "Max weight",
-    "availableWeight": "Available weight",
     "status": "Status",
     "scheduled": "Scheduled",
     "inProgress": "In progress",
