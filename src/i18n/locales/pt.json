@@ -111,7 +111,7 @@
       "title": "Sua viagem em 4 etapas",
       "s1": { "title": "Busque sua rota",     "desc": "Insira origem, destino e data para ver os transportes disponíveis." },
       "s2": { "title": "Escolha sua unidade", "desc": "Veja tipo de veículo, horário, assentos disponíveis e preço por assento." },
-      "s3": { "title": "Reserve seu assento", "desc": "Confirme sua reserva diretamente com o transportador via WhatsApp ou app." },
+      "s3": { "title": "Reserve seu assento", "desc": "Escolha seu assento, confirme sua reserva e receba seu código de embarque na hora." },
       "s4": { "title": "Viaje e avalie",      "desc": "Viaje com confiança e deixe sua avaliação para construir a comunidade." }
     },
     "trust": {
@@ -126,9 +126,9 @@
       "desc":    "WeMove é a plataforma para pessoas reais que querem transportar pessoas. Sem intermediários, com identidade verificada e reputação digital.",
       "btn":     "Entre grátis",
       "howBtn":  "Ver como funciona",
-      "perk1":   "Publique viagens em minutos, sem burocracia",
-      "perk2":   "Gerencie reservas e passageiros em tempo real",
-      "perk3":   "Grupo de WhatsApp por viagem automático",
+      "perk1":   "Publique sua rota, gerencie assentos e receba pagamentos pelo app",
+      "perk2":   "Veja quem reservou, gerencie pagamentos e fale com os passageiros",
+      "perk3":   "Comunicação direta com seu transportador pelo app",
       "perk4":   "Construa sua reputação na comunidade"
     },
     "whyWeMove": {
