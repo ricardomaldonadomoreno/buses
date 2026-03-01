@@ -13,7 +13,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import {
   ArrowLeft, MapPin, Calendar, Users, Bus, Loader2,
-  PawPrint, Wind, Wifi, Home, Info, Check, ArrowRight, Luggage
+  PawPrint, Wind, Wifi, Home, Info, Check, ArrowRight,
+  Luggage, MessageCircle, Phone
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -27,12 +28,9 @@ function useSeatLayouts(vehicleType?: string) {
   return useQuery({
     queryKey: ['seat-layouts', vehicleType],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('seat_layouts').select('*').order('total_seats');
+      const { data, error } = await supabase.from('seat_layouts').select('*').order('total_seats');
       if (error) throw error;
-      return (data as SeatLayout[]).filter(l =>
-        !vehicleType || l.vehicle_type === vehicleType
-      );
+      return (data as SeatLayout[]).filter(l => !vehicleType || l.vehicle_type === vehicleType);
     },
   });
 }
@@ -67,18 +65,12 @@ function SeatGrid({ layout, seatCount, onCountChange }: {
   layout: SeatLayout; seatCount: number; onCountChange: (n: number) => void;
 }) {
   const rows: Record<number, SeatDef[]> = {};
-  layout.layout_json.forEach(s => {
-    if (!rows[s.row]) rows[s.row] = [];
-    rows[s.row].push(s);
-  });
+  layout.layout_json.forEach(s => { if (!rows[s.row]) rows[s.row] = []; rows[s.row].push(s); });
   const maxSeats = layout.layout_json.filter(s => s.type === 'seat').length;
-
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-          {layout.name}
-        </p>
+        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{layout.name}</p>
         <span className="text-xs text-primary font-semibold">{maxSeats} asientos</span>
       </div>
       <div className="bg-muted/30 rounded-2xl p-4 overflow-x-auto">
@@ -88,9 +80,7 @@ function SeatGrid({ layout, seatCount, onCountChange }: {
               {seats.sort((a,b) => a.col-b.col).map(s => {
                 if (s.type === 'aisle') return <div key={s.label} className="w-6 h-6" />;
                 return (
-                  <div key={s.label}
-                    className="w-7 h-7 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center"
-                    title={s.label}>
+                  <div key={s.label} className="w-7 h-7 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center" title={s.label}>
                     <span className="text-[9px] font-bold text-primary/70">{s.label}</span>
                   </div>
                 );
@@ -134,27 +124,34 @@ export default function WeMovePublishRoute() {
   const [notes, setNotes]               = useState('');
   const [currency, setCurrency]         = useState('BOB');
   const [submitting, setSubmitting]     = useState(false);
-  const [acceptsPets, setPets]          = useState(false);
-  const [acceptsLuggage, setLuggage]    = useState(true);
-  const [hasAc, setAc]                  = useState(false);
-  const [hasWifi, setWifi]              = useState(false);
-  const [doorToDoor, setDoor]           = useState(false);
-  const [layoutId, setLayoutId]         = useState('');
 
-  const selectedUnit = units.find(u => u.id === unitId);
+  // WhatsApp + Pickup
+  const [pickupAddress, setPickupAddress]   = useState('');
+  const [whatsappGroup, setWhatsappGroup]   = useState('');
+  const [transporterPhone, setTransPhone]   = useState('');
+
+  // Options
+  const [acceptsPets, setPets]    = useState(false);
+  const [acceptsLuggage, setLug]  = useState(true);
+  const [hasAc, setAc]            = useState(false);
+  const [hasWifi, setWifi]        = useState(false);
+  const [doorToDoor, setDoor]     = useState(false);
+  const [layoutId, setLayoutId]   = useState('');
+
+  const selectedUnit   = units.find(u => u.id === unitId);
   const { data: layouts = [] } = useSeatLayouts(selectedUnit?.type);
   const selectedLayout = layouts.find(l => l.id === layoutId);
 
   useEffect(() => { if (units.length === 1 && !unitId) setUnitId(units[0].id); }, [units]);
-  useEffect(() => {
-    if (layouts.length > 0 && !layoutId) setLayoutId(layouts[0].id);
-  }, [layouts]);
-  useEffect(() => {
-    if (selectedLayout) setSeats(selectedLayout.total_seats);
-  }, [selectedLayout?.id]);
-  useEffect(() => {
-    if (!loading && !user) navigate('/wemove/register');
-  }, [user, loading, navigate]);
+  useEffect(() => { if (layouts.length > 0 && !layoutId) setLayoutId(layouts[0].id); }, [layouts]);
+  useEffect(() => { if (selectedLayout) setSeats(selectedLayout.total_seats); }, [selectedLayout?.id]);
+  useEffect(() => { if (!loading && !user) navigate('/wemove/register'); }, [user, loading, navigate]);
+
+  // Validate WhatsApp group link
+  const validateWAGroup = (url: string) => {
+    if (!url) return true;
+    return url.startsWith('https://chat.whatsapp.com/') || url.startsWith('https://wa.me/');
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -164,6 +161,9 @@ export default function WeMovePublishRoute() {
     if (!departureDate || !departureTime) { toast({ title: t('wemovePublish.errorSelectDateTime'), variant: 'destructive' }); return; }
     if (!price || parseFloat(price) <= 0) { toast({ title: t('wemovePublish.errorInvalidPrice'), variant: 'destructive' }); return; }
     if (!unitId) { toast({ title: t('wemovePublish.errorSelectUnit'), variant: 'destructive' }); return; }
+    if (whatsappGroup && !validateWAGroup(whatsappGroup)) {
+      toast({ title: 'El link del grupo debe empezar con https://chat.whatsapp.com/', variant: 'destructive' }); return;
+    }
 
     const depISO = new Date(`${departureDate}T${departureTime}:00`).toISOString();
     if (new Date(depISO) <= new Date()) { toast({ title: t('wemovePublish.errorPastDate'), variant: 'destructive' }); return; }
@@ -171,13 +171,9 @@ export default function WeMovePublishRoute() {
     setSubmitting(true);
     try {
       const result = await publishRoute.mutateAsync({
-        transporterId: user.id,
-        transportUnitId: unitId,
-        originId,
-        destinationId,
-        departureTime: depISO,
-        availableSeats,
-        price: parseFloat(price),
+        transporterId: user.id, transportUnitId: unitId,
+        originId, destinationId, departureTime: depISO,
+        availableSeats, price: parseFloat(price),
       });
 
       if (result?.id) {
@@ -191,35 +187,30 @@ export default function WeMovePublishRoute() {
           has_wifi: hasWifi,
           door_to_door: doorToDoor,
           vehicle_type: selectedUnit?.type ?? null,
+          pickup_address: pickupAddress || null,
+          whatsapp_group_link: whatsappGroup || null,
+          transporter_phone: transporterPhone || null,
         }).eq('id', result.id);
 
         if (selectedLayout) {
           const seatRows = selectedLayout.layout_json
-            .filter(s => s.type === 'seat')
-            .slice(0, availableSeats)
-            .map(s => ({
-              route_id: result.id, seat_label: s.label,
-              seat_row: s.row, seat_col: s.col,
-              seat_type: 'seat', status: 'available',
-            }));
+            .filter(s => s.type === 'seat').slice(0, availableSeats)
+            .map(s => ({ route_id: result.id, seat_label: s.label, seat_row: s.row, seat_col: s.col, seat_type: 'seat', status: 'available' }));
           await supabase.from('route_seats').insert(seatRows);
         }
       }
 
-      toast({ title: '🎉 ' + t('wemovePublish.successPublished') });
+      toast({ title: '🎉 ¡Viaje publicado exitosamente!' });
       navigate('/wemove/dashboard');
     } catch (err: unknown) {
-      toast({ title: t('wemovePublish.errorPublishing'),
-        description: err instanceof Error ? err.message : undefined,
-        variant: 'destructive' });
-    } finally {
-      setSubmitting(false); }
+      toast({ title: t('wemovePublish.errorPublishing'), description: err instanceof Error ? err.message : undefined, variant: 'destructive' });
+    } finally { setSubmitting(false); }
   };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!user) return null;
 
-  const cities = locations.filter((l: any) => l.type === 'city');
+  const cities  = locations.filter((l: any) => l.type === 'city');
   const minDate = new Date().toISOString().split('T')[0];
 
   return (
@@ -249,13 +240,12 @@ export default function WeMovePublishRoute() {
             <Bus className="h-10 w-10 text-amber-500 mx-auto mb-3" />
             <p className="font-semibold text-amber-800">{t('wemovePublish.noUnitsTitle')}</p>
             <p className="text-sm text-amber-700 mt-1">{t('wemovePublish.noUnitsDesc')}</p>
-            <Link to="/wemove/profile" className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 rounded-xl bg-amber-600 text-white text-sm font-semibold hover:bg-amber-700 transition-colors">
-              {t('wemovePublish.goToProfile')}
-            </Link>
+            <Link to="/wemove/profile" className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 rounded-xl bg-amber-600 text-white text-sm font-semibold">{t('wemovePublish.goToProfile')}</Link>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
 
+            {/* ROUTE */}
             <FormCard title={t('wemovePublish.sectionRoute')} icon={MapPin}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField label={t('wemovePublish.origin')}>
@@ -271,11 +261,64 @@ export default function WeMovePublishRoute() {
                   </Select>
                 </FormField>
               </div>
-              <FormField label="Descripción (opcional)">
-                <Input value={description} onChange={e => setDescription(e.target.value)} placeholder="Ej: Viaje directo, sin paradas" className="rounded-xl border-border/60" />
+              <FormField label="Descripción del viaje (opcional)">
+                <Input value={description} onChange={e => setDescription(e.target.value)} placeholder="Ej: Viaje directo sin paradas" className="rounded-xl border-border/60" />
               </FormField>
             </FormCard>
 
+            {/* PICKUP — NEW */}
+            <FormCard title="Punto de partida y contacto" icon={MapPin}>
+              <FormField label="Dirección exacta de partida *">
+                <Input value={pickupAddress} onChange={e => setPickupAddress(e.target.value)}
+                  placeholder="Ej: Terminal Bimodal, puerta 3 — frente al kiosco azul"
+                  className="rounded-xl border-border/60" />
+                <p className="text-xs text-muted-foreground mt-1">Los pasajeros verán esta dirección al confirmar su reserva</p>
+              </FormField>
+
+              <FormField label="Tu número de WhatsApp (para contacto directo)">
+                <div className="flex gap-2">
+                  <span className="flex items-center px-3 rounded-xl border border-border/60 bg-muted text-sm text-muted-foreground shrink-0">+591</span>
+                  <Input value={transporterPhone} onChange={e => setTransPhone(e.target.value.replace(/\D/g,''))}
+                    placeholder="70000000" maxLength={9}
+                    className="rounded-xl border-border/60 flex-1" />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Los pasajeros podrán escribirte directamente por WhatsApp</p>
+              </FormField>
+
+              {/* WhatsApp Group — STAR FEATURE */}
+              <div className="bg-[#25D366]/5 border border-[#25D366]/30 rounded-xl p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-[#25D366] flex items-center justify-center shrink-0">
+                    <MessageCircle className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Grupo de WhatsApp del viaje</p>
+                    <p className="text-xs text-muted-foreground">Crea un grupo, copia el enlace de invitación y pégalo aquí</p>
+                  </div>
+                </div>
+
+                <FormField label="Enlace de invitación al grupo">
+                  <Input value={whatsappGroup} onChange={e => setWhatsappGroup(e.target.value.trim())}
+                    placeholder="https://chat.whatsapp.com/XXXXXXXXXXXXXXXXXX"
+                    className={cn('rounded-xl border-border/60', whatsappGroup && !validateWAGroup(whatsappGroup) && 'border-red-400')} />
+                </FormField>
+
+                {whatsappGroup && !validateWAGroup(whatsappGroup) && (
+                  <p className="text-xs text-red-500">El link debe empezar con https://chat.whatsapp.com/</p>
+                )}
+
+                <div className="bg-background/60 rounded-lg p-3 space-y-1">
+                  <p className="text-xs font-semibold text-foreground">¿Cómo obtener el link del grupo?</p>
+                  <ol className="text-xs text-muted-foreground space-y-0.5 list-decimal list-inside">
+                    <li>Abre WhatsApp y crea un grupo nuevo para este viaje</li>
+                    <li>Ve a Datos del grupo → Enlace de invitación</li>
+                    <li>Toca "Copiar enlace" y pégalo aquí</li>
+                  </ol>
+                </div>
+              </div>
+            </FormCard>
+
+            {/* DATE & TIME */}
             <FormCard title={t('wemovePublish.sectionDateTime')} icon={Calendar}>
               <div className="grid grid-cols-2 gap-4">
                 <FormField label={t('wemovePublish.date')}>
@@ -287,20 +330,14 @@ export default function WeMovePublishRoute() {
               </div>
             </FormCard>
 
+            {/* VEHICLE */}
             <FormCard title={t('wemovePublish.sectionUnit')} icon={Bus}>
               <FormField label={t('wemovePublish.selectUnit')}>
                 <Select value={unitId} onValueChange={setUnitId}>
                   <SelectTrigger className="rounded-xl border-border/60"><SelectValue placeholder={t('wemovePublish.selectUnitPlaceholder')} /></SelectTrigger>
-                  <SelectContent>
-                    {units.map(u => (
-                      <SelectItem key={u.id} value={u.id}>
-                        {u.type.charAt(0).toUpperCase() + u.type.slice(1)} — {u.capacity} asientos{u.verified ? ' ✓' : ''}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
+                  <SelectContent>{units.map(u => <SelectItem key={u.id} value={u.id}>{u.type.charAt(0).toUpperCase()+u.type.slice(1)} — {u.capacity} asientos{u.verified?' ✓':''}</SelectItem>)}</SelectContent>
                 </Select>
               </FormField>
-
               {unitId && layouts.length > 0 && (
                 <>
                   <FormField label="Distribución de asientos">
@@ -314,6 +351,7 @@ export default function WeMovePublishRoute() {
               )}
             </FormCard>
 
+            {/* PRICE */}
             <FormCard title="Precio" icon={Users}>
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2">
@@ -328,7 +366,6 @@ export default function WeMovePublishRoute() {
                       <SelectItem value="BOB">BOB (Bs.)</SelectItem>
                       <SelectItem value="USD">USD ($)</SelectItem>
                       <SelectItem value="PEN">PEN (S/.)</SelectItem>
-                      <SelectItem value="CLP">CLP ($)</SelectItem>
                       <SelectItem value="ARS">ARS ($)</SelectItem>
                       <SelectItem value="BRL">BRL (R$)</SelectItem>
                     </SelectContent>
@@ -337,24 +374,26 @@ export default function WeMovePublishRoute() {
               </div>
             </FormCard>
 
+            {/* OPTIONS */}
             <FormCard title="Opciones del viaje" icon={Info}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <OptionToggle icon={PawPrint} label="Acepta mascotas" description="Perros, gatos u otros animales" value={acceptsPets} onChange={setPets} />
-                <OptionToggle icon={Luggage} label="Equipaje extra" description="Maletas o bultos adicionales" value={acceptsLuggage} onChange={setLuggage} />
-                <OptionToggle icon={Wind} label="Aire acondicionado" description="Vehículo con A/C" value={hasAc} onChange={setAc} />
-                <OptionToggle icon={Wifi} label="WiFi a bordo" description="Conexión durante el viaje" value={hasWifi} onChange={setWifi} />
-                <OptionToggle icon={Home} label="Puerta a puerta" description="Recojo y entrega en domicilio" value={doorToDoor} onChange={setDoor} />
+                <OptionToggle icon={Luggage}  label="Equipaje extra" description="Maletas o bultos adicionales" value={acceptsLuggage} onChange={setLug} />
+                <OptionToggle icon={Wind}     label="Aire acondicionado" description="Vehículo con A/C" value={hasAc} onChange={setAc} />
+                <OptionToggle icon={Wifi}     label="WiFi a bordo" description="Conexión durante el viaje" value={hasWifi} onChange={setWifi} />
+                <OptionToggle icon={Home}     label="Puerta a puerta" description="Recojo y entrega en domicilio" value={doorToDoor} onChange={setDoor} />
               </div>
               <FormField label="Notas adicionales (opcional)">
                 <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2}
-                  placeholder="Ej: Sin alimentos fuertes, parada en terminal..."
+                  placeholder="Ej: Sin alimentos fuertes, llevar documento de identidad..."
                   className="w-full rounded-xl border border-border/60 bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30" />
               </FormField>
             </FormCard>
 
+            {/* PREVIEW */}
             {originId && destinationId && price && (
-              <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4">
-                <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Vista previa</p>
+              <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 space-y-2">
+                <p className="text-xs font-bold uppercase tracking-widest text-primary">Vista previa</p>
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">🚌</span>
                   <div>
@@ -363,9 +402,9 @@ export default function WeMovePublishRoute() {
                       <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
                       <span>{cities.find((c: any) => c.id === destinationId)?.name}</span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {departureDate}{departureTime ? ` · ${departureTime}` : ''} · {availableSeats} asientos · {currency} {price}
-                    </p>
+                    <p className="text-xs text-muted-foreground">{departureDate}{departureTime?` · ${departureTime}`:''} · {availableSeats} asientos · {currency} {price}</p>
+                    {pickupAddress && <p className="text-xs text-muted-foreground mt-0.5">📍 {pickupAddress}</p>}
+                    {whatsappGroup && <p className="text-xs text-[#25D366] mt-0.5">💬 Grupo de WhatsApp incluido</p>}
                   </div>
                 </div>
               </div>
@@ -373,10 +412,7 @@ export default function WeMovePublishRoute() {
 
             <button type="submit" disabled={submitting}
               className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-primary text-primary-foreground font-semibold text-base hover:bg-primary/90 transition-colors disabled:opacity-60 min-h-[56px]">
-              {submitting
-                ? <><Loader2 className="h-5 w-5 animate-spin" /> Publicando…</>
-                : t('wemovePublish.publishButton')
-              }
+              {submitting ? <><Loader2 className="h-5 w-5 animate-spin" /> Publicando…</> : t('wemovePublish.publishButton')}
             </button>
           </form>
         )}
@@ -389,9 +425,7 @@ function FormCard({ title, icon: Icon, children }: { title: string; icon: React.
   return (
     <div className="bg-card rounded-2xl border border-border/60 overflow-hidden">
       <div className="px-5 py-3.5 border-b border-border/40 flex items-center gap-2.5">
-        <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
-          <Icon className="h-3.5 w-3.5 text-primary" />
-        </div>
+        <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><Icon className="h-3.5 w-3.5 text-primary" /></div>
         <h3 className="text-sm font-semibold">{title}</h3>
       </div>
       <div className="p-5 space-y-4">{children}</div>
