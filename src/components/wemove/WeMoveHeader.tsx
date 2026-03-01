@@ -11,7 +11,7 @@ export function WeMoveHeader() {
           <img src="/logo.png" alt="BUSES" className="h-8 w-auto object-contain opacity-90 group-hover:opacity-100 transition-opacity" />
           <div className="leading-none">
             <span className="font-black text-lg text-primary tracking-tight">WeMove</span>
-            <span className="text-[10px] font-bold text-background/40 block uppercase tracking-widest">by BusesApp</span>
+            <span className="text-[10px] font-bold text-background/40 block uppercase tracking-widest">by Buses</span>
           </div>
         </Link>
 
