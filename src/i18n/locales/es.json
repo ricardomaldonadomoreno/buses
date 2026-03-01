@@ -1,7 +1,7 @@
 {
   "common": {
     "appName": "BUSES APP",
-    "tagline": "Tu plataforma de transporte de confianza",
+    "tagline": "Tu plataforma de transportes de confianza",
     "getStarted": "Comenzar",
     "learnMore": "Más información",
     "login": "Iniciar sesión",
@@ -46,7 +46,7 @@
     },
     "weMove": {
     "title": "WeMove",
-    "byBusesApp": "by BusesApp",
+    "byBusesApp": "by BUSES App",
     "subtitle": "Personas que transportan personas",
     "slogan": "Transporta, gana y crece sin ser empresa",
     "description": "WeMove es una flota comunitaria donde personas reales transportan personas, con identidad verificada y reputación digital.",
@@ -57,7 +57,7 @@
     "noRoutesFound": "No se encontraron rutas disponibles",
     "availableSeats": "asientos disponibles",
     "hero": {
-      "tag": "Flota Comunitaria · BusesApp",
+      "tag": "Flota Comunitaria · Buses",
       "from": "Desde",
       "to": "Hasta",
       "when": "Cuándo",
@@ -93,7 +93,7 @@
       "howBtn":  "Ver cómo funciona",
       "perk1":   "Publica viajes en minutos, sin papeleos",
       "perk2":   "Gestiona reservas y pasajeros en tiempo real",
-      "perk3":   "Grupo de WhatsApp por viaje automático",
+      "perk3":   "Grupo de viaje automático",
       "perk4":   "Construye tu reputación en la comunidad"
     },
     "whyWeMove": {
@@ -101,7 +101,7 @@
       "realCommunity":   { "title": "Comunidad real",        "description": "Personas reales conectando con personas reales" },
       "verifiedPeople":  { "title": "Personas verificadas",  "description": "Identidad verificada para tu seguridad" },
       "visibleReputation":{ "title": "Reputación visible",   "description": "Sistema de calificación transparente" },
-      "noBusiness":      { "title": "No empresas, personas", "description": "Economía colaborativa persona a persona" }
+      "noBusiness":      { "title": "No empresas, Personas", "description": "Economía colaborativa persona a persona" }
     },
     "results": {
       "reserve": "Reservar" }
