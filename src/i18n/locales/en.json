@@ -111,7 +111,7 @@
       "title": "Your trip in 4 steps",
       "s1": { "title": "Find your route",  "desc": "Enter origin, destination and date to see available transports." },
       "s2": { "title": "Choose your unit", "desc": "See vehicle type, schedule, available seats and price per seat." },
-      "s3": { "title": "Book your seat",   "desc": "Confirm your booking directly with the transporter via WhatsApp or the app." },
+      "s3": { "title": "Book your seat",   "desc": "Choose your seat, confirm your booking and receive your boarding code instantly." },
       "s4": { "title": "Travel and rate",  "desc": "Travel with confidence and leave your rating to build the community." }
     },
     "trust": {
@@ -126,9 +126,9 @@
       "desc":    "WeMove is the platform for real people who want to transport people. No middlemen, with verified identity and digital reputation.",
       "btn":     "Join free",
       "howBtn":  "See how it works",
-      "perk1":   "Publish trips in minutes, no paperwork",
-      "perk2":   "Manage bookings and passengers in real time",
-      "perk3":   "Automatic WhatsApp group per trip",
+      "perk1":   "Publish your route, manage seats and collect payments from the app",
+      "perk2":   "See who booked, manage payments and communicate with passengers",
+      "perk3":   "Direct communication with your transporter through the app",
       "perk4":   "Build your reputation in the community"
     },
     "whyWeMove": {
