@@ -5,7 +5,7 @@ import { ArrowRight, Bus, TrendingUp, Smartphone, Users, CheckCircle } from 'luc
 const PERKS = [
   { icon: Bus,        text: 'Publica viajes en minutos, sin papeleos' },
   { icon: TrendingUp, text: 'Gestiona reservas y pasajeros en tiempo real' },
-  { icon: Smartphone, text: 'Grupo de WhatsApp por viaje automático' },
+  { icon: Smartphone, text: 'Grupo de viaje automático' },
   { icon: Users,      text: 'Construye tu reputación en la comunidad' },
 ];
 
