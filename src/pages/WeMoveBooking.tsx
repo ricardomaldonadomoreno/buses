@@ -481,28 +481,39 @@ export default function WeMoveBooking() {
           </div>
         )}
 
-        {/* ── STEP 3: CONFIRM ── */}
-        {step === 'confirm' && (
-          <div className="space-y-4">
-            <div className="bg-card rounded-2xl border border-border/60 p-5 space-y-3">
-              <h2 className="font-serif text-lg font-semibold">Resumen de tu reserva</h2>
-
-              <div className="space-y-2 text-sm">
-                <Row label="Viaje"    value={`${origin} → ${dest}`} />
-                <Row label="Fecha"    value={format(dep, "d 'de' MMMM yyyy · HH:mm", { locale: es })} />
-                <Row label="Asiento"  value={selectedSeat ?? '—'} highlight />
-                <Row label="Precio"   value={`${currency} ${route.price}`} highlight />
-                <div className="border-t border-border/40 pt-2 mt-2">
-                  <Row label="Pasajero" value={name} />
-                  <Row label="Email"    value={email} />
-                  {phone && <Row label="Teléfono" value={phone} />}
-                  {doc   && <Row label="Documento" value={doc} />}
-                  {bringsPet && <Row label="Mascota" value={petDesc || 'Sí'} />}
-                  {extraLuggage && <Row label="Equipaje extra" value={luggageDetails || 'Sí'} />}
-                  {notes && <Row label="Notas" value={notes} />}
+      {/* ── STEP 3: CONFIRM ── */}
+          {step === 'confirm' && (
+            <div className="space-y-4">
+              <div className="bg-card rounded-2xl border border-border/60 p-5 space-y-3">
+                <h2 className="font-serif text-lg font-semibold">Resumen de tu reserva</h2>
+                <div className="space-y-2 text-sm">
+                  <Row label="Viaje"    value={`${origin} → ${dest}`} />
+                  <Row label="Fecha"    value={format(dep, "d 'de' MMMM yyyy · HH:mm", { locale: es })} />
+                  <Row label="Asiento"  value={selectedSeat ?? '—'} highlight />
+                  <Row label="Precio"   value={`${currency} ${route.price}`} highlight />
+                  <div className="border-t border-border/40 pt-2 mt-2">
+                    <Row label="Pasajero" value={name} />
+                    <Row label="Email"    value={email} />
+                    {phone && <Row label="Teléfono" value={phone} />}
+                    {doc   && <Row label="Documento" value={doc} />}
+                    {bringsPet && <Row label="Mascota" value={petDesc || 'Sí'} />}
+                    {extraLuggage && <Row label="Equipaje extra" value={luggageDetails || 'Sí'} />}
+                    {notes && <Row label="Notas" value={notes} />}
+                  </div>
                 </div>
               </div>
-            </div>
+
+              {(route as any).whatsapp_group_link && (
+                <div className="flex items-center gap-3 p-3.5 bg-[#25D366]/10 border border-[#25D366]/30 rounded-2xl">
+                  <span className="text-2xl shrink-0">💬</span>
+                  <p className="text-xs text-foreground leading-relaxed">
+                    Al confirmar recibirás el link para <strong>unirte al grupo de WhatsApp</strong> del viaje — el transportador te compartirá novedades del viaje ahí.
+                  </p>
+                </div>
+              )}
+
+              {/* Payment note */}
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex gap-3">
 
             {/* Payment note */}
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex gap-3">
@@ -549,10 +560,45 @@ export default function WeMoveBooking() {
               <p><span className="text-muted-foreground">Asiento:</span> <strong className="text-primary">{selectedSeat}</strong></p>
               <p><span className="text-muted-foreground">Precio:</span> <strong>{currency} {route.price}</strong></p>
             </div>
+            
+         {/* WhatsApp actions */}
+            <div className="space-y-2 w-full">
+              {route.whatsapp_group_link && (
+                <a
+                  href={route.whatsapp_group_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl font-semibold text-sm text-white transition-colors"
+                  style={{ backgroundColor: '#25D366' }}
+                >
+                  <svg viewBox="0 0 24 24" className="h-5 w-5 fill-white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.553 4.116 1.522 5.847L.057 23.882l6.19-1.438A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.005-1.371l-.36-.213-3.664.851.875-3.567-.234-.374A9.818 9.818 0 1112 21.818z"/></svg>
+                  Unirme al grupo del viaje
+                </a>
+              )}
+
+              {route.transporter_phone && (
+                <a
+                  href={`https://wa.me/591${route.transporter_phone}?text=${encodeURIComponent(
+                    `Hola, reservé el asiento ${selectedSeat} para el viaje ${origin} → ${dest}. Mi nombre es ${name}.`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl border-2 font-semibold text-sm transition-colors"
+                  style={{ borderColor: '#25D366', color: '#25D366' }}
+                >
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" style={{ fill: '#25D366' }}><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.553 4.116 1.522 5.847L.057 23.882l6.19-1.438A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.005-1.371l-.36-.213-3.664.851.875-3.567-.234-.374A9.818 9.818 0 1112 21.818z"/></svg>
+                  Escribir al transportador
+                </a>
+              )}
+            </div>
+
             <p className="text-xs text-muted-foreground">
               El pago se coordina con el transportador antes del viaje.
             </p>
             <Link to="/wemove"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
+              Volver a WeMove
+            </Link>
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
               Volver a WeMove
             </Link>
