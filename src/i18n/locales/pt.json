@@ -155,64 +155,53 @@
     "availableSeats": "assentos disponíveis",
     "hero": {
       "tag": "Frota Comunitária · BusesApp",
-      "searchLabel": "Encontre seu transporte",
       "from": "De",
       "to": "Para",
       "when": "Quando",
-      "selectOrigin": "Cidade de origem",
-      "selectDestination": "Cidade de destino",
+      "selectOrigin": "Cidade de origem...",
+      "selectDestination": "Cidade de destino...",
       "anyDay": "Qualquer dia",
+      "searchLabel": "Encontre seu transporte",
       "trust1": "Identidade verificada",
       "trust2": "Sistema de reputação",
       "trust3": "Frota comunitária",
-      "transporterCta": "Tem um veículo e quer gerar renda?"
-    },
-    "results": {
-      "today": "Hoje",
-      "tomorrow": "Amanhã",
-      "verified": "Verificado",
-      "unknown": "Transportador",
-      "perSeat": "Por assento",
-      "reserve": "Reservar assento",
-      "noSeats": "Sem assentos",
-      "trip": "viagem",
-      "trips": "viagens",
-      "tripFound": "transporte disponível",
-      "tripsFound": "transportes disponíveis",
-      "almostFull": "Últimos {{seats}} assentos!",
-      "full": "Unidade lotada",
-      "tryOtherDate": "Tente outra data ou verifique outros destinos disponíveis."
+      "transporterCta": "É transportador? Entre grátis e publique viagens hoje",
+      "registerFree": "Cadastre-se Grátis"
     },
     "how": {
       "eyebrow": "Como funciona?",
-      "title": "Sua viagem em 4 passos",
-      "s1": { "title": "Busque sua rota", "desc": "Digite origem, destino e data para ver os transportes disponíveis." },
-      "s2": { "title": "Escolha sua unidade", "desc": "Veja tipo de veículo, horário, assentos e preço por assento." },
-      "s3": { "title": "Reserve seu assento", "desc": "Confirme sua reserva diretamente com o transportador." },
-      "s4": { "title": "Viaje e avalie", "desc": "Viaje com confiança e avalie sua experiência." }
+      "title": "Sua viagem em 4 etapas",
+      "s1": { "title": "Busque sua rota",    "desc": "Insira origem, destino e data para ver os transportes disponíveis." },
+      "s2": { "title": "Escolha sua unidade","desc": "Veja tipo de veículo, horário, assentos disponíveis e preço por assento." },
+      "s3": { "title": "Reserve seu assento","desc": "Confirme sua reserva diretamente com o transportador via WhatsApp ou app." },
+      "s4": { "title": "Viaje e avalie",     "desc": "Viaje com confiança e deixe sua avaliação para construir a comunidade." }
     },
     "trust": {
-      "id": "Identidade verificada",
-      "rep": "Reputação digital",
-      "safe": "Segurança básica",
+      "id":    "Identidade verificada",
+      "rep":   "Reputação digital",
+      "safe":  "Segurança básica",
       "trace": "Rastreabilidade da viagem"
     },
     "cta": {
       "eyebrow": "Para transportadores",
-      "title": "Gere renda sem ser empresa",
-      "desc": "Se você tem um veículo, junte-se à Frota Comunitária WeMove. Publique suas rotas, gerencie reservas e construa sua reputação digital.",
-      "btn": "Registrar-me como transportador",
-      "perk1": "Opere com seu próprio veículo",
-      "perk2": "Aumente sua renda",
-      "perk3": "Gerencie tudo pelo celular",
-      "perk4": "Faça parte da comunidade WeMove"
+      "title":   "Transporte, GANHE<br/>e cresça sem<br/><span class='text-primary'>ser uma empresa</span>",
+      "desc":    "WeMove é a plataforma para pessoas reais que querem transportar pessoas. Sem intermediários, com identidade verificada e reputação digital.",
+      "btn":     "Entre grátis",
+      "howBtn":  "Ver como funciona",
+      "perk1":   "Publique viagens em minutos, sem burocracia",
+      "perk2":   "Gerencie reservas e passageiros em tempo real",
+      "perk3":   "Grupo de WhatsApp por viagem automático",
+      "perk4":   "Construa sua reputação na comunidade"
     },
     "whyWeMove": {
       "title": "Por que WeMove?",
-      "realCommunity": { "title": "Comunidade real", "description": "Pessoas reais conectando com pessoas reais" },
-      "verifiedPeople": { "title": "Pessoas verificadas", "description": "Identidade verificada para sua segurança" },
-      "visibleReputation": { "title": "Reputação visível", "description": "Sistema de classificação transparente" },
-      "noBusiness": { "title": "Não empresas, pessoas", "description": "Economia colaborativa de pessoa para pessoa" }
+      "realCommunity":    { "title": "Comunidade real",       "description": "Pessoas reais conectando com pessoas reais" },
+      "verifiedPeople":   { "title": "Pessoas verificadas",   "description": "Identidade verificada para sua segurança" },
+      "visibleReputation":{ "title": "Reputação visível",     "description": "Sistema de avaliação transparente" },
+      "noBusiness":       { "title": "Sem empresas, pessoas", "description": "Economia colaborativa pessoa a pessoa" }
+    },
+    "results": {
+      "reserve": "Reservar"
     }
   },
   "wemoveRegister": {
