@@ -21,11 +21,13 @@ export interface SeatLayout {
 }
 
 interface SeatSelectorProps {
+  readOnly?: boolean;
   layout:       SeatLayout | null;   // JSON del chofer — null = fallback
   totalSeats:   number;              // usado solo en fallback
   takenSeats:   string[];            // labels de asientos ocupados, ej ["1","3","5A"]
   selectedSeat: string | null;       // label del asiento seleccionado
   onSelect:     (label: string | null) => void;
+  readOnly?:    boolean;
 }
 
 // ── Iconos / apariencia por tipo de celda ──
@@ -38,7 +40,7 @@ const CELL_CONFIG: Record<CellType, { bg: string; label: string; clickable: bool
   storage:   { bg: 'bg-muted/40 border-dashed border-foreground/20', label: '🧳', clickable: false },
 };
 
-export function SeatSelector({ layout, totalSeats, takenSeats, selectedSeat, onSelect }: SeatSelectorProps) {
+export function SeatSelector({ layout, totalSeats, takenSeats, selectedSeat, onSelect, readOnly }: SeatSelectorProps) {
   // Si el chofer definió un layout, usarlo; si no, generar fallback simple
   const resolvedLayout = layout ?? buildFallbackLayout(totalSeats);
 
