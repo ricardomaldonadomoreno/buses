@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import {
@@ -82,6 +83,7 @@ function SkeletonCard() {
 
 function RouteCard({ route }: { route: WeMoveRoute }) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const departure = new Date(route.departure_time);
   const vehicle = getVehicle(undefined); // vehicle type not yet in WeMoveRoute interface — graceful fallback
   const seatsLeft = route.available_seats;
@@ -211,7 +213,8 @@ function RouteCard({ route }: { route: WeMoveRoute }) {
           </div>
 
           <Button
-            disabled={isFull}
+           disabled={isFull}
+            onClick={() => !isFull && navigate(`/wemove/booking/${route.id}`)}
             asChild={!isFull}
             className="border-2 border-foreground gap-2 font-bold shadow-[3px_3px_0px_0px_hsl(var(--foreground))] hover:shadow-[1px_1px_0px_0px_hsl(var(--foreground))] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
           >
