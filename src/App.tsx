@@ -1,3 +1,4 @@
+import WeMoveBooking from './pages/WeMoveBooking';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,7 +19,6 @@ import WeMovePublishRoute from "./pages/WeMovePublishRoute";
 import WeMoveBooking from "./pages/WeMoveBooking";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
-import WeMoveBooking from './pages/WeMoveBooking';
 
 const queryClient = new QueryClient();
 
@@ -39,13 +39,13 @@ const App = () => (
           <Route path="/wemove/auth/callback" element={<WeMoveAuthCallback />} />
           <Route path="/wemove/verify-email" element={<WeMoveVerifyEmail />} />
           <Route path="/wemove/dashboard" element={<WeMoveDashboard />} />
+          <Route path="/wemove/booking/:routeId" element={<WeMoveBooking />} />
           <Route path="/wemove/profile" element={<WeMoveCompleteProfile />} />
           <Route path="/wemove/publish-route" element={<WeMovePublishRoute />} />
           <Route path="/wemove/booking/:routeId" element={<WeMoveBooking />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/auth" element={<NotFound />} />
           <Route path="*" element={<NotFound />} />
-          <Route path="/wemove/booking/:routeId" element={<WeMoveBooking />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
