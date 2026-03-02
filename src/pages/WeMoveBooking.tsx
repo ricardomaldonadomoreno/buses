@@ -1,513 +1,359 @@
-import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+// src/pages/WeMoveBooking.tsx
+// Página completa de reserva con selector de asientos y formulario
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { SeatSelector } from '@/components/wemove/SeatSelector';
+import { WeMoveHeader } from '@/components/wemove/WeMoveHeader';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { LanguageSelector } from '@/components/LanguageSelector';
-import {
-  ArrowLeft, ArrowRight, Calendar, Users,
-  PawPrint, Luggage, Wind, Wifi, Home, Loader2,
-  CheckCircle2, AlertCircle, User, CreditCard, Info
-} from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Clock, MapPin, Calendar, DollarSign, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface RouteSeat {
-  id: string; seat_label: string; seat_row: number;
-  seat_col: number; seat_type: string; status: string;
-}
-interface RouteDetail {
-  id: string; departure_time: string; available_seats: number;
-  price: number; currency: string; status: string;
-  accepts_pets: boolean; accepts_luggage: boolean;
-  has_ac: boolean; has_wifi: boolean; door_to_door: boolean;
-  description: string | null; notes: string | null; vehicle_type: string | null;
-  whatsapp_group_link: string | null; transporter_phone: string | null;
-  pickup_address: string | null;
-  route: { origin: { name: string }; destination: { name: string } } | null;
-  transporter: { full_name: string | null; rating: number | null } | null;
-  transport_unit: { type: string; capacity: number } | null;
+interface Route {
+  id: string; price: number; available_seats: number; departure_time: string;
+  transport_unit: { type: string; capacity: number };
+  transporter: { display_name: string; phone_full: string | null; rating: number | null };
+  route: { origin: { name: string }; destination: { name: string } };
 }
 
-function useRouteDetail(routeId?: string) {
-  return useQuery({
-    queryKey: ['route-detail', routeId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('wemove_routes')
-        .select(`*, route:route_id (origin:origin_location_id (name), destination:destination_location_id (name)), transporter:transporter_id (full_name, rating), transport_unit:transport_unit_id (type, capacity)`)
-        .eq('id', routeId!)
-        .single();
-      if (error) throw error;
-      return data as unknown as RouteDetail;
-    },
-    enabled: !!routeId,
-  });
+interface BookingForm {
+  name: string; email: string; phone: string; document: string;
+  hasPet: boolean; hasExtraLuggage: boolean; notes: string;
 }
-
-function useRouteSeats(routeId?: string) {
-  return useQuery({
-    queryKey: ['route-seats', routeId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('route_seats').select('*').eq('route_id', routeId!)
-        .order('seat_row').order('seat_col');
-      if (error) throw error;
-      return data as RouteSeat[];
-    },
-    enabled: !!routeId,
-  });
-}
-
-function useCreateBooking() {
-  return useMutation({
-    mutationFn: async (booking: {
-      route_id: string; seat_label: string;
-      passenger_name: string; passenger_email: string;
-      passenger_phone: string; passenger_doc: string;
-      brings_pet: boolean; pet_description: string;
-      extra_luggage: boolean; luggage_details: string;
-      special_notes: string;
-    }) => {
-      await supabase.from('route_seats').update({ status: 'reserved' })
-        .eq('route_id', booking.route_id).eq('seat_label', booking.seat_label);
-      const { data, error } = await supabase.from('wemove_bookings').insert({
-        route_id: booking.route_id,
-        passenger_name: booking.passenger_name,
-        passenger_email: booking.passenger_email,
-        passenger_phone: booking.passenger_phone || null,
-        passenger_doc: booking.passenger_doc || null,
-        seat_label: booking.seat_label,
-        brings_pet: booking.brings_pet,
-        pet_description: booking.pet_description || null,
-        extra_luggage: booking.extra_luggage,
-        luggage_details: booking.luggage_details || null,
-        special_notes: booking.special_notes || null,
-        status: 'pending', payment_status: 'unpaid',
-      }).select().single();
-      if (error) throw error;
-      return data;
-    },
-  });
-}
-
-const WA_ICON = (
-  <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0">
-    <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-    <path fill="currentColor" d="M12 0C5.373 0 0 5.373 0 12c0 2.123.553 4.116 1.522 5.847L.057 23.882l6.19-1.438A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.005-1.371l-.36-.213-3.664.851.875-3.567-.234-.374A9.818 9.818 0 1112 21.818z"/>
-  </svg>
-);
-
-function SeatMap({ seats, selected, onSelect }: {
-  seats: RouteSeat[]; selected: string | null; onSelect: (label: string) => void;
-}) {
-  if (seats.length === 0) return null;
-  const rows: Record<number, RouteSeat[]> = {};
-  seats.forEach(s => { if (!rows[s.seat_row]) rows[s.seat_row] = []; rows[s.seat_row].push(s); });
-
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
-        <span className="flex items-center gap-1.5"><span className="w-4 h-4 rounded bg-primary/20 border border-primary/40 inline-block" /> Disponible</span>
-        <span className="flex items-center gap-1.5"><span className="w-4 h-4 rounded bg-primary border border-primary inline-block" /> Seleccionado</span>
-        <span className="flex items-center gap-1.5"><span className="w-4 h-4 rounded bg-muted border border-border inline-block" /> Ocupado</span>
-      </div>
-      <div className="bg-muted/20 rounded-2xl p-5 overflow-x-auto">
-        <div className="text-xs text-center text-muted-foreground mb-3 font-medium">⬆ Frente del vehículo</div>
-        <div className="space-y-2 w-fit mx-auto">
-          {Object.entries(rows).sort(([a],[b]) => +a - +b).map(([rowNum, rowSeats]) => (
-            <div key={rowNum} className="flex gap-2 items-center justify-center">
-              <span className="text-xs text-muted-foreground/50 w-4 text-right shrink-0">{rowNum}</span>
-              {rowSeats.sort((a,b) => a.seat_col - b.seat_col).map(seat => {
-                const isAvailable = seat.status === 'available';
-                const isSelected  = selected === seat.seat_label;
-                return (
-                  <button key={seat.seat_label} type="button" disabled={!isAvailable}
-                    onClick={() => isAvailable && onSelect(seat.seat_label)}
-                    title={seat.seat_label}
-                    className={cn('w-9 h-9 rounded-xl text-xs font-bold transition-all duration-150 border-2',
-                      isSelected ? 'bg-primary border-primary text-primary-foreground scale-110 shadow-md'
-                        : isAvailable ? 'bg-primary/10 border-primary/30 text-primary hover:bg-primary/25 hover:border-primary/60 hover:scale-105'
-                        : 'bg-muted border-border text-muted-foreground cursor-not-allowed opacity-50')}>
-                    {seat.seat_label}
-                  </button>
-                );
-              })}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-type Step = 'seat' | 'info' | 'confirm' | 'success';
 
 export default function WeMoveBooking() {
   const { routeId } = useParams<{ routeId: string }>();
-  const { data: route, isLoading: routeLoading } = useRouteDetail(routeId);
-  const { data: seats = [], refetch: refetchSeats } = useRouteSeats(routeId);
-  const createBooking = useCreateBooking();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
 
-  const [step, setStep]             = useState<Step>('seat');
-  const [selectedSeat, setSelectedSeat] = useState<string | null>(null);
-  const [name, setName]             = useState('');
-  const [email, setEmail]           = useState('');
-  const [phone, setPhone]           = useState('');
-  const [doc, setDoc]               = useState('');
-  const [bringsPet, setBringsPet]   = useState(false);
-  const [petDesc, setPetDesc]       = useState('');
-  const [extraLuggage, setExtraLug] = useState(false);
-  const [luggageDetails, setLugDet] = useState('');
-  const [notes, setNotes]           = useState('');
+  const [step, setStep] = useState<1 | 2 | 3>(1);  // 1=asiento, 2=datos, 3=confirmación
+  const [route, setRoute] = useState<Route | null>(null);
+  const [takenSeats, setTakenSeats] = useState<number[]>([]);
+  const [selectedSeat, setSelectedSeat] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [bookingResult, setBookingResult] = useState<{ id: string; boarding_code: string; payment_deadline: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const [form, setForm] = useState<BookingForm>({
+    name: '', email: '', phone: '', document: '',
+    hasPet: false, hasExtraLuggage: false, notes: ''
+  });
+
+  // Cargar ruta y asientos ocupados
+  useEffect(() => {
+    if (!routeId) return;
+    const load = async () => {
+      // Ruta
+      const { data: r } = await supabase
+        .from('wemove_routes')
+        .select(`
+          id, price, available_seats, departure_time,
+          transport_unit:transport_units(type, capacity),
+          transporter:profiles!wemove_routes_transporter_id_fkey(display_name, phone_full, rating),
+          route:routes(
+            origin:locations!routes_origin_location_id_fkey(name),
+            destination:locations!routes_destination_location_id_fkey(name)
+          )
+        `)
+        .eq('id', routeId)
+        .eq('status', 'active')
+        .single();
+      if (!r) { setError('Ruta no disponible'); setLoading(false); return; }
+      setRoute(r as any);
+
+      // Asientos ocupados
+      const { data: bookings } = await supabase
+        .from('wemove_bookings')
+        .select('seat_number')
+        .eq('route_id', routeId)
+        .in('status', ['confirmed', 'paid']);
+      setTakenSeats((bookings ?? []).map(b => b.seat_number));
+      setLoading(false);
+    };
+    load();
+  }, [routeId]);
+
+  const handleSeatSelect = (n: number) => setSelectedSeat(n === 0 ? null : n);
 
   const handleSubmit = async () => {
-    if (!routeId || !selectedSeat) return;
+    if (!route || !selectedSeat || !form.name) return;
+    setSubmitting(true);
+    setError(null);
     try {
-      await createBooking.mutateAsync({
-        route_id: routeId, seat_label: selectedSeat,
-        passenger_name: name, passenger_email: email,
-        passenger_phone: phone, passenger_doc: doc,
-        brings_pet: bringsPet, pet_description: petDesc,
-        extra_luggage: extraLuggage, luggage_details: luggageDetails,
-        special_notes: notes,
-      });
-      await refetchSeats();
-      setStep('success');
-    } catch (err) { console.error(err); }
+      const { data, error: err } = await supabase
+        .from('wemove_bookings')
+        .insert({
+          route_id:           route.id,
+          passenger_name:     form.name,
+          passenger_email:    form.email || null,
+          passenger_phone:    form.phone || null,
+          passenger_document: form.document || null,
+          seat_number:        selectedSeat,
+          seat_label:         `Asiento ${selectedSeat}`,
+          has_pet:            form.hasPet,
+          has_extra_luggage:  form.hasExtraLuggage,
+          passenger_notes:    form.notes || null,
+          status:             'confirmed',
+        })
+        .select('id, boarding_code, payment_deadline')
+        .single();
+
+      if (err) throw err;
+      setBookingResult(data);
+      setStep(3);
+    } catch (e: any) {
+      setError(e?.message ?? 'Error al crear la reserva');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  if (routeLoading) return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-    </div>
-  );
-  if (!route) return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
-      <AlertCircle className="h-12 w-12 text-muted-foreground" />
-      <p className="text-muted-foreground">Viaje no encontrado</p>
-      <Link to="/wemove" className="text-primary underline text-sm">Volver a WeMove</Link>
+  if (loading) return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="text-center space-y-2">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="text-sm text-muted-foreground">Cargando...</p>
+      </div>
     </div>
   );
 
-  const dep      = new Date(route.departure_time);
-  const origin   = route.route?.origin?.name ?? '—';
-  const dest     = route.route?.destination?.name ?? '—';
-  const currency = route.currency ?? 'BOB';
-  const emoji: Record<string,string> = { bus:'🚌', microbus:'🚐', minibus:'🚐', van:'🚐', sedan:'🚗', suv:'🚙', boat:'⛵', plane:'✈️' };
-  const vEmoji = emoji[route.transport_unit?.type ?? ''] ?? '🚌';
+  if (error && !route) return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="text-center space-y-3">
+        <p className="text-destructive font-bold">{error}</p>
+        <Link to="/wemove" className="text-sm text-primary underline">Volver a WeMove</Link>
+      </div>
+    </div>
+  );
 
-  const stepList: Step[] = ['seat', 'info', 'confirm'];
-  const stepLabels = ['Elige asiento', 'Tus datos', 'Confirmar'];
+  const capacity = route?.transport_unit?.capacity ?? 20;
+  const origin = route?.route?.origin?.name ?? '';
+  const destination = route?.route?.destination?.name ?? '';
+  const departure = route ? format(new Date(route.departure_time), "d 'de' MMMM · HH:mm", { locale: es }) : '';
+
+  // ── STEP 3: ÉXITO ──
+  if (step === 3 && bookingResult) {
+    const deadline = new Date(bookingResult.payment_deadline);
+    const phone = route?.transporter?.phone_full;
+    const transporterName = route?.transporter?.display_name;
+    const whatsappMsg = encodeURIComponent(
+      `Hola ${transporterName}, reservé el asiento ${selectedSeat} (código ${bookingResult.boarding_code}) en el viaje ${origin} → ${destination} del ${departure}. Quisiera coordinar el pago.`
+    );
+    const whatsappUrl = phone ? `https://wa.me/${phone.replace(/\D/g,'')}?text=${whatsappMsg}` : null;
+
+    return (
+      <div className="min-h-screen bg-background">
+        <WeMoveHeader />
+        <main className="container max-w-lg py-10">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Check className="h-8 w-8 text-green-600" />
+            </div>
+            <h1 className="text-2xl font-black">¡Reserva confirmada!</h1>
+            <p className="text-muted-foreground mt-1">{origin} → {destination} · {departure}</p>
+          </div>
+
+          {/* Código de embarque */}
+          <div className="border-4 border-foreground rounded-2xl p-6 text-center mb-6 bg-primary/5">
+            <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Tu código de embarque</p>
+            <p className="text-6xl font-black tracking-[0.3em] text-primary">{bookingResult.boarding_code}</p>
+            <p className="text-sm text-muted-foreground mt-2">Asiento <span className="font-black text-foreground">{selectedSeat}</span></p>
+          </div>
+
+          {/* Deadline pago */}
+          <div className="border-2 border-amber-300 bg-amber-50 rounded-xl p-4 mb-4">
+            <div className="flex items-center gap-2 text-amber-800 mb-2">
+              <Clock className="h-4 w-4 shrink-0" />
+              <p className="font-bold text-sm">Coordina tu pago antes de:</p>
+            </div>
+            <p className="text-amber-900 font-black text-lg">
+              {format(deadline, "d 'de' MMMM · HH:mm", { locale: es })}
+            </p>
+            <p className="text-xs text-amber-700 mt-1">
+              Si no se confirma el pago, tu asiento se liberará automáticamente.
+            </p>
+          </div>
+
+          {/* WhatsApp */}
+          {whatsappUrl && (
+            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 bg-green-500 text-white font-black text-sm px-6 py-4 rounded-xl hover:bg-green-600 transition-colors mb-4 w-full">
+              💬 Contactar al transportador por WhatsApp
+            </a>
+          )}
+
+          <Link to="/wemove"
+            className="flex items-center justify-center gap-2 border-2 border-foreground px-6 py-3 rounded-xl font-bold text-sm hover:bg-muted transition-colors w-full">
+            <ArrowLeft className="h-4 w-4" /> Volver a WeMove
+          </Link>
+        </main>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="h-px w-full bg-gradient-to-r from-transparent via-primary to-transparent" />
-        <div className="container flex h-16 items-center justify-between">
-          <Link to="/wemove" className="flex items-center gap-3 group">
-            <img src="/logo.png" alt="WeMove" className="h-9 w-auto object-contain group-hover:opacity-80 transition-opacity" />
-            <span className="font-serif text-lg font-semibold hidden sm:block">We<span className="text-primary">Move</span></span>
+    <div className="min-h-screen bg-background">
+      <WeMoveHeader />
+      <main className="container max-w-lg py-8">
+
+        {/* Breadcrumb del viaje */}
+        <div className="mb-6">
+          <Link to="/wemove" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-3">
+            <ArrowLeft className="h-3.5 w-3.5" /> Volver
           </Link>
-          <LanguageSelector />
-        </div>
-      </header>
-
-      <main className="flex-1 container py-8 max-w-xl">
-        <Link to="/wemove" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
-          <ArrowLeft className="h-4 w-4" /> Volver a resultados
-        </Link>
-
-        {/* Route card */}
-        <div className="bg-card rounded-2xl border border-border/60 p-5 mb-6">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">{vEmoji}</span>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 font-semibold text-base">
-                <span className="truncate">{origin}</span>
-                <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" />
-                <span className="truncate">{dest}</span>
-              </div>
-              <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1.5 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{format(dep, "EEEE d 'de' MMMM · HH:mm", { locale: es })}</span>
-                <span className="flex items-center gap-1"><Users className="h-3 w-3" />{route.available_seats} asientos</span>
-              </div>
-            </div>
-            <div className="text-right shrink-0">
-              <p className="text-xl font-bold text-primary">{currency} {route.price}</p>
-              <p className="text-xs text-muted-foreground">por asiento</p>
-            </div>
+          <div className="flex items-center gap-2 text-sm font-bold">
+            <MapPin className="h-4 w-4 text-primary" />{origin}
+            <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+            <MapPin className="h-4 w-4 text-destructive" />{destination}
           </div>
-
-          <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-border/40">
-            {route.accepts_pets    && <Chip icon={PawPrint} label="Mascotas OK" />}
-            {route.accepts_luggage && <Chip icon={Luggage}  label="Equipaje" />}
-            {route.has_ac          && <Chip icon={Wind}     label="A/C" />}
-            {route.has_wifi        && <Chip icon={Wifi}     label="WiFi" />}
-            {route.door_to_door    && <Chip icon={Home}     label="Puerta a puerta" />}
+          <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1">
+            <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{departure}</span>
+            <span className="flex items-center gap-1"><DollarSign className="h-3 w-3" />Bs. {route?.price.toFixed(0)} por asiento</span>
           </div>
-
-          {route.pickup_address && (
-            <p className="text-xs text-muted-foreground mt-3 pt-3 border-t border-border/40 flex items-start gap-1.5">
-              <span className="shrink-0">📍</span>{route.pickup_address}
-            </p>
-          )}
-
-          {route.transporter?.full_name && (
-            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/40">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary shrink-0">
-                {route.transporter.full_name.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <p className="text-sm font-medium">{route.transporter.full_name}</p>
-                {route.transporter.rating && <p className="text-xs text-muted-foreground">⭐ {Number(route.transporter.rating).toFixed(1)}</p>}
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Step indicators */}
-        {step !== 'success' && (
-          <div className="flex items-center gap-2 mb-6">
-            {stepList.map((s, i) => {
-              const curr = stepList.indexOf(step);
-              const si   = stepList.indexOf(s);
-              return (
-                <div key={s} className="flex items-center gap-2 flex-1 last:flex-none">
-                  <div className={cn('flex items-center gap-1.5 text-xs font-medium whitespace-nowrap', si <= curr ? 'text-primary' : 'text-muted-foreground')}>
-                    <span className={cn('w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors',
-                      si < curr ? 'bg-primary text-primary-foreground' : si === curr ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground')}>
-                      {si < curr ? '✓' : i + 1}
-                    </span>
-                    <span className="hidden sm:inline">{stepLabels[i]}</span>
-                  </div>
-                  {i < 2 && <div className={cn('flex-1 h-px', si < curr ? 'bg-primary' : 'bg-border')} />}
-                </div>
-              );
-            })}
+        {/* Steps */}
+        <div className="flex items-center gap-2 mb-8">
+          {(['Elige asiento', 'Tus datos', 'Confirmar'] as const).map((label, i) => (
+            <div key={i} className="flex items-center gap-2 flex-1">
+              <div className={cn(
+                'w-7 h-7 rounded-full flex items-center justify-center text-xs font-black border-2 transition-all',
+                step > i + 1 ? 'bg-green-500 border-green-500 text-white'
+                  : step === i + 1 ? 'bg-primary border-primary text-primary-foreground'
+                  : 'bg-muted border-border text-muted-foreground'
+              )}>
+                {step > i + 1 ? <Check className="h-3.5 w-3.5" /> : i + 1}
+              </div>
+              <span className={cn('text-xs font-bold', step === i + 1 ? 'text-foreground' : 'text-muted-foreground')}>
+                {label}
+              </span>
+              {i < 2 && <div className={cn('flex-1 h-0.5', step > i + 1 ? 'bg-green-500' : 'bg-border')} />}
+            </div>
+          ))}
+        </div>
+
+        {/* ── STEP 1: Selector de asientos ── */}
+        {step === 1 && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-xl font-black mb-1">Elige tu asiento</h2>
+              <p className="text-sm text-muted-foreground">
+                {takenSeats.length} ocupados · {capacity - takenSeats.length} disponibles
+              </p>
+            </div>
+            <SeatSelector
+              totalSeats={capacity}
+              takenSeats={takenSeats}
+              selectedSeat={selectedSeat}
+              onSelect={handleSeatSelect}
+              vehicleType={route?.transport_unit?.type}
+            />
+            <button
+              onClick={() => setStep(2)}
+              disabled={!selectedSeat}
+              className="w-full bg-primary text-primary-foreground font-black py-4 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors">
+              Continuar con asiento {selectedSeat} <ArrowRight className="h-4 w-4" />
+            </button>
           </div>
         )}
 
-        {/* ── STEP 1: SEAT ── */}
-        {step === 'seat' && (
-          <div className="bg-card rounded-2xl border border-border/60 p-5">
-            <h2 className="font-serif text-lg font-semibold mb-4">Elige tu asiento</h2>
-            {seats.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <Info className="h-8 w-8 mx-auto mb-2 opacity-40" />
-                <p className="text-sm">El transportador no ha definido un mapa de asientos.</p>
-                <p className="text-xs mt-1">Puedes continuar sin seleccionar asiento específico.</p>
-                <button onClick={() => { setSelectedSeat('Libre'); setStep('info'); }}
-                  className="mt-4 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
-                  Continuar →
-                </button>
-              </div>
-            ) : (
-              <>
-                <SeatMap seats={seats} selected={selectedSeat} onSelect={setSelectedSeat} />
-                {selectedSeat && (
-                  <div className="mt-4 p-3 bg-primary/5 border border-primary/20 rounded-xl flex items-center justify-between">
-                    <p className="text-sm font-medium">Asiento: <span className="font-bold text-primary">{selectedSeat}</span></p>
-                    <button onClick={() => setStep('info')}
-                      className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
-                      Continuar →
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        )}
-
-        {/* ── STEP 2: INFO ── */}
-        {step === 'info' && (
-          <div className="bg-card rounded-2xl border border-border/60 overflow-hidden">
-            <div className="px-5 py-4 border-b border-border/40 flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
-                <User className="h-3.5 w-3.5 text-primary" />
-              </div>
-              <h2 className="font-serif text-base font-semibold">Tus datos de pasajero</h2>
-            </div>
-            <div className="p-5 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <BField label="Nombre completo *">
-                  <Input value={name} onChange={e => setName(e.target.value)} placeholder="Juan Pérez" className="rounded-xl border-border/60" />
-                </BField>
-                <BField label="Correo electrónico *">
-                  <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="juan@ejemplo.com" className="rounded-xl border-border/60" />
-                </BField>
-                <BField label="Teléfono">
-                  <Input value={phone} onChange={e => setPhone(e.target.value)} placeholder="+591 70000000" className="rounded-xl border-border/60" />
-                </BField>
-                <BField label="N° de documento">
-                  <Input value={doc} onChange={e => setDoc(e.target.value)} placeholder="CI / Pasaporte" className="rounded-xl border-border/60" />
-                </BField>
-              </div>
-
-              {route.accepts_pets && (
-                <div className="space-y-2">
-                  <Toggle icon={PawPrint} label="Llevaré una mascota" value={bringsPet} onChange={setBringsPet} />
-                  {bringsPet && <Input value={petDesc} onChange={e => setPetDesc(e.target.value)} placeholder="Raza, tamaño, etc." className="rounded-xl border-border/60 text-sm" />}
-                </div>
-              )}
-              {route.accepts_luggage && (
-                <div className="space-y-2">
-                  <Toggle icon={Luggage} label="Equipaje extra o bultos grandes" value={extraLuggage} onChange={setExtraLug} />
-                  {extraLuggage && <Input value={luggageDetails} onChange={e => setLugDet(e.target.value)} placeholder="Cantidad, tamaño" className="rounded-xl border-border/60 text-sm" />}
-                </div>
-              )}
-
-              <BField label="Notas especiales (opcional)">
-                <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2}
-                  placeholder="¿Algo que el transportador deba saber?"
-                  className="w-full rounded-xl border border-border/60 bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30" />
-              </BField>
-
-              <div className="flex gap-2 pt-2">
-                <button onClick={() => setStep('seat')} className="flex-1 py-3 rounded-xl border border-border text-sm font-medium hover:bg-muted transition-colors">← Atrás</button>
-                <button onClick={() => { if (!name.trim() || !email.trim()) return; setStep('confirm'); }}
-                  disabled={!name.trim() || !email.trim()}
-                  className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50">
-                  Revisar reserva →
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── STEP 3: CONFIRM ── */}
-        {step === 'confirm' && (
-          <div className="space-y-4">
-            {/* Summary */}
-            <div className="bg-card rounded-2xl border border-border/60 p-5 space-y-3">
-              <h2 className="font-serif text-lg font-semibold">Resumen de tu reserva</h2>
-              <div className="space-y-2 text-sm">
-                <Row label="Viaje"   value={`${origin} → ${dest}`} />
-                <Row label="Fecha"   value={format(dep, "d 'de' MMMM yyyy · HH:mm", { locale: es })} />
-                <Row label="Asiento" value={selectedSeat ?? '—'} highlight />
-                <Row label="Precio"  value={`${currency} ${route.price}`} highlight />
-                <div className="border-t border-border/40 pt-2 mt-2">
-                  <Row label="Pasajero" value={name} />
-                  <Row label="Email"    value={email} />
-                  {phone         && <Row label="Teléfono"      value={phone} />}
-                  {doc           && <Row label="Documento"     value={doc} />}
-                  {bringsPet     && <Row label="Mascota"        value={petDesc || 'Sí'} />}
-                  {extraLuggage  && <Row label="Equipaje extra" value={luggageDetails || 'Sí'} />}
-                  {notes         && <Row label="Notas"          value={notes} />}
-                </div>
-              </div>
+        {/* ── STEP 2: Datos del pasajero ── */}
+        {step === 2 && (
+          <div className="space-y-5">
+            <div>
+              <h2 className="text-xl font-black mb-1">Tus datos</h2>
+              <p className="text-sm text-muted-foreground">Asiento {selectedSeat} · Bs. {route?.price.toFixed(0)}</p>
             </div>
 
-            {/* WhatsApp group notice */}
-            {route.whatsapp_group_link && (
-              <div className="flex items-center gap-3 p-3.5 bg-[#25D366]/10 border border-[#25D366]/30 rounded-2xl">
-                <span className="text-2xl shrink-0">💬</span>
-                <p className="text-xs text-foreground leading-relaxed">
-                  Al confirmar recibirás el link para <strong>unirte al grupo de WhatsApp</strong> del viaje.
-                </p>
-              </div>
-            )}
-
-            {/* Payment note */}
-            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex gap-3">
-              <CreditCard className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+            <div className="space-y-4">
+              {/* Nombre */}
               <div>
-                <p className="text-sm font-semibold text-amber-800">Pago al momento del viaje</p>
-                <p className="text-xs text-amber-700 mt-0.5">El transportador confirmará tu reserva. El pago se coordina directamente con él.</p>
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground block mb-1.5">
+                  Nombre completo *
+                </label>
+                <input value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))}
+                  placeholder="Tu nombre"
+                  className="w-full border-2 border-foreground rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:border-primary bg-background" />
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground block mb-1.5">
+                  Email (para recibir confirmación)
+                </label>
+                <input type="email" value={form.email} onChange={e => setForm(f => ({...f, email: e.target.value}))}
+                  placeholder="tucorreo@email.com"
+                  className="w-full border-2 border-foreground/40 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:border-primary bg-background" />
+              </div>
+
+              {/* Teléfono */}
+              <div>
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground block mb-1.5">
+                  Teléfono
+                </label>
+                <input value={form.phone} onChange={e => setForm(f => ({...f, phone: e.target.value}))}
+                  placeholder="+591 7XXXXXXX"
+                  className="w-full border-2 border-foreground/40 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:border-primary bg-background" />
+              </div>
+
+              {/* Documento */}
+              <div>
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground block mb-1.5">
+                  Número de documento
+                </label>
+                <input value={form.document} onChange={e => setForm(f => ({...f, document: e.target.value}))}
+                  placeholder="CI / Pasaporte"
+                  className="w-full border-2 border-foreground/40 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:border-primary bg-background" />
+              </div>
+
+              {/* Extras — toggles */}
+              <div className="grid grid-cols-2 gap-3">
+                <button onClick={() => setForm(f => ({...f, hasPet: !f.hasPet}))}
+                  className={cn('border-2 rounded-xl py-3 px-4 text-sm font-bold text-left transition-all',
+                    form.hasPet ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:border-foreground/40')}>
+                  🐾 {form.hasPet ? '✓ ' : ''}Con mascota
+                </button>
+                <button onClick={() => setForm(f => ({...f, hasExtraLuggage: !f.hasExtraLuggage}))}
+                  className={cn('border-2 rounded-xl py-3 px-4 text-sm font-bold text-left transition-all',
+                    form.hasExtraLuggage ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:border-foreground/40')}>
+                  🧳 {form.hasExtraLuggage ? '✓ ' : ''}Equipaje extra
+                </button>
+              </div>
+
+              {/* Notas */}
+              <div>
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground block mb-1.5">
+                  Comentarios adicionales
+                </label>
+                <textarea value={form.notes} onChange={e => setForm(f => ({...f, notes: e.target.value}))}
+                  placeholder="Ej: Necesito subir en otro punto de la ruta..."
+                  rows={3}
+                  className="w-full border-2 border-foreground/40 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:border-primary bg-background resize-none" />
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex gap-2">
-              <button onClick={() => setStep('info')} className="flex-1 py-3.5 rounded-xl border border-border text-sm font-medium hover:bg-muted transition-colors">← Editar datos</button>
-              <button onClick={handleSubmit} disabled={createBooking.isPending}
-                className="flex-1 py-3.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
-                {createBooking.isPending ? <><Loader2 className="h-4 w-4 animate-spin" /> Procesando…</> : 'Confirmar reserva ✓'}
+            {error && <p className="text-sm text-destructive font-bold">{error}</p>}
+
+            <div className="flex gap-3">
+              <button onClick={() => setStep(1)}
+                className="flex-1 border-2 border-foreground rounded-xl py-4 font-bold text-sm hover:bg-muted transition-colors">
+                ← Editar asiento
+              </button>
+              <button onClick={handleSubmit}
+                disabled={!form.name || submitting}
+                className="flex-[2] bg-primary text-primary-foreground font-black py-4 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors">
+                {submitting
+                  ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Confirmando...</>
+                  : <>Confirmar reserva ✓</>
+                }
               </button>
             </div>
           </div>
         )}
-
-        {/* ── SUCCESS ── */}
-        {step === 'success' && (
-          <div className="bg-card rounded-2xl border border-border/60 p-8 text-center space-y-5">
-            <div className="w-16 h-16 rounded-full bg-green-50 border border-green-200 flex items-center justify-center mx-auto">
-              <CheckCircle2 className="h-8 w-8 text-green-600" />
-            </div>
-            <div>
-              <h2 className="font-serif text-2xl font-semibold">¡Reserva enviada!</h2>
-              <p className="text-sm text-muted-foreground mt-2">
-                Tu solicitud fue enviada al transportador. Recibirás confirmación en <strong>{email}</strong>.
-              </p>
-            </div>
-
-            <div className="bg-muted/40 rounded-xl p-4 text-sm text-left space-y-1.5">
-              <p><span className="text-muted-foreground">Viaje:</span> <strong>{origin} → {dest}</strong></p>
-              <p><span className="text-muted-foreground">Fecha:</span> {format(dep, "d MMM · HH:mm", { locale: es })}</p>
-              <p><span className="text-muted-foreground">Asiento:</span> <strong className="text-primary">{selectedSeat}</strong></p>
-              <p><span className="text-muted-foreground">Precio:</span> <strong>{currency} {route.price}</strong></p>
-              {route.pickup_address && (
-                <p><span className="text-muted-foreground">Punto de partida:</span> {route.pickup_address}</p>
-              )}
-            </div>
-
-            {/* WhatsApp buttons */}
-            <div className="space-y-2 w-full">
-              {route.whatsapp_group_link && (
-                <a href={route.whatsapp_group_link} target="_blank" rel="noopener noreferrer"
-                  className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl font-semibold text-sm text-white transition-opacity hover:opacity-90"
-                  style={{ backgroundColor: '#25D366' }}>
-                  {WA_ICON} Unirme al grupo del viaje
-                </a>
-              )}
-              {route.transporter_phone && (
-                <a href={`https://wa.me/591${route.transporter_phone}?text=${encodeURIComponent(
-                  `Hola, reservé el asiento ${selectedSeat} para el viaje ${origin} → ${dest}. Mi nombre es ${name}.`
-                )}`} target="_blank" rel="noopener noreferrer"
-                  className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl border-2 font-semibold text-sm transition-opacity hover:opacity-80"
-                  style={{ borderColor: '#25D366', color: '#25D366' }}>
-                  {WA_ICON} Escribir al transportador
-                </a>
-              )}
-            </div>
-
-            <p className="text-xs text-muted-foreground">El pago se coordina con el transportador antes del viaje.</p>
-            <Link to="/wemove" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
-              Volver a WeMove
-            </Link>
-          </div>
-        )}
       </main>
-    </div>
-  );
-}
-
-function Chip({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
-  return <span className="inline-flex items-center gap-1 text-xs text-foreground/60 bg-muted px-2 py-0.5 rounded-full"><Icon className="h-3 w-3" /> {label}</span>;
-}
-function Toggle({ icon: Icon, label, value, onChange }: { icon: React.ElementType; label: string; value: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <button type="button" onClick={() => onChange(!value)}
-      className={cn('flex items-center gap-2.5 w-full p-3 rounded-xl border text-left transition-all text-sm font-medium',
-        value ? 'border-primary bg-primary/5 text-primary' : 'border-border/60 text-foreground hover:bg-muted/40')}>
-      <Icon className="h-4 w-4 shrink-0" />
-      <span className="flex-1">{label}</span>
-      <span className={cn('w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all', value ? 'border-primary bg-primary' : 'border-border')}>
-        {value && <span className="text-primary-foreground text-[10px] font-bold">✓</span>}
-      </span>
-    </button>
-  );
-}
-function BField({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">{label}</Label>{children}</div>;
-}
-function Row({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
-  return (
-    <div className="flex items-start justify-between gap-2">
-      <span className="text-muted-foreground shrink-0">{label}:</span>
-      <span className={cn('text-right', highlight ? 'font-bold text-primary' : 'text-foreground')}>{value}</span>
     </div>
   );
 }
