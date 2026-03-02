@@ -1,467 +1,668 @@
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate, Link } from 'react-router-dom';
-import { useWeMoveAuth } from '@/hooks/useWeMoveAuth';
-import { useMyWeMoveTransporter, useMyProfile, useMyTransportUnits, useMyWeMoveRoutes, useCancelWeMoveRoute } from '@/hooks/useWeMoveTransporter';
+// src/pages/WeMoveDashboard.tsx — REESCRITO COMPLETO
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useWeMoveAuth } from '@/hooks/useWeMoveAuth';
 import { useToast } from '@/hooks/use-toast';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useMyProfile, useMyWeMoveTransporter,
+  useMyTransportUnits, useMyWeMoveRoutes,
+  useCancelWeMoveRoute
+} from '@/hooks/useWeMoveTransporter';
+import { SeatSelector } from '@/components/wemove/SeatSelector';
+import { SeatLayoutEditor, SeatLayout } from '@/components/wemove/SeatLayoutEditor';
+import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { LanguageSelector } from '@/components/LanguageSelector';
 import {
-  LogOut, User, Star, Bus, MapPin, ArrowRight,
-  Calendar, Users, CheckCircle, Clock, Plus,
-  PawPrint, Luggage, ChevronDown, ChevronUp,
-  AlertCircle, Loader2, TrendingUp, Shield, Bell, Route
+  ArrowLeft, Plus, Star, Bus, MapPin, ArrowRight,
+  Calendar, Users, Clock, XCircle, LogOut, User,
+  DollarSign, CheckCircle, AlertCircle, Layout,
+  ChevronDown, ChevronUp, Printer, Share2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface Booking {
-  id: string;
-  passenger_name: string;
-  passenger_email: string;
-  passenger_phone: string | null;
-  passenger_doc: string | null;
-  seat_label: string;
-  brings_pet: boolean;
-  pet_description: string | null;
-  extra_luggage: boolean;
-  luggage_details: string | null;
-  special_notes: string | null;
-  status: string;
-  payment_status: string;
-  payment_method: string | null;
-  amount_paid: number | null;
-  booked_at: string;
-  confirmed_at?: string | null;
-  cancelled_at?: string | null;
-}
-
+// ── Hook: bookings por ruta ───────────────────────────────────
 function useRouteBookings(routeId: string | null) {
-  return useQuery({
-    queryKey: ['route-bookings', routeId],
-    queryFn: async () => {
-      if (!routeId) return [];
-      const { data, error } = await supabase
-        .from('wemove_bookings')
-        .select('*')
-        .eq('route_id', routeId)
-        .order('booked_at', { ascending: true });
-      if (error) throw error;
-      return data as Booking[];
-    },
-    enabled: !!routeId,
-  });
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [loading, setLoading]   = useState(false);
+
+  useEffect(() => {
+    if (!routeId) { setBookings([]); return; }
+    setLoading(true);
+    supabase
+      .from('wemove_bookings')
+      .select('*')
+      .eq('route_id', routeId)
+      .in('status', ['confirmed', 'paid', 'expired'])
+      .order('created_at', { ascending: true })
+      .then(({ data }) => { setBookings(data ?? []); setLoading(false); });
+
+    // Realtime
+    const ch = supabase
+      .channel(`bookings-${routeId}`)
+      .on('postgres_changes', {
+        event: '*', schema: 'public',
+        table: 'wemove_bookings',
+        filter: `route_id=eq.${routeId}`
+      }, () => {
+        supabase.from('wemove_bookings')
+          .select('*').eq('route_id', routeId)
+          .in('status', ['confirmed', 'paid', 'expired'])
+          .order('created_at', { ascending: true })
+          .then(({ data }) => setBookings(data ?? []));
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(ch); };
+  }, [routeId]);
+
+  return { bookings, loading };
 }
 
-function useUpdateBooking() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async ({ bookingId, updates }: { bookingId: string; updates: Record<string, unknown> }) => {
-      const { error } = await supabase
-        .from('wemove_bookings')
-        .update(updates)
-        .eq('id', bookingId);
-      if (error) throw error;
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['route-bookings'] }),
-  });
+// ── Componente: lista de pasajeros de una ruta ────────────────
+function RouteManifest({ route, units }: { route: any; units: any[] }) {
+  const { toast }              = useToast();
+  const qc                     = useQueryClient();
+  const { bookings, loading }  = useRouteBookings(route.id);
+  const [marking, setMarking]  = useState<string | null>(null);
+  const { user }               = useWeMoveAuth();
+
+  const unit       = units.find(u => u.id === route.transport_unit_id);
+  const layout     = unit?.seat_layout ?? null;
+  const takenSeats = bookings
+    .filter(b => b.status === 'confirmed' || b.status === 'paid')
+    .map(b => b.seat_label).filter(Boolean);
+
+  const paid      = bookings.filter(b => b.status === 'paid').length;
+  const confirmed = bookings.filter(b => b.status === 'confirmed').length;
+  const expired   = bookings.filter(b => b.status === 'expired').length;
+
+  const handleMarkPaid = async (bookingId: string) => {
+    if (!user) return;
+    setMarking(bookingId);
+    const { data, error } = await supabase.rpc('mark_booking_paid', {
+      p_booking_id:          bookingId,
+      p_transporter_user_id: user.id,
+    });
+    setMarking(null);
+    if (error) {
+      toast({ title: 'Error al confirmar pago', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: `✓ Pago confirmado · comisión Bs.${data?.commission ?? '—'}` });
+      qc.invalidateQueries({ queryKey: ['my-wemove-routes', user.id] });
+    }
+  };
+
+  const handlePrint = () => {
+    const lines = bookings.map(b =>
+      `${b.seat_label ?? '?'} | ${b.passenger_name} | ${b.passenger_phone ?? '—'} | ${b.status === 'paid' ? 'PAGADO' : 'PENDIENTE'}`
+    ).join('\n');
+    const win = window.open('', '_blank');
+    if (!win) return;
+    win.document.write(`<pre style="font-family:monospace;padding:20px">
+MANIFIESTO DE PASAJEROS
+${route.trip_code ?? ''} — ${route.route?.origin?.name} → ${route.route?.destination?.name}
+${format(new Date(route.departure_time), "d 'de' MMMM yyyy · HH:mm", { locale: es })}
+─────────────────────────────────────────
+ASIENTO | NOMBRE | TELÉFONO | ESTADO
+─────────────────────────────────────────
+${lines}
+─────────────────────────────────────────
+Total: ${bookings.length} reservas · ${paid} pagadas · ${confirmed} pendientes
+    </pre>`);
+    win.print();
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Mapa de asientos */}
+      {(layout || (unit?.capacity ?? 0) > 0) && (
+        <div className="bg-muted/20 rounded-2xl p-4">
+          <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-3">
+            Mapa del vehículo
+          </p>
+          <SeatSelector
+            layout={layout}
+            totalSeats={unit?.capacity ?? 10}
+            takenSeats={takenSeats}
+            selectedSeat={null}
+            onSelect={() => {}}
+            readOnly
+          />
+        </div>
+      )}
+
+      {/* Estadísticas */}
+      <div className="grid grid-cols-3 gap-2 text-center">
+        <StatBadge label="Pagadas" value={paid} color="text-green-600 bg-green-50 border-green-200" />
+        <StatBadge label="Pendientes" value={confirmed} color="text-amber-600 bg-amber-50 border-amber-200" />
+        <StatBadge label="Expiradas" value={expired} color="text-muted-foreground bg-muted/40 border-border" />
+      </div>
+
+      {/* Lista pasajeros */}
+      {loading ? (
+        <div className="h-16 bg-muted/30 rounded-xl animate-pulse" />
+      ) : bookings.length === 0 ? (
+        <div className="text-center py-8 border-2 border-dashed border-border rounded-xl">
+          <Users className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground">Sin reservas aún</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {bookings.map(b => {
+            const isPaid     = b.status === 'paid';
+            const isExpired  = b.status === 'expired';
+            const isOverdue  = !isPaid && !isExpired && b.payment_deadline &&
+              new Date(b.payment_deadline) < new Date();
+            return (
+              <div key={b.id} className={cn(
+                'rounded-xl border-2 p-3.5 space-y-2 transition-colors',
+                isPaid    ? 'border-green-200 bg-green-50/30' :
+                isExpired ? 'border-border bg-muted/20 opacity-60' :
+                isOverdue ? 'border-red-200 bg-red-50/30' :
+                            'border-foreground/20 bg-background'
+              )}>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2.5">
+                    <div className={cn(
+                      'w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black border-2 shrink-0',
+                      isPaid ? 'bg-green-100 border-green-300 text-green-700' :
+                      isExpired ? 'bg-muted border-border text-muted-foreground' :
+                      'bg-primary/10 border-primary/30 text-primary'
+                    )}>
+                      {b.seat_label ?? '?'}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold leading-tight">{b.passenger_name}</p>
+                      <div className="flex flex-wrap gap-2 mt-0.5 text-xs text-muted-foreground">
+                        {b.passenger_phone && <span>📞 {b.passenger_phone}</span>}
+                        {b.passenger_email && <span>✉ {b.passenger_email}</span>}
+                        {b.has_pet && <span>🐾 Mascota</span>}
+                        {b.has_extra_luggage && <span>🧳 Equipaje extra</span>}
+                      </div>
+                      {b.passenger_notes && (
+                        <p className="text-xs text-muted-foreground italic mt-0.5">"{b.passenger_notes}"</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    {isPaid ? (
+                      <span className="text-xs font-bold text-green-700 flex items-center gap-1">
+                        <CheckCircle className="h-3.5 w-3.5" /> Pagado
+                      </span>
+                    ) : isExpired ? (
+                      <span className="text-xs text-muted-foreground">Expirado</span>
+                    ) : (
+                      <span className={cn(
+                        'text-xs font-bold',
+                        isOverdue ? 'text-red-600' : 'text-amber-600'
+                      )}>
+                        {isOverdue ? '⚠ Vencido' : 'Pendiente'}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Boarding code + acciones */}
+                <div className="flex items-center justify-between pt-1 border-t border-foreground/8">
+                  <span className="text-xs text-muted-foreground font-mono">
+                    Código: <span className="font-black text-foreground">{b.boarding_code ?? '—'}</span>
+                  </span>
+                  {!isPaid && !isExpired && (
+                    <button
+                      onClick={() => handleMarkPaid(b.id)}
+                      disabled={!!marking}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500 text-white text-xs font-bold hover:bg-green-600 disabled:opacity-50 transition-colors"
+                    >
+                      {marking === b.id
+                        ? <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        : <CheckCircle className="h-3.5 w-3.5" />
+                      }
+                      Marcar pagado
+                    </button>
+                  )}
+                  {isPaid && b.commission_amount && (
+                    <span className="text-xs text-muted-foreground">
+                      Comisión: <span className="font-bold text-foreground">Bs.{b.commission_amount}</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Acciones pie */}
+      {bookings.length > 0 && (
+        <div className="flex gap-2 pt-2">
+          <button onClick={handlePrint}
+            className="flex items-center gap-1.5 px-4 py-2 border-2 border-foreground rounded-xl text-xs font-bold hover:bg-muted transition-colors">
+            <Printer className="h-3.5 w-3.5" /> Imprimir manifiesto
+          </button>
+          <button
+            onClick={() => {
+              const url = `${window.location.origin}/wemove/booking/${route.id}`;
+              navigator.clipboard.writeText(url);
+              toast({ title: '✓ Enlace copiado al portapapeles' });
+            }}
+            className="flex items-center gap-1.5 px-4 py-2 border-2 border-primary/40 text-primary rounded-xl text-xs font-bold hover:bg-primary/10 transition-colors">
+            <Share2 className="h-3.5 w-3.5" /> Compartir viaje
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }
 
-const STATUS_CFG: Record<string, { label: string; cls: string }> = {
-  pending:   { label: 'Pendiente',       cls: 'text-amber-700 bg-amber-50 border-amber-200' },
-  confirmed: { label: 'Confirmado',      cls: 'text-blue-700 bg-blue-50 border-blue-200' },
-  paid:      { label: 'Pagado',          cls: 'text-green-700 bg-green-50 border-green-200' },
-  cancelled: { label: 'Cancelado',       cls: 'text-red-700 bg-red-50 border-red-200' },
-  no_show:   { label: 'No se presentó', cls: 'text-gray-600 bg-gray-50 border-gray-200' },
-};
+function StatBadge({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <div className={cn('border rounded-xl py-2 px-3', color)}>
+      <p className="text-lg font-black">{value}</p>
+      <p className="text-[10px] font-bold uppercase tracking-wide">{label}</p>
+    </div>
+  );
+}
 
-const VEHICLE_EMOJI: Record<string, string> = {
-  bus: '🚌', microbus: '🚐', minibus: '🚐', van: '🚐',
-  sedan: '🚗', suv: '🚙', boat: '⛵', plane: '✈️', coaster: '🚌',
-};
-
+// ── Dashboard principal ───────────────────────────────────────
 export default function WeMoveDashboard() {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const navigate        = useNavigate();
+  const { toast }       = useToast();
   const { user, loading, signOut } = useWeMoveAuth();
+  const qc              = useQueryClient();
 
-  const { data: transporter }          = useMyWeMoveTransporter(user?.id);
-  const { data: profile }              = useMyProfile(user?.id);
-  const { data: units = [] }           = useMyTransportUnits(user?.id);
-  const { data: myRoutes = [], isLoading: routesLoading } = useMyWeMoveRoutes(user?.id);
-  const cancelRoute   = useCancelWeMoveRoute();
-  const updateBooking = useUpdateBooking();
+  const { data: profile }             = useMyProfile(user?.id);
+  const { data: transporter }         = useMyWeMoveTransporter(user?.id);
+  const { data: units = [] }          = useMyTransportUnits(user?.id);
+  const { data: routes = [], isLoading: routesLoading } = useMyWeMoveRoutes(user?.id);
+  const cancelRoute                   = useCancelWeMoveRoute();
 
-  const [expandedRoute, setExpandedRoute] = useState<string | null>(null);
-  const { data: bookings = [], isLoading: bookingsLoading } = useRouteBookings(expandedRoute);
+  const [activeTab, setActiveTab]   = useState<string | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
+  const [editorUnit, setEditorUnit] = useState<{
+    id: string; type: string; capacity: number; layout: SeatLayout | null;
+  } | null>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate('/wemove/register');
   }, [user, loading, navigate]);
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/wemove');
-  };
+  // Auto-seleccionar primera ruta activa
+  useEffect(() => {
+    if (routes.length > 0 && !activeTab) {
+      const first = routes.find(r => r.status === 'active') ?? routes[0];
+      setActiveTab(first.id);
+    }
+  }, [routes]);
 
-  const bookingAction = async (bookingId: string, action: 'confirm' | 'pay' | 'cancel') => {
-    const now = new Date().toISOString();
-    const updates: Record<string, unknown> = {
-      confirm: { status: 'confirmed', confirmed_at: now },
-      pay:     { status: 'paid', payment_status: 'paid' },
-      cancel:  { status: 'cancelled', cancelled_at: now },
-    }[action];
+  const handleCancelRoute = async (routeId: string) => {
+    if (!user || !confirm('¿Cancelar este viaje?')) return;
     try {
-      await updateBooking.mutateAsync({ bookingId, updates });
-      toast({ title: action === 'cancel' ? 'Reserva rechazada' : 'Reserva actualizada' });
+      await cancelRoute.mutateAsync({ routeId, userId: user.id });
+      toast({ title: 'Viaje cancelado' });
+      qc.invalidateQueries({ queryKey: ['my-wemove-routes', user.id] });
     } catch {
-      toast({ title: 'Error al actualizar', variant: 'destructive' });
+      toast({ title: 'Error al cancelar', variant: 'destructive' });
     }
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
     </div>
   );
   if (!user) return null;
 
-  const activeRoutes    = myRoutes.filter(r => r.status === 'active');
-  const completedRoutes = myRoutes.filter(r => r.status === 'completed');
-  const displayName     = profile?.full_name || user.email?.split('@')[0] || 'Transportador';
-  const isVerified      = transporter?.verification_status === 'verified';
+  const displayName    = profile?.full_name || user.email?.split('@')[0] || 'Transportador';
+  const isVerified     = transporter?.verification_status === 'verified';
+  const activeRoutes   = routes.filter(r => r.status === 'active');
+  const pastRoutes     = routes.filter(r => r.status !== 'active');
+  const selectedRoute  = routes.find(r => r.id === activeTab) ?? null;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-
-      {/* HEADER */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/50">
         <div className="h-px w-full bg-gradient-to-r from-transparent via-primary to-transparent" />
-        <div className="container flex h-16 items-center justify-between gap-4">
-          <Link to="/wemove" className="flex items-center gap-3 group">
-            <img src="/logo.png" alt="WeMove" className="h-9 w-auto object-contain group-hover:opacity-80 transition-opacity" />
-            <span className="font-serif text-lg font-semibold hidden sm:block">
-              We<span className="text-primary">Move</span>
-            </span>
+        <div className="container flex h-14 items-center justify-between">
+          <Link to="/wemove" className="font-serif text-lg font-semibold">
+            We<span className="text-primary">Move</span>
           </Link>
-          <div className="flex items-center gap-3">
-            <LanguageSelector />
-            <button onClick={handleSignOut}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors min-h-[44px] px-3">
+          <div className="flex items-center gap-2">
+            <Link to="/wemove/publish-route"
+              className="flex items-center gap-1.5 px-3 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-xl hover:bg-primary/90 transition-colors">
+              <Plus className="h-3.5 w-3.5" /> Nuevo viaje
+            </Link>
+            <button onClick={async () => { await signOut(); navigate('/wemove'); }}
+              className="p-2 text-muted-foreground hover:text-foreground transition-colors">
               <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('common.logout')}</span>
             </button>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 container py-8 max-w-4xl space-y-8">
+      <div className="flex-1 container py-6">
+        <div className="flex flex-col lg:flex-row gap-6">
 
-        {/* WELCOME */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="font-serif text-2xl font-semibold">
-              Hola, <span className="text-primary">{displayName}</span>
-            </h1>
-            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-              <span className={cn(
-                'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border',
-                isVerified
-                  ? 'text-green-700 bg-green-50 border-green-200'
-                  : 'text-amber-700 bg-amber-50 border-amber-200'
-              )}>
-                {isVerified ? <><Shield className="h-3 w-3" /> Verificado</> : <><Clock className="h-3 w-3" /> Verificación pendiente</>}
-              </span>
-              {!!profile?.rating && (
-                <span className="inline-flex items-center gap-1.5 text-xs text-foreground/70 bg-muted px-2.5 py-1 rounded-full">
-                  <Star className="h-3 w-3 fill-primary text-primary" /> {Number(profile.rating).toFixed(1)}
+          {/* ── COLUMNA IZQUIERDA ─────────────────────────── */}
+          <aside className="lg:w-64 shrink-0 space-y-4">
+
+            {/* Perfil */}
+            <div className="bg-card border border-border/60 rounded-2xl p-5 text-center space-y-3">
+              {/* Avatar */}
+              <div className="w-16 h-16 rounded-full bg-primary/10 border-4 border-primary/20 flex items-center justify-center mx-auto text-2xl font-black text-primary">
+                {displayName.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <p className="font-bold text-sm">{displayName}</p>
+                <p className="text-xs text-muted-foreground">{user.email}</p>
+              </div>
+              {/* Rating */}
+              {profile?.rating ? (
+                <div className="flex items-center justify-center gap-1">
+                  {[1,2,3,4,5].map(i => (
+                    <Star key={i} className={cn('h-3.5 w-3.5',
+                      i <= Math.round(profile.rating ?? 0)
+                        ? 'fill-yellow-400 text-yellow-400'
+                        : 'text-muted-foreground/30'
+                    )} />
+                  ))}
+                  <span className="text-xs font-bold ml-1">{profile.rating}</span>
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">Sin calificaciones aún</p>
+              )}
+              {/* Badge verificado */}
+              {isVerified ? (
+                <span className="inline-flex items-center gap-1 text-xs text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full font-semibold">
+                  <CheckCircle className="h-3 w-3" /> Verificado
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-xs text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full font-semibold">
+                  <AlertCircle className="h-3 w-3" /> Pendiente verificación
                 </span>
               )}
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Link to="/wemove/profile"
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-border text-sm font-medium hover:bg-muted transition-colors min-h-[44px]">
-              <User className="h-4 w-4" />
-              <span className="hidden sm:inline">Mi perfil</span>
-            </Link>
-            <Link to="/wemove/publish-route"
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors min-h-[44px]">
-              <Plus className="h-4 w-4" /> Publicar viaje
-            </Link>
-          </div>
-        </div>
-
-        {/* STATS */}
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { value: activeRoutes.length,         label: 'Viajes activos', icon: Route,      color: 'text-primary' },
-            { value: units.length,                label: 'Mis unidades',   icon: Bus,        color: 'text-foreground' },
-            { value: transporter?.total_trips ?? 0, label: 'Completados', icon: TrendingUp, color: 'text-green-600' },
-          ].map(({ value, label, icon: Icon, color }) => (
-            <div key={label} className="bg-card rounded-2xl border border-border/60 p-4 text-center">
-              <Icon className={cn('h-5 w-5 mx-auto mb-2 opacity-50', color)} />
-              <div className={cn('text-3xl font-serif font-bold', color)}>{value}</div>
-              <div className="text-xs text-muted-foreground mt-0.5">{label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* NO UNITS WARNING */}
-        {units.length === 0 && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm font-semibold text-amber-800">Sin unidades de transporte</p>
-              <p className="text-xs text-amber-700 mt-0.5">Registra tu vehículo en tu perfil para poder publicar viajes.</p>
-              <Link to="/wemove/profile" className="inline-block mt-2 text-xs font-semibold text-amber-800 underline underline-offset-2">
-                Ir a Mi perfil →
+              <Link to="/wemove/profile"
+                className="flex items-center justify-center gap-1.5 w-full py-2 border-2 border-foreground/20 rounded-xl text-xs font-bold hover:bg-muted transition-colors">
+                <User className="h-3.5 w-3.5" /> Mi perfil y documentos
               </Link>
             </div>
-          </div>
-        )}
 
-        {/* MY ROUTES */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-serif text-lg font-semibold">Mis viajes publicados</h2>
-            <span className="text-xs text-muted-foreground">{myRoutes.length} total</span>
-          </div>
-
-          {routesLoading ? (
-            <div className="space-y-3">
-              {[1,2].map(i => <div key={i} className="h-24 bg-card rounded-2xl border border-border/60 animate-pulse" />)}
+            {/* Estadísticas */}
+            <div className="bg-card border border-border/60 rounded-2xl p-4 grid grid-cols-2 gap-3">
+              <div className="text-center">
+                <p className="text-2xl font-black text-primary">{activeRoutes.length}</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-bold">Activos</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-black">{transporter?.total_trips ?? 0}</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-bold">Viajes</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-black">{units.length}</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-bold">Unidades</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-black">{Math.min(routes.length, 10)}/10</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-bold">Fichas</p>
+              </div>
             </div>
-          ) : myRoutes.length === 0 ? (
-            <div className="bg-card rounded-2xl border border-border/60 p-12 text-center">
-              <Route className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">No has publicado ningún viaje aún</p>
-              <Link to="/wemove/publish-route"
-                className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
-                <Plus className="h-4 w-4" /> Publicar mi primer viaje
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {myRoutes.map((route) => {
-                const isExpanded = expandedRoute === route.id;
-                const departure  = new Date(route.departure_time);
-                const emoji      = VEHICLE_EMOJI[route.transport_unit?.type ?? ''] ?? '🚌';
-                const routeAny   = route as any;
 
-                const routeStatusCls: Record<string, string> = {
-                  active:    'text-green-700 bg-green-50 border-green-200',
-                  completed: 'text-blue-700 bg-blue-50 border-blue-200',
-                  cancelled: 'text-red-700 bg-red-50 border-red-200',
-                };
-
-                return (
-                  <div key={route.id} className="bg-card rounded-2xl border border-border/60 overflow-hidden">
-                    <div className="p-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <span className="text-2xl shrink-0">{emoji}</span>
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-1.5 font-semibold text-sm">
-                              <span className="truncate">{route.route?.origin?.name ?? '—'}</span>
-                              <ArrowRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                              <span className="truncate">{route.route?.destination?.name ?? '—'}</span>
-                            </div>
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
-                              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                <Calendar className="h-3 w-3" />
-                                {format(departure, "d MMM · HH:mm", { locale: es })}
-                              </span>
-                              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                <Users className="h-3 w-3" /> {route.available_seats} asientos
-                              </span>
-                              <span className="text-xs font-semibold text-primary">
-                                Bs. {route.price}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className={cn('text-xs font-medium px-2.5 py-1 rounded-full border',
-                            routeStatusCls[route.status] ?? 'text-muted-foreground bg-muted border-border')}>
-                            {route.status === 'active' ? 'Activo' : route.status === 'completed' ? 'Completado' : 'Cancelado'}
-                          </span>
-                          {route.status === 'active' && (
-                            <button
-                              onClick={() => cancelRoute.mutateAsync({ routeId: route.id, userId: user.id })
-                                .then(() => toast({ title: 'Viaje cancelado' }))
-                                .catch(() => toast({ title: 'Error', variant: 'destructive' }))}
-                              className="text-xs text-red-600 hover:text-red-700 px-2 py-1 rounded-lg hover:bg-red-50 transition-colors">
-                              Cancelar
-                            </button>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Options */}
-                      <div className="flex flex-wrap gap-1.5 mt-2.5">
-                        {routeAny.accepts_pets  && <Badge>🐾 Mascotas</Badge>}
-                        {routeAny.has_ac        && <Badge>❄️ A/C</Badge>}
-                        {routeAny.has_wifi      && <Badge>📶 WiFi</Badge>}
-                        {routeAny.door_to_door  && <Badge>🏠 Puerta a puerta</Badge>}
-                      </div>
-
-                      <button
-                        onClick={() => setExpandedRoute(isExpanded ? null : route.id)}
-                        className="flex items-center gap-1.5 mt-3 text-xs font-medium text-primary hover:text-primary/80 transition-colors">
-                        {isExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-                        Ver pasajeros y reservas
-                      </button>
-                    </div>
-
-                    {/* BOOKINGS PANEL */}
-                    {isExpanded && (
-                      <div className="border-t border-border/40 bg-muted/20">
-                        {bookingsLoading ? (
-                          <div className="p-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                            <Loader2 className="h-4 w-4 animate-spin" /> Cargando…
-                          </div>
-                        ) : bookings.length === 0 ? (
-                          <div className="p-8 text-center">
-                            <Bell className="h-8 w-8 text-muted-foreground/20 mx-auto mb-2" />
-                            <p className="text-sm text-muted-foreground">Sin reservas aún para este viaje</p>
-                          </div>
-                        ) : (
-                          <div className="divide-y divide-border/30">
-                            {/* Summary bar */}
-                            <div className="px-4 py-2 flex flex-wrap gap-4 text-xs text-muted-foreground bg-muted/40">
-                              <span className="font-medium">{bookings.length} reserva{bookings.length !== 1 ? 's' : ''}</span>
-                              <span className="text-green-700">{bookings.filter(b => b.payment_status === 'paid').length} pagadas</span>
-                              <span className="text-amber-700">{bookings.filter(b => b.status === 'pending').length} pendientes</span>
-                              <span className="text-blue-700">{bookings.filter(b => b.status === 'confirmed').length} confirmadas</span>
-                            </div>
-
-                            {bookings.map((b) => {
-                              const sc = STATUS_CFG[b.status] ?? STATUS_CFG.pending;
-                              return (
-                                <div key={b.id} className="p-4">
-                                  <div className="flex items-start justify-between gap-3">
-                                    <div className="min-w-0 flex-1">
-                                      <div className="flex items-center gap-2.5">
-                                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary shrink-0">
-                                          {b.passenger_name.charAt(0).toUpperCase()}
-                                        </div>
-                                        <div>
-                                          <p className="text-sm font-semibold text-foreground">{b.passenger_name}</p>
-                                          <p className="text-xs text-muted-foreground">{b.passenger_email}</p>
-                                        </div>
-                                      </div>
-
-                                      <div className="flex flex-wrap gap-1.5 mt-2.5">
-                                        <span className="text-xs font-bold bg-foreground/10 text-foreground px-2 py-0.5 rounded-lg">
-                                          Asiento {b.seat_label}
-                                        </span>
-                                        {b.passenger_phone && (
-                                          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-lg">📞 {b.passenger_phone}</span>
-                                        )}
-                                        {b.passenger_doc && (
-                                          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-lg">🪪 {b.passenger_doc}</span>
-                                        )}
-                                        {b.brings_pet && (
-                                          <span className="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-lg">
-                                            🐾 Mascota{b.pet_description ? `: ${b.pet_description}` : ''}
-                                          </span>
-                                        )}
-                                        {b.extra_luggage && (
-                                          <span className="text-xs text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-lg">
-                                            🧳 Equipaje extra{b.luggage_details ? `: ${b.luggage_details}` : ''}
-                                          </span>
-                                        )}
-                                        {b.special_notes && (
-                                          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-lg italic max-w-xs truncate">
-                                            💬 {b.special_notes}
-                                          </span>
-                                        )}
-                                      </div>
-
-                                      {b.amount_paid && (
-                                        <p className="text-xs font-semibold text-green-700 mt-1.5">
-                                          Pagado: Bs. {b.amount_paid}{b.payment_method ? ` · ${b.payment_method}` : ''}
-                                        </p>
-                                      )}
-                                    </div>
-
-                                    <div className="flex flex-col items-end gap-2 shrink-0">
-                                      <span className={cn('text-xs font-medium px-2.5 py-1 rounded-full border', sc.cls)}>
-                                        {sc.label}
-                                      </span>
-                                      <span className={cn('text-xs', b.payment_status === 'paid' ? 'text-green-600 font-medium' : 'text-muted-foreground')}>
-                                        {b.payment_status === 'paid' ? '✓ Pagado' : 'Sin pago'}
-                                      </span>
-                                      {b.status === 'pending' && (
-                                        <div className="flex gap-1.5 mt-1">
-                                          <button onClick={() => bookingAction(b.id, 'confirm')}
-                                            className="text-xs px-2.5 py-1.5 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors">
-                                            Confirmar
-                                          </button>
-                                          <button onClick={() => bookingAction(b.id, 'cancel')}
-                                            className="text-xs px-2.5 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors">
-                                            Rechazar
-                                          </button>
-                                        </div>
-                                      )}
-                                      {b.status === 'confirmed' && b.payment_status === 'unpaid' && (
-                                        <button onClick={() => bookingAction(b.id, 'pay')}
-                                          className="text-xs px-2.5 py-1.5 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors mt-1">
-                                          Marcar pagado
-                                        </button>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    )}
+            {/* Mis unidades con editor de asientos */}
+            <div className="bg-card border border-border/60 rounded-2xl overflow-hidden">
+              <div className="px-4 py-3 border-b border-border/40 flex items-center justify-between">
+                <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">Mis unidades</p>
+                <Link to="/wemove/profile"
+                  className="text-xs text-primary font-bold hover:underline">
+                  + Agregar
+                </Link>
+              </div>
+              <div className="divide-y divide-border/40">
+                {units.length === 0 ? (
+                  <div className="px-4 py-4 text-center">
+                    <p className="text-xs text-muted-foreground">Sin unidades</p>
+                    <Link to="/wemove/profile" className="text-xs text-primary font-bold mt-1 block">
+                      Registrar vehículo →
+                    </Link>
                   </div>
-                );
-              })}
+                ) : units.map(unit => (
+                  <div key={unit.id} className="px-4 py-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-bold capitalize">
+                          {unit.type === 'sedan' ? '🚗' : unit.type === 'suv' ? '🚙' :
+                           unit.type === 'boat' ? '⛵' : unit.type === 'plane' ? '✈️' : '🚐'
+                          } {unit.type}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {unit.capacity} asientos
+                          {(unit as any).plate ? ` · ${(unit as any).plate}` : ''}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setEditorUnit({
+                        id:       unit.id,
+                        type:     unit.type,
+                        capacity: unit.capacity,
+                        layout:   (unit as any).seat_layout ?? null,
+                      })}
+                      className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline w-full"
+                    >
+                      <Layout className="h-3 w-3" />
+                      {(unit as any).seat_layout
+                        ? '✓ Plantilla guardada — editar'
+                        : 'Diseñar asientos'
+                      }
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
-          )}
-        </section>
+          </aside>
 
-        {/* COMPLETED */}
-        {completedRoutes.length > 0 && (
-          <section>
-            <h2 className="font-serif text-lg font-semibold mb-3">
-              Completados <span className="text-muted-foreground text-base font-normal">({completedRoutes.length})</span>
-            </h2>
-            <div className="space-y-2">
-              {completedRoutes.map(r => (
-                <div key={r.id} className="bg-card/50 rounded-xl border border-border/40 px-4 py-3 flex items-center gap-3 opacity-60">
-                  <span className="text-lg">{VEHICLE_EMOJI[r.transport_unit?.type ?? ''] ?? '🚌'}</span>
-                  <span className="text-sm font-medium text-foreground/70">
-                    {r.route?.origin?.name} → {r.route?.destination?.name}
-                  </span>
-                  <span className="ml-auto text-xs text-muted-foreground">
-                    {format(new Date(r.departure_time), "d MMM yyyy", { locale: es })}
-                  </span>
-                </div>
-              ))}
+          {/* ── COLUMNA DERECHA ────────────────────────────── */}
+          <main className="flex-1 min-w-0 space-y-4">
+
+            {/* Tabs de rutas activas */}
+            <div>
+              <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none">
+                {routesLoading ? (
+                  <div className="h-10 w-48 bg-muted/30 rounded-xl animate-pulse" />
+                ) : activeRoutes.length === 0 ? null :
+                  activeRoutes.map(route => (
+                    <button
+                      key={route.id}
+                      onClick={() => setActiveTab(route.id)}
+                      className={cn(
+                        'shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 text-xs font-bold transition-all whitespace-nowrap',
+                        activeTab === route.id
+                          ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+                          : 'border-border bg-card text-foreground hover:border-primary/50'
+                      )}
+                    >
+                      <span className="font-mono text-[10px] opacity-70">{route.trip_code ?? '—'}</span>
+                      <span>{route.route?.origin?.name ?? '—'}</span>
+                      <ArrowRight className="h-3 w-3 opacity-60" />
+                      <span>{route.route?.destination?.name ?? '—'}</span>
+                    </button>
+                  ))
+                }
+                {/* Botón nueva ruta */}
+                {activeRoutes.length < 10 && (
+                  <Link to="/wemove/publish-route"
+                    className="shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-xl border-2 border-dashed border-primary/40 text-primary text-xs font-bold hover:bg-primary/5 transition-colors whitespace-nowrap">
+                    <Plus className="h-3.5 w-3.5" /> Nuevo viaje
+                  </Link>
+                )}
+              </div>
             </div>
-          </section>
-        )}
 
-      </main>
+            {/* Ficha de la ruta seleccionada */}
+            {selectedRoute ? (
+              <RouteCard
+                route={selectedRoute}
+                units={units}
+                onCancel={handleCancelRoute}
+              />
+            ) : !routesLoading && (
+              <div className="bg-card border-2 border-dashed border-border rounded-2xl py-16 text-center space-y-3">
+                <MapPin className="h-10 w-10 text-muted-foreground/30 mx-auto" />
+                <p className="font-bold text-muted-foreground">No tienes viajes publicados</p>
+                <Link to="/wemove/publish-route"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-bold rounded-xl hover:bg-primary/90 transition-colors">
+                  <Plus className="h-4 w-4" /> Publicar primer viaje
+                </Link>
+              </div>
+            )}
+
+            {/* Historial de viajes pasados */}
+            {pastRoutes.length > 0 && (
+              <div className="bg-card border border-border/60 rounded-2xl overflow-hidden">
+                <button
+                  onClick={() => setShowHistory(!showHistory)}
+                  className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-muted/30 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-semibold">Historial de viajes</span>
+                    <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full font-bold">
+                      {pastRoutes.length}
+                    </span>
+                  </div>
+                  {showHistory ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </button>
+                {showHistory && (
+                  <div className="border-t border-border/40 divide-y divide-border/30">
+                    {pastRoutes.map(route => (
+                      <div key={route.id}
+                        onClick={() => setActiveTab(route.id)}
+                        className="flex items-center gap-3 px-5 py-3 hover:bg-muted/20 cursor-pointer transition-colors">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
+                            {route.route?.origin?.name ?? '—'}
+                            <ArrowRight className="h-3 w-3" />
+                            {route.route?.destination?.name ?? '—'}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {format(new Date(route.departure_time), "d MMM yyyy", { locale: es })}
+                            {route.trip_code && ` · ${route.trip_code}`}
+                          </p>
+                        </div>
+                        <span className={cn(
+                          'text-xs px-2 py-0.5 rounded-full font-bold border',
+                          route.status === 'completed'
+                            ? 'text-green-700 bg-green-50 border-green-200'
+                            : 'text-red-600 bg-red-50 border-red-200'
+                        )}>
+                          {route.status === 'completed' ? 'Completado' : 'Cancelado'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </main>
+        </div>
+      </div>
+
+      {/* Modal editor de asientos */}
+      {editorUnit && (
+        <SeatLayoutEditor
+          unitId={editorUnit.id}
+          unitType={editorUnit.type}
+          unitCapacity={editorUnit.capacity}
+          initialLayout={editorUnit.layout}
+          onSave={() => {
+            setEditorUnit(null);
+            qc.invalidateQueries({ queryKey: ['my-transport-units', user?.id] });
+            toast({ title: '✓ Plantilla de asientos guardada' });
+          }}
+          onClose={() => setEditorUnit(null)}
+        />
+      )}
     </div>
   );
 }
 
-function Badge({ children }: { children: React.ReactNode }) {
+// ── Ficha individual de ruta ──────────────────────────────────
+function RouteCard({ route, units, onCancel }: {
+  route: any; units: any[]; onCancel: (id: string) => void;
+}) {
+  const departure = format(new Date(route.departure_time), "d 'de' MMMM · HH:mm", { locale: es });
+  const unit      = units.find(u => u.id === route.transport_unit_id);
+  const isPast    = new Date(route.departure_time) < new Date();
+
   return (
-    <span className="inline-flex items-center gap-1 text-xs text-foreground/60 bg-muted px-2 py-0.5 rounded-full">
-      {children}
-    </span>
+    <div className="bg-card border border-border/60 rounded-2xl overflow-hidden">
+      {/* Header de la ficha */}
+      <div className="bg-primary/5 border-b border-border/40 px-5 py-4">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-black text-lg">
+                {route.route?.origin?.name ?? '—'}
+              </span>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+              <span className="font-black text-lg">
+                {route.route?.destination?.name ?? '—'}
+              </span>
+              <span className={cn(
+                'text-xs px-2 py-0.5 rounded-full font-bold border',
+                route.status === 'active'
+                  ? 'text-green-700 bg-green-50 border-green-200'
+                  : route.status === 'completed'
+                  ? 'text-blue-700 bg-blue-50 border-blue-200'
+                  : 'text-red-600 bg-red-50 border-red-200'
+              )}>
+                {route.status === 'active' ? 'Activo'
+                  : route.status === 'completed' ? 'Completado' : 'Cancelado'}
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <Calendar className="h-3 w-3" /> {departure}
+              </span>
+              <span className="flex items-center gap-1">
+                <DollarSign className="h-3 w-3" /> Bs. {route.price} / asiento
+              </span>
+              {unit && (
+                <span className="flex items-center gap-1">
+                  <Bus className="h-3 w-3" /> {unit.type}
+                  {unit.plate ? ` · ${unit.plate}` : ''}
+                  {unit.color ? ` · ${unit.color}` : ''}
+                </span>
+              )}
+              <span className="flex items-center gap-1">
+                <Users className="h-3 w-3" /> {route.available_seats} asientos libres
+              </span>
+            </div>
+            {route.notes && (
+              <p className="text-xs text-muted-foreground italic">📌 {route.notes}</p>
+            )}
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            {route.trip_code && (
+              <span className="text-xs font-black text-primary bg-primary/10 border border-primary/30 px-2.5 py-1 rounded-full">
+                {route.trip_code}
+              </span>
+            )}
+            {route.status === 'active' && !isPast && (
+              <button onClick={() => onCancel(route.id)}
+                className="flex items-center gap-1.5 px-3 py-1.5 border-2 border-red-200 text-red-600 rounded-xl text-xs font-bold hover:bg-red-50 transition-colors">
+                <XCircle className="h-3.5 w-3.5" /> Cancelar
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Manifiesto */}
+      <div className="p-5">
+        <RouteManifest route={route} units={units} />
+      </div>
+    </div>
   );
 }
