@@ -18,6 +18,7 @@ import WeMovePublishRoute from "./pages/WeMovePublishRoute";
 import WeMoveBooking from "./pages/WeMoveBooking";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
+import WeMoveBooking from './pages/WeMoveBooking';
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/auth" element={<NotFound />} />
           <Route path="*" element={<NotFound />} />
+          <Route path="/wemove/booking/:routeId" element={<WeMoveBooking />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
