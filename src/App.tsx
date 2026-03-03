@@ -1,4 +1,5 @@
 import WeMoveBooking from './pages/WeMoveBooking';
+import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,8 +24,9 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+  <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
@@ -49,7 +51,8 @@ const App = () => (
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
-  </QueryClientProvider>
+    </QueryClientProvider>
+  </ThemeProvider>
 );
 
 export default App;
