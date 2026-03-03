@@ -1,11 +1,12 @@
-import { useState, useRef } from 'react';
-import { WeMoveHeader } from '@/components/wemove/WeMoveHeader';
-import { WeMoveHeroSearch } from '@/components/wemove/WeMoveHeroSearch';
-import { WeMoveResults } from '@/components/wemove/WeMoveResults';
-import { WeMoveHowItWorks } from '@/components/wemove/WeMoveHowItWorks';
-import { WeMoveCTA } from '@/components/wemove/WeMoveCTA';
-import { LandingFooter } from '@/components/landing/LandingFooter';
-import { useWeMoveRoutes } from '@/hooks/useWeMoveData';
+import { useState, useRef } from "react";
+import { WeMoveHeader }      from "@/components/wemove/WeMoveHeader";
+import { WeMoveHeroSearch }  from "@/components/wemove/WeMoveHeroSearch";
+import { WeMoveResults }     from "@/components/wemove/WeMoveResults";
+import { WeMoveHowItWorks }  from "@/components/wemove/WeMoveHowItWorks";
+import { WeMoveFleet }       from "@/components/wemove/WeMoveFleet";
+import { WeMoveCTA }         from "@/components/wemove/WeMoveCTA";
+import { LandingFooter }     from "@/components/landing/LandingFooter";
+import { useWeMoveRoutes }   from "@/hooks/useWeMoveData";
 
 const WeMove = () => {
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -13,11 +14,11 @@ const WeMove = () => {
     origin: string;
     destination: string;
     date?: Date;
-  }>({ origin: '', destination: '' });
+  }>({ origin: "", destination: "" });
   const [hasSearched, setHasSearched] = useState(false);
 
   const { data: routes, isLoading } = useWeMoveRoutes(
-    searchParams.origin || undefined,
+    searchParams.origin      || undefined,
     searchParams.destination || undefined,
     searchParams.date
   );
@@ -26,7 +27,7 @@ const WeMove = () => {
     setSearchParams({ origin, destination, date });
     setHasSearched(true);
     setTimeout(() => {
-      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 150);
   };
 
@@ -39,6 +40,7 @@ const WeMove = () => {
           <WeMoveResults routes={routes} isLoading={isLoading} hasSearched={hasSearched} />
         </div>
         {!hasSearched && <WeMoveHowItWorks />}
+        {!hasSearched && <WeMoveFleet />}
         <WeMoveCTA />
       </main>
       <LandingFooter />
