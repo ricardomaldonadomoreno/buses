@@ -318,7 +318,6 @@
     "errorSelectUnit": "Select a transport unit"
     "errorPublishing": "Error publishing route",
     "errorPastDate": "Departure date and time must be in the future",
-    }
   },
   "footer": {
     "terms": "Terms and Conditions",
