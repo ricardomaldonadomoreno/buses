@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "BUSES APP",
+    "appName": "BUSES",
     "tagline": "Tu plataforma de transporte de confianza",
     "getStarted": "Comenzar",
     "learnMore": "Más información",
@@ -125,7 +125,7 @@
     "noRoutesFound": "No se encontraron rutas disponibles",
     "availableSeats": "asientos disponibles",
     "hero": {
-      "tag": "Flota Comunitaria · BusesApp",
+      "tag": "Flota Comunitaria By Buses",
       "from": "Desde",
       "to": "Hasta",
       "when": "Cuándo",
