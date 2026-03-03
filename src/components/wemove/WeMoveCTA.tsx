@@ -1,60 +1,57 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { LanguageSelector } from '@/components/LanguageSelector';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Smartphone, TrendingUp, Bus, Users } from 'lucide-react';
 
-export function WeMoveCTA() {
+export function WeMoveHeader() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-
-  const perks = [
-    { icon: Bus,        key: 'weMove.cta.perk1' },
-    { icon: TrendingUp, key: 'weMove.cta.perk2' },
-    { icon: Smartphone, key: 'weMove.cta.perk3' },
-    { icon: Users,      key: 'weMove.cta.perk4' },
-  ];
+  const { resolvedTheme, setTheme } = useTheme();
 
   return (
-    <section className="bg-primary text-primary-foreground py-16">
-      <div className="container max-w-5xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-background border-b-4 border-foreground">
+      <div className="container flex h-16 items-center justify-between">
 
-          {/* Left */}
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-primary-foreground/50 mb-3">
-              {t('weMove.cta.eyebrow')}
-            </p>
-            <h2 className="text-3xl md:text-5xl font-black leading-tight mb-4">
-              {t('weMove.cta.titleLine1')}<br />
-              {t('weMove.cta.titleLine2')}<br />
-              <span className="text-foreground">{t('weMove.cta.titleAccent')}</span>
-            </h2>
-            <p className="text-primary-foreground/70 text-base mb-8 leading-relaxed">
-              {t('weMove.cta.desc')}
-            </p>
-            <Button
-              size="lg"
-              onClick={() => navigate('/wemove/register')}
-              className="bg-foreground text-background border-2 border-foreground/80 font-black gap-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100"
-            >
-              {t('weMove.cta.btn')}
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
+        {/* Logo + nombre */}
+        <Link to="/wemove" className="flex items-center gap-2">
+          <img src="/logo.png" alt="WeMove" className="h-8 w-auto" />
+          <span className="font-black text-xl text-foreground tracking-tight">
+            {t('weMove.title')}
+            <span className="text-sm font-bold text-muted-foreground ml-1">{t('weMove.byBusesApp')}</span>
+          </span>
+        </Link>
 
-          {/* Right: perks */}
-          <div className="grid grid-cols-1 gap-3">
-            {perks.map(({ icon: Icon, key }, i) => (
-              <div key={i} className="flex items-center gap-4 border border-primary-foreground/20 bg-primary-foreground/10 px-5 py-4 hover:bg-primary-foreground/20 transition-colors">
-                <div className="w-10 h-10 bg-foreground border border-primary-foreground/20 flex items-center justify-center shrink-0">
-                  <Icon className="h-5 w-5 text-background" />
-                </div>
-                <span className="font-bold text-sm text-primary-foreground">{t(key)}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Nav */}
+        <nav className="flex items-center gap-2">
+          <LanguageSelector />
+
+          {/* Dark mode toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+            className="border-2 border-foreground/40 text-foreground hover:bg-foreground/10 h-9 w-9 rounded-full"
+          >
+            {resolvedTheme === 'dark'
+              ? <Sun className="h-4 w-4" />
+              : <Moon className="h-4 w-4" />
+            }
+          </Button>
+
+          <Button asChild size="sm" variant="outline"
+            className="rounded-full border-2 border-foreground font-bold text-foreground hover:bg-foreground/10"
+          >
+            <Link to="/auth">{t('common.access')}</Link>
+          </Button>
+
+          <Button asChild size="sm" variant="outline"
+            className="rounded-full border-2 border-foreground font-bold text-foreground hover:bg-foreground/10"
+          >
+            <Link to="/">← {t('common.backToHome')}</Link>
+          </Button>
+        </nav>
       </div>
-    </section>
+    </header>
   );
 }
