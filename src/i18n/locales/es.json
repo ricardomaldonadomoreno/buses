@@ -124,10 +124,10 @@
     },
     "whyWeMove": {
       "title": "¿Por qué WeMove?",
-      "realCommunity":    { "title": "Comunidad real",        "description": "Personas reales conectando con personas reales" },
-      "verifiedPeople":   { "title": "Personas verificadas",  "description": "Identidad verificada para tu seguridad" },
-      "visibleReputation":{ "title": "Reputación visible",    "description": "Sistema de calificación transparente" },
-      "noBusiness":       { "title": "No empresas, personas", "description": "Economía colaborativa persona a persona" }
+      "realCommunity":     { "title": "Comunidad real",        "description": "Personas reales conectando con personas reales" },
+      "verifiedPeople":    { "title": "Personas verificadas",  "description": "Identidad verificada para tu seguridad" },
+      "visibleReputation": { "title": "Reputación visible",    "description": "Sistema de calificación transparente" },
+      "noBusiness":        { "title": "No empresas, personas", "description": "Economía colaborativa persona a persona" }
     },
     "results": {
       "today": "Hoy",
@@ -310,7 +310,6 @@
     "errorPublishing": "Error al publicar la ruta",
     "errorPastDate": "La fecha y hora de salida debe ser en el futuro"
   },
-  
   "footer": {
     "terms": "Términos y Condiciones",
     "privacy": "Política de Privacidad",
