@@ -10,7 +10,7 @@ export function WeMoveHeader() {
   const { resolvedTheme, setTheme } = useTheme();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-primary border-b-4 border-foreground">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-background border-b-4 border-foreground">
       <div className="container flex h-16 items-center justify-between">
 
         {/* Logo + nombre */}
@@ -18,7 +18,7 @@ export function WeMoveHeader() {
           <img src="/logo.png" alt="WeMove" className="h-8 w-auto" />
           <span className="font-black text-xl text-foreground tracking-tight">
             {t('weMove.title')}
-            <span className="text-sm font-bold opacity-60 ml-1">{t('weMove.byBusesApp')}</span>
+            <span className="text-sm font-bold text-muted-foreground ml-1">{t('weMove.byBusesApp')}</span>
           </span>
         </Link>
 
