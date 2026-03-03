@@ -155,7 +155,7 @@ export function WeMoveHeroSearch({ onSearch }: WeMoveHeroSearchProps) {
         style={{ clipPath: 'polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%)' }}
       />
 
-      <div className="relative container py-12 md:py-25">
+      <div className="relative container py-12 md:py-20">
         {/* ── ÚNICO CAMBIO: grid 2 columnas en lugar de max-w-2xl ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
 
