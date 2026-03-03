@@ -40,9 +40,18 @@
     "destination": "Destino",
     "results": "Resultados",
     "noResultsYet": "Busque viagens disponíveis",
-    "packService": { "title": "PackService", "subtitle": "Transporte de Pacotes" },
-    "advertising": { "title": "Anuncie Sua Empresa Aqui", "subtitle": "Buses.App" },
-    "notifications": { "title": "Notificações", "empty": "Sem notificações" },
+    "packService": {
+      "title": "PackService",
+      "subtitle": "Transporte de Pacotes"
+    },
+    "advertising": {
+      "title": "Anuncie Sua Empresa Aqui",
+      "subtitle": "Buses.App"
+    },
+    "notifications": {
+      "title": "Notificações",
+      "empty": "Sem notificações"
+    },
     "hero": {
       "title": "Envios seguros entre cidades",
       "subtitle": "A plataforma que conecta remetentes com transportadores verificados.",
@@ -51,23 +60,56 @@
     },
     "howItWorks": {
       "title": "Como funciona?",
-      "step1": { "title": "1. Publique ou encontre uma viagem", "description": "Transportadores publicam suas rotas. Remetentes encontram a viagem ideal." },
-      "step2": { "title": "2. Verificação do pacote", "description": "O transportador verifica o pacote em um endereço certificado." },
-      "step3": { "title": "3. Depósito em garantia", "description": "O destinatário deposita os fundos. O dinheiro é liberado apenas após a entrega confirmada." },
-      "step4": { "title": "4. Entrega segura", "description": "O destinatário confirma a entrega. Fundos liberados automaticamente." }
+      "step1": {
+        "title": "1. Publique ou encontre uma viagem",
+        "description": "Transportadores publicam suas rotas. Remetentes encontram a viagem ideal."
+      },
+      "step2": {
+        "title": "2. Verificação do pacote",
+        "description": "O transportador verifica o pacote em um endereço certificado."
+      },
+      "step3": {
+        "title": "3. Depósito em garantia",
+        "description": "O destinatário deposita os fundos. O dinheiro é liberado apenas após a entrega confirmada."
+      },
+      "step4": {
+        "title": "4. Entrega segura",
+        "description": "O destinatário confirma a entrega. Fundos liberados automaticamente."
+      }
     },
     "features": {
       "title": "Recursos principais",
-      "escrow": { "title": "Escrow seguro", "description": "Fundos protegidos até a entrega ser confirmada" },
-      "verification": { "title": "Verificação obrigatória", "description": "Cada pacote é verificado antes do transporte" },
-      "tracking": { "title": "Rastreamento completo", "description": "Status da transação em tempo real" },
-      "disputes": { "title": "Resolução de disputas", "description": "Sistema justo para resolver conflitos" }
+      "escrow": {
+        "title": "Escrow seguro",
+        "description": "Fundos protegidos até a entrega ser confirmada"
+      },
+      "verification": {
+        "title": "Verificação obrigatória",
+        "description": "Cada pacote é verificado antes do transporte"
+      },
+      "tracking": {
+        "title": "Rastreamento completo",
+        "description": "Status da transação em tempo real"
+      },
+      "disputes": {
+        "title": "Resolução de disputas",
+        "description": "Sistema justo para resolver conflitos"
+      }
     },
     "roles": {
       "title": "Para todos os participantes",
-      "sender": { "title": "Remetentes", "description": "Envie pacotes com segurança e garantia de pagamento" },
-      "transporter": { "title": "Transportadores", "description": "Monetize suas viagens transportando pacotes verificados" },
-      "receiver": { "title": "Destinatários", "description": "Receba seus pacotes com proteção ao comprador" }
+      "sender": {
+        "title": "Remetentes",
+        "description": "Envie pacotes com segurança e garantia de pagamento"
+      },
+      "transporter": {
+        "title": "Transportadores",
+        "description": "Monetize suas viagens transportando pacotes verificados"
+      },
+      "receiver": {
+        "title": "Destinatários",
+        "description": "Receba seus pacotes com proteção ao comprador"
+      }
     }
   },
   "weMove": {
@@ -94,40 +136,64 @@
       "trust1": "Identidade verificada",
       "trust2": "Sistema de reputação",
       "trust3": "Frota comunitária",
-      "transporterCta": "É transportador? Entre grátis e publique viagens hoje",
+      "transporterCta": "Tem algo que se move? Entre e publique viagens hoje",
       "registerFree": "Cadastre-se Grátis"
     },
     "how": {
       "eyebrow": "Como funciona?",
       "title": "Sua viagem em 4 etapas",
-      "s1": { "title": "Busque sua rota",     "desc": "Insira origem, destino e data para ver os transportes disponíveis." },
-      "s2": { "title": "Escolha sua unidade", "desc": "Veja tipo de veículo, horário, assentos disponíveis e preço por assento." },
-      "s3": { "title": "Reserve seu assento", "desc": "Escolha seu assento, confirme sua reserva e receba seu código de embarque na hora." },
-      "s4": { "title": "Viaje e avalie",      "desc": "Viaje com confiança e deixe sua avaliação para construir a comunidade." }
+      "s1": {
+        "title": "Busque sua rota",
+        "desc": "Insira origem, destino e data para ver os transportes disponíveis."
+      },
+      "s2": {
+        "title": "Escolha sua unidade",
+        "desc": "Veja tipo de veículo, horário, assentos disponíveis e preço por assento."
+      },
+      "s3": {
+        "title": "Reserve seu assento",
+        "desc": "Escolha seu assento, confirme sua reserva e receba seu código de embarque na hora."
+      },
+      "s4": {
+        "title": "Viaje e avalie",
+        "desc": "Viaje com confiança e deixe sua avaliação para construir a comunidade."
+      }
     },
     "trust": {
-      "id":    "Identidade verificada",
-      "rep":   "Reputação digital",
-      "safe":  "Segurança básica",
+      "id": "Identidade verificada",
+      "rep": "Reputação digital",
+      "safe": "Segurança básica",
       "trace": "Rastreabilidade da viagem"
     },
     "cta": {
       "eyebrow": "Para transportadores",
-      "title":   "Transporte, GANHE<br/>e cresça sem<br/><span class='text-primary'>ser uma empresa</span>",
-      "desc":    "WeMove é a plataforma para pessoas reais que querem transportar pessoas. Sem intermediários, com identidade verificada e reputação digital.",
-      "btn":     "Entre grátis",
-      "howBtn":  "Ver como funciona",
-      "perk1":   "Publique sua rota, gerencie assentos e receba pagamentos pelo app",
-      "perk2":   "Veja quem reservou, gerencie pagamentos e fale com os passageiros",
-      "perk3":   "Comunicação direta com seu transportador pelo app",
-      "perk4":   "Construa sua reputação na comunidade"
+      "title": "Transporte, GANHE<br/>e cresça sem<br/><span class='text-primary'>ser uma empresa</span>",
+      "desc": "WeMove é a plataforma para pessoas reais que querem transportar pessoas. Sem intermediários, com identidade verificada e reputação digital.",
+      "btn": "Entre grátis",
+      "howBtn": "Ver como funciona",
+      "perk1": "Publique sua rota, gerencie assentos e receba pagamentos pelo app",
+      "perk2": "Veja quem reservou, gerencie pagamentos e fale com os passageiros",
+      "perk3": "Comunicação direta com seu transportador pelo app",
+      "perk4": "Construa sua reputação na comunidade"
     },
     "whyWeMove": {
       "title": "Por que WeMove?",
-      "realCommunity":     { "title": "Comunidade real",       "description": "Pessoas reais conectando com pessoas reais" },
-      "verifiedPeople":    { "title": "Pessoas verificadas",   "description": "Identidade verificada para sua segurança" },
-      "visibleReputation": { "title": "Reputação visível",     "description": "Sistema de avaliação transparente" },
-      "noBusiness":        { "title": "Sem empresas, pessoas", "description": "Economia colaborativa pessoa a pessoa" }
+      "realCommunity": {
+        "title": "Comunidade real",
+        "description": "Pessoas reais conectando com pessoas reais"
+      },
+      "verifiedPeople": {
+        "title": "Pessoas verificadas",
+        "description": "Identidade verificada para sua segurança"
+      },
+      "visibleReputation": {
+        "title": "Reputação visível",
+        "description": "Sistema de avaliação transparente"
+      },
+      "noBusiness": {
+        "title": "Sem empresas, pessoas",
+        "description": "Economia colaborativa pessoa a pessoa"
+      }
     },
     "results": {
       "today": "Hoje",
@@ -140,13 +206,39 @@
       "almostFull": "Últimos {{seats}} assentos!",
       "full": "Unidade cheia",
       "tryOtherDate": "Tente outra data ou verifique outros destinos disponíveis."
+    },
+    "fleet": {
+      "eyebrow": "Plataforma global de mobilidade",
+      "title": "Se se move, transforme em",
+      "titleAccent": "NEGÓCIO",
+      "subtitle": "Não definimos como você transporta — só conectamos",
+      "car": "Carro",
+      "van": "Van",
+      "bus": "Ônibus",
+      "motorcycle": "Moto",
+      "boat": "Lancha",
+      "plane": "Avião",
+      "helicopter": "Helicóptero",
+      "drone": "Drone",
+      "balloon": "Balão",
+      "rv": "Motor-home",
+      "truck": "Caminhão",
+      "anything": "Qualquer coisa",
+      "tagline": "Se tem capacidade, tem passageiros."
     }
   },
   "wemoveRegister": {
     "title": "Acesso Transportador WeMove",
     "subtitle": "Faça parte da Frota Comunitária",
-    "tabs": { "signup": "Criar conta nova", "login": "Já tenho conta" },
-    "sections": { "credentials": "Credenciais de acesso", "phone": "Número de telefone", "identity": "Identidade pessoal" },
+    "tabs": {
+      "signup": "Criar conta nova",
+      "login": "Já tenho conta"
+    },
+    "sections": {
+      "credentials": "Credenciais de acesso",
+      "phone": "Número de telefone",
+      "identity": "Identidade pessoal"
+    },
     "fields": {
       "email": "E-mail",
       "password": "Senha",
@@ -158,8 +250,15 @@
       "documentType": "Tipo de documento",
       "documentNumber": "Número do documento"
     },
-    "documentTypes": { "idCard": "Carteira de identidade", "driverLicense": "Carteira de motorista", "passport": "Passaporte" },
-    "buttons": { "createAccount": "Criar conta WeMove", "login": "Entrar" },
+    "documentTypes": {
+      "idCard": "Carteira de identidade",
+      "driverLicense": "Carteira de motorista",
+      "passport": "Passaporte"
+    },
+    "buttons": {
+      "createAccount": "Criar conta WeMove",
+      "login": "Entrar"
+    },
     "errors": {
       "passwordMismatch": "As senhas não coincidem",
       "passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
@@ -168,10 +267,17 @@
       "loginFailed": "Erro ao entrar",
       "notTransporter": "Esta conta não está registrada como transportador WeMove"
     },
-    "success": { "accountCreated": "Conta criada com sucesso", "checkEmail": "Verifique seu e-mail para confirmar sua conta" }
+    "success": {
+      "accountCreated": "Conta criada com sucesso",
+      "checkEmail": "Verifique seu e-mail para confirmar sua conta"
+    }
   },
   "wemoveAuth": {
-    "callback": { "processing": "Verificando sua conta...", "success": "Conta verificada com sucesso", "error": "Erro ao verificar a conta" },
+    "callback": {
+      "processing": "Verificando sua conta...",
+      "success": "Conta verificada com sucesso",
+      "error": "Erro ao verificar a conta"
+    },
     "verifyEmail": {
       "title": "Verifique seu e-mail",
       "message": "Enviamos um e-mail de verificação. Clique no link para ativar sua conta.",
@@ -240,8 +346,13 @@
     "errorDeletingUnit": "Erro ao excluir a unidade",
     "invalidCapacity": "A capacidade deve ser um número válido maior que 0",
     "vehicleTypes": {
-      "bus": "Ônibus", "microbus": "Micro-ônibus", "van": "Van",
-      "minibus": "Minibus", "coaster": "Coaster", "sedan": "Sedan", "suv": "SUV"
+      "bus": "Ônibus",
+      "microbus": "Micro-ônibus",
+      "van": "Van",
+      "minibus": "Minibus",
+      "coaster": "Coaster",
+      "sedan": "Sedan",
+      "suv": "SUV"
     }
   },
   "wemovePublish": {
