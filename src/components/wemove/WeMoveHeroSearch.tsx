@@ -279,8 +279,8 @@ export function WeMoveHeroSearch({ onSearch }: WeMoveHeroSearchProps) {
 
       {/* Transporter CTA bar — sin cambios */}
       <div className="relative border-t-2 border-primary-foreground/20 bg-primary-foreground/5">
-        <div className="container py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-primary-foreground/70 text-sm font-medium text-center sm:text-left">
+        <div className="container py-3 flex flex-col sm:flex-row items-center justify-between gap-3 max-w-5xl mx-auto">
+          <p className="text-primary-foreground font-semibold text-sm text-center sm:text-left">
             {t('weMove.hero.transporterCta')}
           </p>
           <Button
