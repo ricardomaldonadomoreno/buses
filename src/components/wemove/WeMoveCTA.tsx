@@ -25,7 +25,9 @@ export function WeMoveCTA() {
               {t('weMove.cta.eyebrow')}
             </p>
             <h2 className="text-3xl md:text-5xl font-black leading-tight mb-4">
-              {t('weMove.cta.title')}
+              {t('weMove.cta.titleLine1')}<br />
+              {t('weMove.cta.titleLine2')}<br />
+              <span className="text-foreground">{t('weMove.cta.titleAccent')}</span>
             </h2>
             <p className="text-primary-foreground/70 text-base mb-8 leading-relaxed">
               {t('weMove.cta.desc')}
