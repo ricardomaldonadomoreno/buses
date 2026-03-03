@@ -40,18 +40,9 @@
     "destination": "Destination",
     "results": "Results",
     "noResultsYet": "Search for available trips",
-    "packService": {
-      "title": "PackService",
-      "subtitle": "Package Transport"
-    },
-    "advertising": {
-      "title": "Advertise Your Business Here",
-      "subtitle": "Buses.App"
-    },
-    "notifications": {
-      "title": "Notifications",
-      "empty": "No notifications"
-    },
+    "packService": {"title": "PackService","subtitle": "Package Transport"},
+    "advertising": {"title": "Advertise Your Business Here","subtitle": "Buses.App"},
+    "notifications": {"title": "Notifications","empty": "No notifications"},
     "hero": {
       "title": "Secure intercity shipping",
       "subtitle": "The platform connecting senders with verified transporters.",
@@ -308,7 +299,7 @@
     "unitCapacityHint": "Your vehicle capacity: {{max}}",
     "noUnitsWarning": "Register a vehicle first",
     "noUnitsWarningDesc": "You need at least one registered unit to publish trips.",
-    "goToProfileLink": "Go to My profile →",
+    "goToProfileLink": "Go to My profile ->",
     "previewTitle": "Trip preview",
     "errorSelectLocations": "Select origin and destination city",
     "errorSameLocation": "Origin and destination cannot be the same",
@@ -319,7 +310,6 @@
     "errorPublishing": "Error publishing route",
     "errorPastDate": "Departure date and time must be in the future"
   },
-  
   "footer": {
     "terms": "Terms and Conditions",
     "privacy": "Privacy Policy",
