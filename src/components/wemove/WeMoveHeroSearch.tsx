@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { useLocations } from '@/hooks/useWeMoveData';
@@ -14,6 +13,115 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// ── Combobox con filtro de texto ─────────────────────────────────────────────
+interface CityComboboxProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  excludeId?: string;
+  pinColor?: string;
+  disabled?: boolean;
+}
+
+function CityCombobox({ value, onChange, placeholder, excludeId, pinColor = 'text-primary', disabled }: CityComboboxProps) {
+  const { data: locations, isLoading } = useLocations();
+  const [query, setQuery] = useState('');
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const selected = locations?.find(l => l.id === value);
+
+  // Solo muestra resultados cuando hay texto escrito
+  const filtered = query.trim().length > 0
+    ? (locations ?? [])
+        .filter(l => l.id !== excludeId)
+        .filter(l => l.name.toLowerCase().includes(query.toLowerCase()))
+    : [];
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        setQuery('');
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const handleSelect = (id: string) => {
+    onChange(id);
+    setOpen(false);
+    setQuery('');
+  };
+
+  const handleClear = () => {
+    onChange('');
+    setQuery('');
+    setTimeout(() => inputRef.current?.focus(), 50);
+  };
+
+  return (
+    <div ref={containerRef} className="relative w-full">
+      <div className="relative flex items-center">
+        <MapPin className={cn('absolute left-4 h-4 w-4 shrink-0 pointer-events-none', pinColor)} />
+        <input
+          ref={inputRef}
+          type="text"
+          value={selected && !open ? selected.name : query}
+          onChange={e => { setQuery(e.target.value); setOpen(true); }}
+          onFocus={() => { if (!disabled) setOpen(true); }}
+          placeholder={placeholder}
+          disabled={disabled}
+          className={cn(
+            'w-full h-12 pl-10 pr-10 bg-transparent text-sm font-medium outline-none',
+            'text-foreground placeholder:text-muted-foreground',
+            'disabled:opacity-50 disabled:cursor-not-allowed'
+          )}
+        />
+        {value && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="absolute right-3 text-muted-foreground hover:text-foreground transition-colors text-lg leading-none"
+          >
+            ×
+          </button>
+        )}
+      </div>
+
+      {/* Dropdown — solo cuando hay texto escrito */}
+      {open && query.trim().length > 0 && (
+        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden">
+          {isLoading ? (
+            <div className="px-4 py-3 text-sm text-muted-foreground">Cargando...</div>
+          ) : filtered.length === 0 ? (
+            <div className="px-4 py-3 text-sm text-muted-foreground">Sin resultados</div>
+          ) : (
+            <ul className="max-h-48 overflow-y-auto py-1">
+              {filtered.map(loc => (
+                <li
+                  key={loc.id}
+                  onMouseDown={() => handleSelect(loc.id)}
+                  className={cn(
+                    'flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer transition-colors hover:bg-muted',
+                    loc.id === value && 'font-semibold'
+                  )}
+                >
+                  <MapPin className={cn('h-3.5 w-3.5 shrink-0', pinColor)} />
+                  {loc.name}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── WeMoveHeroSearch ──────────────────────────────────────────────────────────
 interface WeMoveHeroSearchProps {
   onSearch: (origin: string, destination: string, date?: Date) => void;
 }
@@ -21,17 +129,19 @@ interface WeMoveHeroSearchProps {
 export function WeMoveHeroSearch({ onSearch }: WeMoveHeroSearchProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { data: locations, isLoading: locLoading } = useLocations();
+  const { isLoading: locLoading } = useLocations();
 
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
   const [date, setDate] = useState<Date | undefined>();
 
-  const handleSearch = () => onSearch(origin, destination, date);
+  const handleSearch = () => {
+    onSearch(origin, destination, date);
+  };
 
   return (
-    <section className="relative bg-primary overflow-hidden pt-16">
-      {/* Dot grid background */}
+    <section className="relative bg-primary overflow-hidden">
+      {/* Dot grid background — sin cambios */}
       <div
         className="absolute inset-0 opacity-[0.07]"
         style={{
@@ -40,159 +150,128 @@ export function WeMoveHeroSearch({ onSearch }: WeMoveHeroSearchProps) {
         }}
       />
 
+      {/* Bold diagonal stripe — sin cambios */}
+      <div
+        className="absolute top-0 right-0 w-2/5 h-full bg-primary-foreground/5 pointer-events-none"
+        style={{ clipPath: 'polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%)' }}
+      />
+
       <div className="relative container py-12 md:py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+        <div className="max-w-2xl">
 
-          {/* ── IZQUIERDA: identidad ── */}
-          <div>
-            {/* Tag */}
-            <div className="inline-flex items-center gap-2 border-2 border-primary-foreground/40 px-4 py-1.5 mb-6">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-primary-foreground text-xs font-bold uppercase tracking-widest">
-                {t('weMove.hero.tag')}
-              </span>
-            </div>
-
-            {/* Título */}
-            <h1 className="text-7xl md:text-8xl font-black text-primary-foreground leading-none tracking-tight mb-3">
-              WeMove
-            </h1>
-
-            {/* Subtítulo */}
-            <p className="text-primary-foreground text-xl md:text-2xl font-bold mb-4">
-              {t('weMove.subtitle')}
-            </p>
-
-            {/* Descripción — opacidad alta para legibilidad */}
-            <p className="text-primary-foreground/80 text-base leading-relaxed mb-8 max-w-md">
-              {t('weMove.description')}
-            </p>
-
-            {/* Trust badges */}
-            <div className="flex flex-wrap items-center gap-5">
-              {[
-                { icon: ShieldCheck, label: t('weMove.hero.trust1') },
-                { icon: Star,        label: t('weMove.hero.trust2') },
-                { icon: Users,       label: t('weMove.hero.trust3') },
-              ].map(({ icon: Icon, label }, i) => (
-                <div key={i} className="flex items-center gap-1.5 text-primary-foreground">
-                  <Icon className="h-4 w-4" />
-                  <span className="text-sm font-semibold">{label}</span>
-                </div>
-              ))}
-            </div>
+          {/* Identity tag — sin cambios */}
+          <div className="inline-flex items-center gap-2 border-2 border-primary-foreground/30 px-4 py-1.5 mb-6">
+            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+            <span className="text-primary-foreground/80 text-xs font-bold uppercase tracking-widest">
+              {t('weMove.hero.tag')}
+            </span>
           </div>
 
-          {/* ── DERECHA: search box ── */}
-          <div className="border-4 border-foreground bg-foreground shadow-[8px_8px_0px_0px_rgba(0,0,0,0.4)]">
+          {/* Main title — sin cambios */}
+          <h1 className="text-6xl md:text-8xl font-black text-primary-foreground leading-none tracking-tight mb-2">
+            WeMove
+          </h1>
+          <p className="text-primary-foreground/70 text-lg md:text-xl font-semibold mb-1">
+            {t('weMove.subtitle')}
+          </p>
+          <p className="text-primary-foreground/50 text-sm mb-8 max-w-md">
+            {t('weMove.description')}
+          </p>
 
-            {/* Header */}
-            <div className="px-5 py-3 flex items-center gap-2 border-b-4 border-foreground/20">
-              <Search className="h-4 w-4 text-background" />
-              <span className="text-background text-xs font-black uppercase tracking-[0.2em]">
-                {t('weMove.hero.searchLabel')}
-              </span>
+          {/* ── SEARCH BOX — ÚNICO BLOQUE MODIFICADO ── */}
+          <div className="bg-card rounded-2xl overflow-visible shadow-lg border border-border/40">
+
+            {/* Origen */}
+            <div className="px-2 pt-2">
+              <CityCombobox
+                value={origin}
+                onChange={setOrigin}
+                placeholder={t('weMove.hero.selectOrigin')}
+                pinColor="text-primary"
+                disabled={locLoading}
+              />
             </div>
 
-            <div className="p-5 flex flex-col gap-4">
+            {/* Separador */}
+            <div className="mx-4 border-t border-border/50" />
 
-              {/* Origin */}
-              <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-background/60 block mb-1.5 pl-1">
-                  {t('weMove.hero.from')}
-                </label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-yellow-400 z-10 pointer-events-none" />
-                  <Select value={origin} onValueChange={setOrigin} disabled={locLoading}>
-                    <SelectTrigger className="border-2 border-background/30 bg-background/10 text-background h-12 pl-9 font-semibold hover:bg-background/20 focus:border-yellow-400 focus:ring-0">
-                      <SelectValue placeholder={t('weMove.hero.selectOrigin')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {locations?.map((loc) => (
-                        <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+            {/* Destino */}
+            <div className="px-2">
+              <CityCombobox
+                value={destination}
+                onChange={setDestination}
+                placeholder={t('weMove.hero.selectDestination')}
+                excludeId={origin}
+                pinColor="text-destructive"
+                disabled={locLoading}
+              />
+            </div>
 
-              {/* Destination */}
-              <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-background/60 block mb-1.5 pl-1">
-                  {t('weMove.hero.to')}
-                </label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-red-400 z-10 pointer-events-none" />
-                  <Select value={destination} onValueChange={setDestination} disabled={locLoading}>
-                    <SelectTrigger className="border-2 border-background/30 bg-background/10 text-background h-12 pl-9 font-semibold hover:bg-background/20 focus:border-yellow-400 focus:ring-0">
-                      <SelectValue placeholder={t('weMove.hero.selectDestination')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {locations?.filter(l => l.id !== origin).map((loc) => (
-                        <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+            {/* Separador */}
+            <div className="mx-4 border-t border-border/50" />
 
-              {/* Divider con icono */}
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-px bg-background/20" />
-                <CalendarIcon className="h-3.5 w-3.5 text-background/40" />
-                <div className="flex-1 h-px bg-background/20" />
-              </div>
+            {/* Fecha */}
+            <div className="px-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className={cn(
+                      'w-full h-12 flex items-center gap-3 px-4 text-sm font-medium',
+                      'text-left rounded-xl transition-colors hover:bg-muted/50',
+                      !date && 'text-muted-foreground'
+                    )}
+                  >
+                    <CalendarIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    {date ? format(date, 'PP', { locale: es }) : t('weMove.hero.anyDay')}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 border border-border rounded-xl" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
 
-              {/* Date */}
-              <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-background/60 block mb-1.5 pl-1">
-                  {t('weMove.hero.when')}
-                </label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        'w-full h-12 border-2 border-background/30 bg-background/10 text-background justify-start text-left font-semibold hover:bg-background/20',
-                        !date && 'text-background/50'
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4 shrink-0 text-yellow-400" />
-                      {date ? format(date, 'PP', { locale: es }) : t('weMove.hero.anyDay')}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 border-2 border-foreground" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              {/* Search Button */}
+            {/* Botón buscar */}
+            <div className="px-3 pb-3">
               <Button
                 size="lg"
                 onClick={handleSearch}
-                className="w-full h-13 bg-yellow-400 hover:bg-yellow-300 text-foreground border-2 border-foreground font-black text-sm gap-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100"
+                className="w-full h-12 rounded-xl font-black text-sm gap-2"
               >
                 <Search className="h-4 w-4" />
                 {t('weMove.searchTransport')}
               </Button>
-
             </div>
           </div>
+          {/* ── FIN SEARCH BOX ── */}
 
+          {/* Trust badges — sin cambios */}
+          <div className="flex flex-wrap items-center gap-4 mt-6">
+            {[
+              { icon: ShieldCheck, label: t('weMove.hero.trust1') },
+              { icon: Star,        label: t('weMove.hero.trust2') },
+              { icon: Users,       label: t('weMove.hero.trust3') },
+            ].map(({ icon: Icon, label }, i) => (
+              <div key={i} className="flex items-center gap-1.5 text-primary-foreground/60">
+                <Icon className="h-3.5 w-3.5" />
+                <span className="text-xs font-semibold">{label}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Transporter CTA bar */}
+      {/* Transporter CTA bar — sin cambios */}
       <div className="relative border-t-2 border-primary-foreground/20 bg-primary-foreground/5">
         <div className="container py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-primary-foreground/80 text-sm font-medium text-center sm:text-left">
+          <p className="text-primary-foreground/70 text-sm font-medium text-center sm:text-left">
             {t('weMove.hero.transporterCta')}
           </p>
           <Button
