@@ -84,25 +84,27 @@ export function WeMoveHeroSearch({ onSearch }: WeMoveHeroSearchProps) {
           </div>
 
           {/* ── DERECHA: search box ── */}
-          <div className="bg-background border-4 border-foreground shadow-[8px_8px_0px_0px_rgba(0,0,0,0.5)]">
-            {/* Header del box */}
-            <div className="bg-foreground px-5 py-2.5 flex items-center gap-2">
-              <Search className="h-3.5 w-3.5 text-background" />
-              <span className="text-background text-xs font-black uppercase tracking-widest">
+          <div className="border-4 border-foreground bg-foreground shadow-[8px_8px_0px_0px_rgba(0,0,0,0.4)]">
+
+            {/* Header */}
+            <div className="px-5 py-3 flex items-center gap-2 border-b-4 border-foreground/20">
+              <Search className="h-4 w-4 text-background" />
+              <span className="text-background text-xs font-black uppercase tracking-[0.2em]">
                 {t('weMove.hero.searchLabel')}
               </span>
             </div>
 
-            <div className="p-4 flex flex-col gap-3">
+            <div className="p-5 flex flex-col gap-4">
+
               {/* Origin */}
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block mb-1 pl-1">
+                <label className="text-[10px] font-black uppercase tracking-widest text-background/60 block mb-1.5 pl-1">
                   {t('weMove.hero.from')}
                 </label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary z-10 pointer-events-none" />
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-yellow-400 z-10 pointer-events-none" />
                   <Select value={origin} onValueChange={setOrigin} disabled={locLoading}>
-                    <SelectTrigger className="border-2 border-foreground h-12 pl-9 font-semibold">
+                    <SelectTrigger className="border-2 border-background/30 bg-background/10 text-background h-12 pl-9 font-semibold hover:bg-background/20 focus:border-yellow-400 focus:ring-0">
                       <SelectValue placeholder={t('weMove.hero.selectOrigin')} />
                     </SelectTrigger>
                     <SelectContent>
@@ -116,13 +118,13 @@ export function WeMoveHeroSearch({ onSearch }: WeMoveHeroSearchProps) {
 
               {/* Destination */}
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block mb-1 pl-1">
+                <label className="text-[10px] font-black uppercase tracking-widest text-background/60 block mb-1.5 pl-1">
                   {t('weMove.hero.to')}
                 </label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-destructive z-10 pointer-events-none" />
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-red-400 z-10 pointer-events-none" />
                   <Select value={destination} onValueChange={setDestination} disabled={locLoading}>
-                    <SelectTrigger className="border-2 border-foreground h-12 pl-9 font-semibold">
+                    <SelectTrigger className="border-2 border-background/30 bg-background/10 text-background h-12 pl-9 font-semibold hover:bg-background/20 focus:border-yellow-400 focus:ring-0">
                       <SelectValue placeholder={t('weMove.hero.selectDestination')} />
                     </SelectTrigger>
                     <SelectContent>
@@ -134,9 +136,16 @@ export function WeMoveHeroSearch({ onSearch }: WeMoveHeroSearchProps) {
                 </div>
               </div>
 
+              {/* Divider con icono */}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-background/20" />
+                <CalendarIcon className="h-3.5 w-3.5 text-background/40" />
+                <div className="flex-1 h-px bg-background/20" />
+              </div>
+
               {/* Date */}
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block mb-1 pl-1">
+                <label className="text-[10px] font-black uppercase tracking-widest text-background/60 block mb-1.5 pl-1">
                   {t('weMove.hero.when')}
                 </label>
                 <Popover>
@@ -144,11 +153,11 @@ export function WeMoveHeroSearch({ onSearch }: WeMoveHeroSearchProps) {
                     <Button
                       variant="outline"
                       className={cn(
-                        'w-full h-12 border-2 border-foreground justify-start text-left font-semibold',
-                        !date && 'text-muted-foreground'
+                        'w-full h-12 border-2 border-background/30 bg-background/10 text-background justify-start text-left font-semibold hover:bg-background/20',
+                        !date && 'text-background/50'
                       )}
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+                      <CalendarIcon className="mr-2 h-4 w-4 shrink-0 text-yellow-400" />
                       {date ? format(date, 'PP', { locale: es }) : t('weMove.hero.anyDay')}
                     </Button>
                   </PopoverTrigger>
@@ -168,11 +177,12 @@ export function WeMoveHeroSearch({ onSearch }: WeMoveHeroSearchProps) {
               <Button
                 size="lg"
                 onClick={handleSearch}
-                className="w-full h-12 border-2 border-foreground font-black text-sm gap-2 shadow-[4px_4px_0px_0px_hsl(var(--foreground))] hover:shadow-[2px_2px_0px_0px_hsl(var(--foreground))] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100"
+                className="w-full h-13 bg-yellow-400 hover:bg-yellow-300 text-foreground border-2 border-foreground font-black text-sm gap-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100"
               >
                 <Search className="h-4 w-4" />
                 {t('weMove.searchTransport')}
               </Button>
+
             </div>
           </div>
 
