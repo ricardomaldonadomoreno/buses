@@ -1,31 +1,47 @@
-// src/components/wemove/WeMoveHeader.tsx
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { LanguageSelector } from '@/components/LanguageSelector';
-import { UserCircle, Home } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function WeMoveHeader() {
   const { t } = useTranslation();
+  const { theme, setTheme } = useTheme();
+
   return (
-    <header className="sticky top-0 z-50 w-full bg-foreground border-b-2 border-foreground">
-      <div className="container flex h-14 items-center justify-between">
-        <Link to="/wemove" className="flex items-center gap-2 group">
-          <img src="/logo.png" alt="BUSES" className="h-8 w-auto object-contain opacity-90 group-hover:opacity-100 transition-opacity" />
-          <div className="leading-none">
-            <span className="font-black text-lg text-primary tracking-tight">WeMove</span>
-            <span className="text-[10px] font-bold text-background/40 block uppercase tracking-widest">{t('weMove.byBusesApp')}</span>
-          </div>
+    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-primary/95 backdrop-blur-sm border-b-4 border-foreground">
+      <div className="container flex h-16 items-center justify-between">
+        <Link to="/wemove" className="font-black text-2xl text-foreground tracking-tight">
+          {t('weMove.title')}{' '}
+          <span className="text-lg font-bold opacity-70">{t('weMove.byBusesApp')}</span>
         </Link>
-        <nav className="flex items-center gap-2">
+
+        <nav className="flex items-center gap-3">
           <LanguageSelector />
-          <Link to="/" className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-background/70 hover:text-background transition-colors">
-            <Home className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">{t('common.backToHome')}</span>
-          </Link>
-          <Link to="/wemove/register"
-            className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground text-xs font-black uppercase tracking-wide hover:bg-primary/90 transition-colors border-2 border-primary">
-            <UserCircle className="h-3.5 w-3.5" />
+
+          {/* Dark mode toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="border-2 border-foreground/40 text-foreground hover:bg-foreground/10 h-9 w-9"
+          >
+            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          </Button>
+
+          <Link
+            to="/auth"
+            className="font-bold text-foreground hover:underline underline-offset-4 text-sm"
+          >
             {t('common.access')}
+          </Link>
+          <Link
+            to="/"
+            className="font-bold text-foreground hover:underline underline-offset-4 text-sm"
+          >
+            {t('common.backToHome')}
           </Link>
         </nav>
       </div>
