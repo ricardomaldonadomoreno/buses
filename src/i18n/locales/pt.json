@@ -137,7 +137,12 @@
       "trust2": "Sistema de reputação",
       "trust3": "Frota comunitária",
       "transporterCta": "Tem algo que se move? Entre e publique viagens hoje",
-      "registerFree": "Cadastre-se Grátis"
+      "registerFree": "Cadastre-se Grátis",
+      "statPassengers": "Passageiros ativos",
+      "statRoutes": "Rotas disponíveis",
+      "statSatisfaction": "Satisfação",
+      "statSupport": "Disponibilidade",
+      "quote": "Não definimos como você transporta — apenas conectamos"
     },
     "how": {
       "eyebrow": "Como funciona?",
