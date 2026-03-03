@@ -309,8 +309,8 @@
     "errorSelectUnit": "Selecciona una unidad de transporte",
     "errorPublishing": "Error al publicar la ruta",
     "errorPastDate": "La fecha y hora de salida debe ser en el futuro"
-  }
   },
+  
   "footer": {
     "terms": "Términos y Condiciones",
     "privacy": "Política de Privacidad",
