@@ -1,443 +1,355 @@
+// src/pages/WeMovePublishRoute.tsx — REESCRITO COMPLETO
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate, Link } from 'react-router-dom';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { LanguageSelector } from '@/components/LanguageSelector';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { useWeMoveAuth } from '@/hooks/useWeMoveAuth';
 import { useToast } from '@/hooks/use-toast';
-import { useLocations } from '@/hooks/useWeMoveData';
 import { useMyTransportUnits, usePublishWeMoveRoute } from '@/hooks/useWeMoveTransporter';
-import { supabase } from '@/integrations/supabase/client';
-import { useQuery } from '@tanstack/react-query';
+import { LocationCombobox } from '@/components/wemove/LocationCombobox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
-  ArrowLeft, MapPin, Calendar, Users, Bus, Loader2,
-  PawPrint, Wind, Wifi, Home, Info, Check, ArrowRight,
-  Luggage, MessageCircle, Phone
+  ArrowLeft, ArrowRight, Bus, Calendar, Users,
+  DollarSign, MapPin, CheckCircle, Loader2, AlertCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface SeatDef { row: number; col: number; label: string; type: string; }
-interface SeatLayout {
-  id: string; name: string; vehicle_type: string;
-  rows: number; cols: number; total_seats: number; layout_json: SeatDef[];
-}
-
-function useSeatLayouts(vehicleType?: string) {
-  return useQuery({
-    queryKey: ['seat-layouts', vehicleType],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('seat_layouts').select('*').order('total_seats');
-      if (error) throw error;
-      return (data as SeatLayout[]).filter(l => !vehicleType || l.vehicle_type === vehicleType);
-    },
-  });
-}
-
-function OptionToggle({ icon: Icon, label, description, value, onChange }: {
-  icon: React.ElementType; label: string; description?: string;
-  value: boolean; onChange: (v: boolean) => void;
-}) {
-  return (
-    <button type="button" onClick={() => onChange(!value)}
-      className={cn(
-        'flex items-start gap-3 p-3 rounded-xl border text-left transition-all',
-        value ? 'border-primary bg-primary/5' : 'border-border/60 hover:border-border hover:bg-muted/40'
-      )}>
-      <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center shrink-0',
-        value ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground')}>
-        <Icon className="h-4 w-4" />
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className={cn('text-sm font-medium', value ? 'text-primary' : 'text-foreground')}>{label}</p>
-        {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
-      </div>
-      <div className={cn('w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all',
-        value ? 'border-primary bg-primary' : 'border-border')}>
-        {value && <Check className="h-3 w-3 text-primary-foreground" />}
-      </div>
-    </button>
-  );
-}
-
-function SeatGrid({ layout, seatCount, onCountChange }: {
-  layout: SeatLayout; seatCount: number; onCountChange: (n: number) => void;
-}) {
-  const rows: Record<number, SeatDef[]> = {};
-  layout.layout_json.forEach(s => { if (!rows[s.row]) rows[s.row] = []; rows[s.row].push(s); });
-  const maxSeats = layout.layout_json.filter(s => s.type === 'seat').length;
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{layout.name}</p>
-        <span className="text-xs text-primary font-semibold">{maxSeats} asientos</span>
-      </div>
-      <div className="bg-muted/30 rounded-2xl p-4 overflow-x-auto">
-        <div className="space-y-1.5 w-fit mx-auto">
-          {Object.entries(rows).sort(([a],[b]) => +a - +b).map(([r, seats]) => (
-            <div key={r} className="flex gap-1.5 justify-center">
-              {seats.sort((a,b) => a.col-b.col).map(s => {
-                if (s.type === 'aisle') return <div key={s.label} className="w-6 h-6" />;
-                return (
-                  <div key={s.label} className="w-7 h-7 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center" title={s.label}>
-                    <span className="text-[9px] font-bold text-primary/70">{s.label}</span>
-                  </div>
-                );
-              })}
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="flex items-center justify-between">
-        <p className="text-xs text-muted-foreground">Asientos disponibles para este viaje</p>
-        <div className="flex items-center gap-3">
-          <button type="button" onClick={() => onCountChange(Math.max(1, seatCount - 1))}
-            className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-lg hover:bg-muted transition-colors">−</button>
-          <span className="text-lg font-bold w-6 text-center">{seatCount}</span>
-          <button type="button" onClick={() => onCountChange(Math.min(maxSeats, seatCount + 1))}
-            className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-lg hover:bg-muted transition-colors">+</button>
-        </div>
-      </div>
-    </div>
-  );
-}
+const VEHICLE_LABELS: Record<string,string> = {
+  bus:'Bus', microbus:'Microbus', van:'Van', minibus:'Minibus',
+  coaster:'Coaster', sedan:'Sedan', suv:'SUV', boat:'Lancha/Bote', plane:'Avioneta'
+};
 
 export default function WeMovePublishRoute() {
-  const { t }    = useTranslation();
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const navigate       = useNavigate();
+  const { toast }      = useToast();
   const { user, loading } = useWeMoveAuth();
+  const { data: units = [] } = useMyTransportUnits(user?.id);
+  const publishRoute   = usePublishWeMoveRoute();
 
-  const { data: locations = [] } = useLocations();
-  const { data: units = [] }     = useMyTransportUnits(user?.id);
-  const publishRoute = usePublishWeMoveRoute();
+  // Form state
+  const [originId,   setOriginId]   = useState('');
+  const [originName, setOriginName] = useState('');
+  const [destId,     setDestId]     = useState('');
+  const [destName,   setDestName]   = useState('');
+  const [date,       setDate]       = useState('');
+  const [time,       setTime]       = useState('');
+  const [unitId,     setUnitId]     = useState('');
+  const [seats,      setSeats]      = useState('');
+  const [price,      setPrice]      = useState('');
+  const [notes,      setNotes]      = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const [originId, setOriginId]         = useState('');
-  const [destinationId, setDestId]      = useState('');
-  const [departureDate, setDate]        = useState('');
-  const [departureTime, setTime]        = useState('');
-  const [availableSeats, setSeats]      = useState(4);
-  const [price, setPrice]               = useState('');
-  const [unitId, setUnitId]             = useState('');
-  const [description, setDescription]   = useState('');
-  const [notes, setNotes]               = useState('');
-  const [currency, setCurrency]         = useState('BOB');
-  const [submitting, setSubmitting]     = useState(false);
+  useEffect(() => {
+    if (!loading && !user) navigate('/wemove/register');
+  }, [user, loading, navigate]);
 
-  // WhatsApp + Pickup
-  const [pickupAddress, setPickupAddress]   = useState('');
-  const [whatsappGroup, setWhatsappGroup]   = useState('');
-  const [transporterPhone, setTransPhone]   = useState('');
+  // Auto-seleccionar única unidad
+  useEffect(() => {
+    if (units.length === 1 && !unitId) setUnitId(units[0].id);
+  }, [units]);
 
-  // Options
-  const [acceptsPets, setPets]    = useState(false);
-  const [acceptsLuggage, setLug]  = useState(true);
-  const [hasAc, setAc]            = useState(false);
-  const [hasWifi, setWifi]        = useState(false);
-  const [doorToDoor, setDoor]     = useState(false);
-  const [layoutId, setLayoutId]   = useState('');
+  // Auto-llenar asientos según la unidad seleccionada
+  const selectedUnit = units.find(u => u.id === unitId);
+  useEffect(() => {
+    if (selectedUnit && !seats) setSeats(String(selectedUnit.capacity));
+  }, [selectedUnit]);
 
-  const selectedUnit   = units.find(u => u.id === unitId);
-  const { data: layouts = [] } = useSeatLayouts(selectedUnit?.type);
-  const selectedLayout = layouts.find(l => l.id === layoutId);
+  const maxSeats = selectedUnit?.capacity ?? 60;
 
-  useEffect(() => { if (units.length === 1 && !unitId) setUnitId(units[0].id); }, [units]);
-  useEffect(() => { if (layouts.length > 0 && !layoutId) setLayoutId(layouts[0].id); }, [layouts]);
-  useEffect(() => { if (selectedLayout) setSeats(selectedLayout.total_seats); }, [selectedLayout?.id]);
-  useEffect(() => { if (!loading && !user) navigate('/wemove/register'); }, [user, loading, navigate]);
+  const minDate = new Date().toISOString().split('T')[0];
 
-  // Validate WhatsApp group link
-  const validateWAGroup = (url: string) => {
-    if (!url) return true;
-    return url.startsWith('https://chat.whatsapp.com/') || url.startsWith('https://wa.me/');
-  };
+  const isValid = originId && destId && originId !== destId &&
+    date && time && unitId && seats && price &&
+    parseInt(seats) >= 1 && parseFloat(price) > 0;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) return;
-    if (!originId || !destinationId) { toast({ title: t('wemovePublish.errorSelectLocations'), variant: 'destructive' }); return; }
-    if (originId === destinationId)  { toast({ title: t('wemovePublish.errorSameLocation'),    variant: 'destructive' }); return; }
-    if (!departureDate || !departureTime) { toast({ title: t('wemovePublish.errorSelectDateTime'), variant: 'destructive' }); return; }
-    if (!price || parseFloat(price) <= 0) { toast({ title: t('wemovePublish.errorInvalidPrice'), variant: 'destructive' }); return; }
-    if (!unitId) { toast({ title: t('wemovePublish.errorSelectUnit'), variant: 'destructive' }); return; }
-    if (whatsappGroup && !validateWAGroup(whatsappGroup)) {
-      toast({ title: 'El link del grupo debe empezar con https://chat.whatsapp.com/', variant: 'destructive' }); return;
-    }
-
-    const depISO = new Date(`${departureDate}T${departureTime}:00`).toISOString();
-    if (new Date(depISO) <= new Date()) { toast({ title: t('wemovePublish.errorPastDate'), variant: 'destructive' }); return; }
-
+  const handleSubmit = async () => {
+    if (!user || !isValid) return;
     setSubmitting(true);
     try {
-      const result = await publishRoute.mutateAsync({
-        transporterId: user.id, transportUnitId: unitId,
-        originId, destinationId, departureTime: depISO,
-        availableSeats, price: parseFloat(price),
+      const departureTime = new Date(`${date}T${time}`).toISOString();
+      await publishRoute.mutateAsync({
+        transporterId:   user.id,
+        transportUnitId: unitId,
+        originId,
+        destinationId:   destId,
+        departureTime,
+        availableSeats:  parseInt(seats),
+        price:           parseFloat(price),
       });
 
-      if (result?.id) {
-        await supabase.from('wemove_routes').update({
-          description: description || null,
-          notes: notes || null,
-          currency,
-          accepts_pets: acceptsPets,
-          accepts_luggage: acceptsLuggage,
-          has_ac: hasAc,
-          has_wifi: hasWifi,
-          door_to_door: doorToDoor,
-          vehicle_type: selectedUnit?.type ?? null,
-          pickup_address: pickupAddress || null,
-          whatsapp_group_link: whatsappGroup || null,
-          transporter_phone: transporterPhone || null,
-        }).eq('id', result.id);
-
-        if (selectedLayout) {
-          const seatRows = selectedLayout.layout_json
-            .filter(s => s.type === 'seat').slice(0, availableSeats)
-            .map(s => ({ route_id: result.id, seat_label: s.label, seat_row: s.row, seat_col: s.col, seat_type: 'seat', status: 'available' }));
-          await supabase.from('route_seats').insert(seatRows);
+      // Guardar notas si hay
+      if (notes.trim()) {
+        // Se guarda en la ruta recién creada — buscarla por transporter + departure
+        const { data: newRoute } = await supabase
+          .from('wemove_routes')
+          .select('id')
+          .eq('transporter_id', user.id)
+          .eq('departure_time', departureTime)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (newRoute) {
+          await supabase.from('wemove_routes').update({ notes: notes.trim() }).eq('id', newRoute.id);
         }
       }
 
-      toast({ title: '🎉 ¡Viaje publicado exitosamente!' });
+      toast({ title: '🎉 ¡Viaje publicado!' });
       navigate('/wemove/dashboard');
-    } catch (err: unknown) {
-      toast({ title: t('wemovePublish.errorPublishing'), description: err instanceof Error ? err.message : undefined, variant: 'destructive' });
-    } finally { setSubmitting(false); }
+    } catch (err: any) {
+      toast({ title: 'Error al publicar', description: err.message, variant: 'destructive' });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    </div>
+  );
   if (!user) return null;
-
-  const cities  = locations.filter((l: any) => l.type === 'city');
-  const minDate = new Date().toISOString().split('T')[0];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/50">
         <div className="h-px w-full bg-gradient-to-r from-transparent via-primary to-transparent" />
-        <div className="container flex h-16 items-center justify-between">
-          <Link to="/wemove/dashboard" className="flex items-center gap-3 group">
-            <img src="/logo.png" alt="WeMove" className="h-9 w-auto object-contain group-hover:opacity-80 transition-opacity" />
-            <span className="font-serif text-lg font-semibold hidden sm:block">We<span className="text-primary">Move</span></span>
+        <div className="container flex h-14 items-center justify-between">
+          <Link to="/wemove/dashboard" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="h-4 w-4" /> Volver al panel
           </Link>
-          <LanguageSelector />
+          <span className="font-serif font-semibold text-lg">
+            We<span className="text-primary">Move</span>
+          </span>
+          <div className="w-24" />
         </div>
       </header>
 
-      <main className="flex-1 container py-8 max-w-2xl">
-        <div className="mb-6">
-          <Link to="/wemove/dashboard" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
-            <ArrowLeft className="h-4 w-4" />{t('weMoveDashboard.backToDashboard')}
-          </Link>
-          <h1 className="font-serif text-2xl font-semibold">{t('wemovePublish.title')}</h1>
-          <p className="text-sm text-muted-foreground mt-1">{t('wemovePublish.subtitle')}</p>
+      <main className="flex-1 container max-w-lg py-8 space-y-6">
+        <div>
+          <h1 className="text-2xl font-black">Publicar viaje</h1>
+          <p className="text-sm text-muted-foreground mt-1">Define los detalles de tu próximo viaje</p>
         </div>
 
-        {units.length === 0 ? (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center">
-            <Bus className="h-10 w-10 text-amber-500 mx-auto mb-3" />
-            <p className="font-semibold text-amber-800">{t('wemovePublish.noUnitsTitle')}</p>
-            <p className="text-sm text-amber-700 mt-1">{t('wemovePublish.noUnitsDesc')}</p>
-            <Link to="/wemove/profile" className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 rounded-xl bg-amber-600 text-white text-sm font-semibold">{t('wemovePublish.goToProfile')}</Link>
+        {/* Sin unidades */}
+        {units.length === 0 && (
+          <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold text-amber-800 text-sm">Primero registra un vehículo</p>
+              <p className="text-xs text-amber-700 mt-0.5">
+                Necesitas al menos una unidad registrada para publicar viajes.
+              </p>
+              <Link to="/wemove/profile"
+                className="text-xs font-bold text-amber-800 underline mt-2 inline-block">
+                Ir a Mi perfil →
+              </Link>
+            </div>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-5">
-
-            {/* ROUTE */}
-            <FormCard title={t('wemovePublish.sectionRoute')} icon={MapPin}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FormField label={t('wemovePublish.origin')}>
-                  <Select value={originId} onValueChange={setOriginId}>
-                    <SelectTrigger className="rounded-xl border-border/60"><SelectValue placeholder={t('wemovePublish.selectOrigin')} /></SelectTrigger>
-                    <SelectContent>{cities.map((l: any) => <SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>)}</SelectContent>
-                  </Select>
-                </FormField>
-                <FormField label={t('wemovePublish.destination')}>
-                  <Select value={destinationId} onValueChange={setDestId}>
-                    <SelectTrigger className="rounded-xl border-border/60"><SelectValue placeholder={t('wemovePublish.selectDestination')} /></SelectTrigger>
-                    <SelectContent>{cities.filter((l: any) => l.id !== originId).map((l: any) => <SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>)}</SelectContent>
-                  </Select>
-                </FormField>
-              </div>
-              <FormField label="Descripción del viaje (opcional)">
-                <Input value={description} onChange={e => setDescription(e.target.value)} placeholder="Ej: Viaje directo sin paradas" className="rounded-xl border-border/60" />
-              </FormField>
-            </FormCard>
-
-            {/* PICKUP — NEW */}
-            <FormCard title="Punto de partida y contacto" icon={MapPin}>
-              <FormField label="Dirección exacta de partida *">
-                <Input value={pickupAddress} onChange={e => setPickupAddress(e.target.value)}
-                  placeholder="Ej: Terminal Bimodal, puerta 3 — frente al kiosco azul"
-                  className="rounded-xl border-border/60" />
-                <p className="text-xs text-muted-foreground mt-1">Los pasajeros verán esta dirección al confirmar su reserva</p>
-              </FormField>
-
-              <FormField label="Tu número de WhatsApp (para contacto directo)">
-                <div className="flex gap-2">
-                  <span className="flex items-center px-3 rounded-xl border border-border/60 bg-muted text-sm text-muted-foreground shrink-0">+591</span>
-                  <Input value={transporterPhone} onChange={e => setTransPhone(e.target.value.replace(/\D/g,''))}
-                    placeholder="70000000" maxLength={9}
-                    className="rounded-xl border-border/60 flex-1" />
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">Los pasajeros podrán escribirte directamente por WhatsApp</p>
-              </FormField>
-
-              {/* WhatsApp Group — STAR FEATURE */}
-              <div className="bg-[#25D366]/5 border border-[#25D366]/30 rounded-xl p-4 space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-[#25D366] flex items-center justify-center shrink-0">
-                    <MessageCircle className="h-4 w-4 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">Grupo de WhatsApp del viaje</p>
-                    <p className="text-xs text-muted-foreground">Crea un grupo, copia el enlace de invitación y pégalo aquí</p>
-                  </div>
-                </div>
-
-                <FormField label="Enlace de invitación al grupo">
-                  <Input value={whatsappGroup} onChange={e => setWhatsappGroup(e.target.value.trim())}
-                    placeholder="https://chat.whatsapp.com/XXXXXXXXXXXXXXXXXX"
-                    className={cn('rounded-xl border-border/60', whatsappGroup && !validateWAGroup(whatsappGroup) && 'border-red-400')} />
-                </FormField>
-
-                {whatsappGroup && !validateWAGroup(whatsappGroup) && (
-                  <p className="text-xs text-red-500">El link debe empezar con https://chat.whatsapp.com/</p>
-                )}
-
-                <div className="bg-background/60 rounded-lg p-3 space-y-1">
-                  <p className="text-xs font-semibold text-foreground">¿Cómo obtener el link del grupo?</p>
-                  <ol className="text-xs text-muted-foreground space-y-0.5 list-decimal list-inside">
-                    <li>Abre WhatsApp y crea un grupo nuevo para este viaje</li>
-                    <li>Ve a Datos del grupo → Enlace de invitación</li>
-                    <li>Toca "Copiar enlace" y pégalo aquí</li>
-                  </ol>
-                </div>
-              </div>
-            </FormCard>
-
-            {/* DATE & TIME */}
-            <FormCard title={t('wemovePublish.sectionDateTime')} icon={Calendar}>
-              <div className="grid grid-cols-2 gap-4">
-                <FormField label={t('wemovePublish.date')}>
-                  <Input type="date" min={minDate} value={departureDate} onChange={e => setDate(e.target.value)} className="rounded-xl border-border/60" />
-                </FormField>
-                <FormField label={t('wemovePublish.time')}>
-                  <Input type="time" value={departureTime} onChange={e => setTime(e.target.value)} className="rounded-xl border-border/60" />
-                </FormField>
-              </div>
-            </FormCard>
-
-            {/* VEHICLE */}
-            <FormCard title={t('wemovePublish.sectionUnit')} icon={Bus}>
-              <FormField label={t('wemovePublish.selectUnit')}>
-                <Select value={unitId} onValueChange={setUnitId}>
-                  <SelectTrigger className="rounded-xl border-border/60"><SelectValue placeholder={t('wemovePublish.selectUnitPlaceholder')} /></SelectTrigger>
-                  <SelectContent>{units.map(u => <SelectItem key={u.id} value={u.id}>{u.type.charAt(0).toUpperCase()+u.type.slice(1)} — {u.capacity} asientos{u.verified?' ✓':''}</SelectItem>)}</SelectContent>
-                </Select>
-              </FormField>
-              {unitId && layouts.length > 0 && (
-                <>
-                  <FormField label="Distribución de asientos">
-                    <Select value={layoutId} onValueChange={setLayoutId}>
-                      <SelectTrigger className="rounded-xl border-border/60"><SelectValue placeholder="Selecciona distribución" /></SelectTrigger>
-                      <SelectContent>{layouts.map(l => <SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </FormField>
-                  {selectedLayout && <SeatGrid layout={selectedLayout} seatCount={availableSeats} onCountChange={setSeats} />}
-                </>
-              )}
-            </FormCard>
-
-            {/* PRICE */}
-            <FormCard title="Precio" icon={Users}>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="col-span-2">
-                  <FormField label={t('wemovePublish.pricePerSeat')}>
-                    <Input type="number" min="0" step="0.50" value={price} onChange={e => setPrice(e.target.value)} placeholder="0.00" className="rounded-xl border-border/60 text-lg font-semibold" />
-                  </FormField>
-                </div>
-                <FormField label="Moneda">
-                  <Select value={currency} onValueChange={setCurrency}>
-                    <SelectTrigger className="rounded-xl border-border/60"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="BOB">BOB (Bs.)</SelectItem>
-                      <SelectItem value="USD">USD ($)</SelectItem>
-                      <SelectItem value="PEN">PEN (S/.)</SelectItem>
-                      <SelectItem value="ARS">ARS ($)</SelectItem>
-                      <SelectItem value="BRL">BRL (R$)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormField>
-              </div>
-            </FormCard>
-
-            {/* OPTIONS */}
-            <FormCard title="Opciones del viaje" icon={Info}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <OptionToggle icon={PawPrint} label="Acepta mascotas" description="Perros, gatos u otros animales" value={acceptsPets} onChange={setPets} />
-                <OptionToggle icon={Luggage}  label="Equipaje extra" description="Maletas o bultos adicionales" value={acceptsLuggage} onChange={setLug} />
-                <OptionToggle icon={Wind}     label="Aire acondicionado" description="Vehículo con A/C" value={hasAc} onChange={setAc} />
-                <OptionToggle icon={Wifi}     label="WiFi a bordo" description="Conexión durante el viaje" value={hasWifi} onChange={setWifi} />
-                <OptionToggle icon={Home}     label="Puerta a puerta" description="Recojo y entrega en domicilio" value={doorToDoor} onChange={setDoor} />
-              </div>
-              <FormField label="Notas adicionales (opcional)">
-                <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2}
-                  placeholder="Ej: Sin alimentos fuertes, llevar documento de identidad..."
-                  className="w-full rounded-xl border border-border/60 bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30" />
-              </FormField>
-            </FormCard>
-
-            {/* PREVIEW */}
-            {originId && destinationId && price && (
-              <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 space-y-2">
-                <p className="text-xs font-bold uppercase tracking-widest text-primary">Vista previa</p>
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">🚌</span>
-                  <div>
-                    <div className="flex items-center gap-2 font-semibold text-sm">
-                      <span>{cities.find((c: any) => c.id === originId)?.name}</span>
-                      <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span>{cities.find((c: any) => c.id === destinationId)?.name}</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">{departureDate}{departureTime?` · ${departureTime}`:''} · {availableSeats} asientos · {currency} {price}</p>
-                    {pickupAddress && <p className="text-xs text-muted-foreground mt-0.5">📍 {pickupAddress}</p>}
-                    {whatsappGroup && <p className="text-xs text-[#25D366] mt-0.5">💬 Grupo de WhatsApp incluido</p>}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <button type="submit" disabled={submitting}
-              className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-primary text-primary-foreground font-semibold text-base hover:bg-primary/90 transition-colors disabled:opacity-60 min-h-[56px]">
-              {submitting ? <><Loader2 className="h-5 w-5 animate-spin" /> Publicando…</> : t('wemovePublish.publishButton')}
-            </button>
-          </form>
         )}
+
+        {/* Sección: Ruta */}
+        <Section icon={<MapPin className="h-4 w-4" />} title="Ruta">
+          <div className="grid grid-cols-1 gap-3">
+            <LocationCombobox
+              label="Ciudad de origen"
+              value={originId}
+              onChange={(id, name) => { setOriginId(id); setOriginName(name); }}
+              placeholder="Escribe o busca ciudad de origen…"
+              excludeId={destId}
+            />
+            <div className="flex items-center justify-center">
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <LocationCombobox
+              label="Ciudad de destino"
+              value={destId}
+              onChange={(id, name) => { setDestId(id); setDestName(name); }}
+              placeholder="Escribe o busca ciudad de destino…"
+              excludeId={originId}
+            />
+            {originId && destId && originId === destId && (
+              <p className="text-xs text-destructive font-bold">
+                Origen y destino no pueden ser la misma ciudad.
+              </p>
+            )}
+          </div>
+          <div className="mt-3">
+            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground block mb-1.5">
+              Descripción del viaje (opcional)
+            </label>
+            <Input
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              placeholder="Ej: Viaje directo sin paradas, salida desde terminal"
+              className="rounded-xl border-foreground/30"
+            />
+          </div>
+        </Section>
+
+        {/* Sección: Fecha y hora */}
+        <Section icon={<Calendar className="h-4 w-4" />} title="Fecha y hora de salida">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground block mb-1.5">
+                Fecha
+              </label>
+              <Input
+                type="date" min={minDate} value={date}
+                onChange={e => setDate(e.target.value)}
+                className="rounded-xl border-foreground/30"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground block mb-1.5">
+                Hora
+              </label>
+              <Input
+                type="time" value={time}
+                onChange={e => setTime(e.target.value)}
+                className="rounded-xl border-foreground/30"
+              />
+            </div>
+          </div>
+        </Section>
+
+        {/* Sección: Vehículo */}
+        <Section icon={<Bus className="h-4 w-4" />} title="Vehículo">
+          {units.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Sin unidades registradas.</p>
+          ) : (
+            <div className="grid grid-cols-1 gap-2">
+              {units.map(unit => (
+                <button
+                  key={unit.id}
+                  onClick={() => setUnitId(unit.id)}
+                  className={cn(
+                    'flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all',
+                    unitId === unit.id
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border hover:border-foreground/40'
+                  )}
+                >
+                  <span className="text-2xl">
+                    {unit.type === 'sedan' ? '🚗' : unit.type === 'suv' ? '🚙' :
+                     unit.type === 'boat' ? '⛵' : unit.type === 'plane' ? '✈️' : '🚐'}
+                  </span>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold">
+                      {VEHICLE_LABELS[unit.type] ?? unit.type}
+                      {(unit as any).plate ? ` · ${(unit as any).plate}` : ''}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {unit.capacity} asientos
+                      {(unit as any).color ? ` · ${(unit as any).color}` : ''}
+                    </p>
+                  </div>
+                  {unitId === unit.id && (
+                    <CheckCircle className="h-4 w-4 text-primary shrink-0" />
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </Section>
+
+        {/* Sección: Asientos y precio */}
+        <Section icon={<Users className="h-4 w-4" />} title="Asientos y precio">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground block mb-1.5">
+                Asientos a vender
+              </label>
+              <Input
+                type="number" min="1" max={maxSeats} value={seats}
+                onChange={e => setSeats(e.target.value)}
+                placeholder={`Máx. ${maxSeats}`}
+                className="rounded-xl border-foreground/30"
+              />
+              {selectedUnit && (
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  Capacidad de tu vehículo: {maxSeats}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground block mb-1.5">
+                Precio por asiento (Bs.)
+              </label>
+              <Input
+                type="number" min="1" step="0.5" value={price}
+                onChange={e => setPrice(e.target.value)}
+                placeholder="Ej: 50"
+                className="rounded-xl border-foreground/30"
+              />
+            </div>
+          </div>
+        </Section>
+
+        {/* Preview */}
+        {isValid && (
+          <div className="border-4 border-primary rounded-2xl overflow-hidden">
+            <div className="bg-primary px-4 py-2.5">
+              <p className="text-primary-foreground font-black text-xs uppercase tracking-widest">
+                Vista previa del viaje
+              </p>
+            </div>
+            <div className="p-4 space-y-2">
+              <div className="flex items-center gap-2 font-black text-base">
+                <MapPin className="h-4 w-4 text-primary" />
+                {originName}
+                <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+                <MapPin className="h-4 w-4 text-destructive" />
+                {destName}
+              </div>
+              <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <Calendar className="h-3 w-3" />
+                  {date} · {time}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Users className="h-3 w-3" />
+                  {seats} asientos
+                </span>
+                <span className="flex items-center gap-1 font-bold text-primary">
+                  <DollarSign className="h-3 w-3" />
+                  Bs. {price} / asiento
+                </span>
+              </div>
+              {notes && <p className="text-xs text-muted-foreground italic">📌 {notes}</p>}
+            </div>
+          </div>
+        )}
+
+        {/* Botón publicar */}
+        <button
+          onClick={handleSubmit}
+          disabled={!isValid || submitting || units.length === 0}
+          className="w-full py-4 bg-primary text-primary-foreground font-black text-sm rounded-xl hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+        >
+          {submitting
+            ? <><Loader2 className="h-4 w-4 animate-spin" /> Publicando…</>
+            : '🚀 Publicar viaje'
+          }
+        </button>
       </main>
     </div>
   );
 }
 
-function FormCard({ title, icon: Icon, children }: { title: string; icon: React.ElementType; children: React.ReactNode }) {
+// ── Sección visual ────────────────────────────────────────────
+function Section({ icon, title, children }: {
+  icon: React.ReactNode; title: string; children: React.ReactNode;
+}) {
   return (
-    <div className="bg-card rounded-2xl border border-border/60 overflow-hidden">
-      <div className="px-5 py-3.5 border-b border-border/40 flex items-center gap-2.5">
-        <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><Icon className="h-3.5 w-3.5 text-primary" /></div>
-        <h3 className="text-sm font-semibold">{title}</h3>
+    <div className="bg-card border border-border/60 rounded-2xl overflow-hidden">
+      <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-border/40 bg-muted/20">
+        <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+          {icon}
+        </div>
+        <h3 className="text-sm font-bold">{title}</h3>
       </div>
-      <div className="p-5 space-y-4">{children}</div>
-    </div>
-  );
-}
-
-function FormField({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-1.5">
-      <Label className="text-xs text-muted-foreground">{label}</Label>
-      {children}
+      <div className="p-5">{children}</div>
     </div>
   );
 }
