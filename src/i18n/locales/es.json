@@ -166,15 +166,17 @@
       "trace": "Trazabilidad del viaje"
     },
     "cta": {
-      "eyebrow": "Para transportadores",
-      "title": "Transporta, GANA<br/>y crece sin ser<br/><span class='text-primary'>una empresa</span>",
-      "desc": "WeMove es la plataforma para personas reales que quieren transportar personas. Sin intermediarios, con identidad verificada y reputación digital.",
-      "btn": "Únete gratis",
-      "howBtn": "Ver cómo funciona",
-      "perk1": "Publica tu ruta, gestiona asientos y cobra todo desde la app",
-      "perk2": "Ve quién reservó, gestiona pagos y comunícate con pasajeros",
-      "perk3": "Comunicación directa con tu transportador desde la app",
-      "perk4": "Construye tu reputación en la comunidad"
+    "eyebrow": "Para transportadores",
+    "titleLine1": "Transporta, GANA",
+    "titleLine2": "y crece sin ser",
+    "titleAccent": "una empresa",
+    "title": "Sé parte de la Flota Comunitaria",
+    "desc": "WeMove es la plataforma para personas reales que quieren transportar personas. Sin intermediarios, con identidad verificada y reputación digital.",
+    "btn": "Únete gratis",
+    "perk1": "Publica tu ruta, gestiona asientos y cobra todo desde la app",
+    "perk2": "Ve quién reservó, gestiona pagos y comunícate con pasajeros",
+    "perk3": "Comunicación directa con tu transportador desde la app",
+    "perk4": "Construye tu reputación en la comunidad"
     },
     "whyWeMove": {
       "title": "¿Por qué WeMove?",
