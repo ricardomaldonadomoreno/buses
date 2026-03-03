@@ -40,18 +40,9 @@
     "destination": "Destino",
     "results": "Resultados",
     "noResultsYet": "Busque viagens disponíveis",
-    "packService": {
-      "title": "PackService",
-      "subtitle": "Transporte de Pacotes"
-    },
-    "advertising": {
-      "title": "Anuncie Sua Empresa Aqui",
-      "subtitle": "Buses.App"
-    },
-    "notifications": {
-      "title": "Notificações",
-      "empty": "Sem notificações"
-    },
+    "packService": { "title": "PackService", "subtitle": "Transporte de Pacotes" },
+    "advertising": { "title": "Anuncie Sua Empresa Aqui", "subtitle": "Buses.App" },
+    "notifications": { "title": "Notificações", "empty": "Sem notificações" },
     "hero": {
       "title": "Envios seguros entre cidades",
       "subtitle": "A plataforma que conecta remetentes com transportadores verificados.",
@@ -139,7 +130,16 @@
       "noBusiness":        { "title": "Sem empresas, pessoas", "description": "Economia colaborativa pessoa a pessoa" }
     },
     "results": {
-      "reserve": "Reservar"
+      "today": "Hoje",
+      "tomorrow": "Amanhã",
+      "verified": "Verificado",
+      "unknown": "Transportador",
+      "perSeat": "por assento",
+      "reserve": "Reservar",
+      "noSeats": "Sem assentos",
+      "almostFull": "Últimos {{seats}} assentos!",
+      "full": "Unidade cheia",
+      "tryOtherDate": "Tente outra data ou verifique outros destinos disponíveis."
     }
   },
   "wemoveRegister": {
@@ -308,10 +308,8 @@
     "errorInvalidPrice": "Insira um preço válido",
     "errorSelectUnit": "Selecione uma unidade de transporte",
     "errorPublishing": "Erro ao publicar a rota",
-    "errorPastDate": "A data e hora de saída deve ser no futuro",
-    }
+    "errorPastDate": "A data e hora de saída deve ser no futuro"
   },
-  
   "footer": {
     "terms": "Termos e Condições",
     "privacy": "Política de Privacidade",
