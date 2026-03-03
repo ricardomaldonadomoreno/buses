@@ -244,7 +244,8 @@
       "minibus": "Minibus", "coaster": "Coaster", "sedan": "Sedan", "suv": "SUV"
     }
   },
- "title": "Publicar rota",
+  "wemovePublish": {
+    "title": "Publicar rota",
     "subtitle": "Defina os detalhes da sua próxima viagem",
     "sectionRoute": "Rota",
     "origin": "Cidade de origem",
@@ -308,7 +309,6 @@
     "errorSelectUnit": "Selecione uma unidade de transporte",
     "errorPublishing": "Erro ao publicar a rota",
     "errorPastDate": "A data e hora de saída deve ser no futuro"
-  }
   },
   "footer": {
     "terms": "Termos e Condições",
