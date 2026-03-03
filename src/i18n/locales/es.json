@@ -306,9 +306,10 @@
     "errorSelectDateTime": "Selecciona fecha y hora de salida",
     "errorInvalidSeats": "Ingresa un número válido de asientos",
     "errorInvalidPrice": "Ingresa un precio válido",
-    "errorSelectUnit": "Selecciona una unidad de transporte"
+    "errorSelectUnit": "Selecciona una unidad de transporte",
     "errorPublishing": "Error al publicar la ruta",
     "errorPastDate": "La fecha y hora de salida debe ser en el futuro"
+  }
   },
   "footer": {
     "terms": "Términos y Condiciones",
