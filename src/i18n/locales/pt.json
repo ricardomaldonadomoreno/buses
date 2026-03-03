@@ -308,8 +308,10 @@
     "errorInvalidPrice": "Insira um preço válido",
     "errorSelectUnit": "Selecione uma unidade de transporte",
     "errorPublishing": "Erro ao publicar a rota",
-    "errorPastDate": "A data e hora de saída deve ser no futuro"
+    "errorPastDate": "A data e hora de saída deve ser no futuro",
+    }
   },
+  
   "footer": {
     "terms": "Termos e Condições",
     "privacy": "Política de Privacidade",
