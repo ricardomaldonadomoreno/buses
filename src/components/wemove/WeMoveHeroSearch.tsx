@@ -155,121 +155,126 @@ export function WeMoveHeroSearch({ onSearch }: WeMoveHeroSearchProps) {
         style={{ clipPath: 'polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%)' }}
       />
 
+      {/* CAMBIO 5: agregado max-w-5xl mx-auto para centrar */}
       <div className="relative container py-12 md:py-20">
-        {/* ── ÚNICO CAMBIO: grid 2 columnas en lugar de max-w-2xl ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
 
-          {/* Columna izquierda: texto */}
-          <div>
-            {/* Identity tag */}
-            <div className="inline-flex items-center gap-2 border-2 border-primary-foreground/30 px-4 py-1.5 mb-6">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-primary-foreground/80 text-xs font-bold uppercase tracking-widest">
-                {t('weMove.hero.tag')}
-              </span>
+            {/* Columna izquierda: texto */}
+            <div>
+              {/* Identity tag */}
+              <div className="inline-flex items-center gap-2 border-2 border-primary-foreground/30 px-4 py-1.5 mb-6">
+                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                {/* CAMBIO 1: quitada opacidad /80 */}
+                <span className="text-primary-foreground text-xs font-bold uppercase tracking-widest">
+                  {t('weMove.hero.tag')}
+                </span>
+              </div>
+
+              {/* Main title */}
+              <h1 className="text-6xl md:text-8xl font-black text-primary-foreground leading-none tracking-tight mb-2">
+                WeMove
+              </h1>
+              {/* CAMBIO 2: quitada opacidad /70, font-semibold → font-bold */}
+              <p className="text-primary-foreground text-lg md:text-xl font-bold mb-1">
+                {t('weMove.subtitle')}
+              </p>
+              {/* CAMBIO 3: quitada opacidad /50, agregado font-semibold */}
+              <p className="text-primary-foreground font-semibold text-sm mb-8 max-w-md">
+                {t('weMove.description')}
+              </p>
+
+              {/* Trust badges */}
+              <div className="flex flex-wrap items-center gap-4">
+                {[
+                  { icon: ShieldCheck, label: t('weMove.hero.trust1') },
+                  { icon: Star,        label: t('weMove.hero.trust2') },
+                  { icon: Users,       label: t('weMove.hero.trust3') },
+                ].map(({ icon: Icon, label }, i) => (
+                  // CAMBIO 4: quitada opacidad /60, font-semibold → font-bold
+                  <div key={i} className="flex items-center gap-1.5 text-primary-foreground">
+                    <Icon className="h-3.5 w-3.5" />
+                    <span className="text-xs font-bold">{label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Main title */}
-            <h1 className="text-6xl md:text-8xl font-black text-primary-foreground leading-none tracking-tight mb-2">
-              WeMove
-            </h1>
-            <p className="text-primary-foreground/70 text-lg md:text-xl font-semibold mb-1">
-              {t('weMove.subtitle')}
-            </p>
-            <p className="text-primary-foreground/50 text-sm mb-8 max-w-md">
-              {t('weMove.description')}
-            </p>
+            {/* Columna derecha: search box — sin cambios internos */}
+            <div>
+              <div className="bg-card rounded-2xl overflow-visible shadow-lg border border-border/40">
 
-            {/* Trust badges */}
-            <div className="flex flex-wrap items-center gap-4">
-              {[
-                { icon: ShieldCheck, label: t('weMove.hero.trust1') },
-                { icon: Star,        label: t('weMove.hero.trust2') },
-                { icon: Users,       label: t('weMove.hero.trust3') },
-              ].map(({ icon: Icon, label }, i) => (
-                <div key={i} className="flex items-center gap-1.5 text-primary-foreground/60">
-                  <Icon className="h-3.5 w-3.5" />
-                  <span className="text-xs font-semibold">{label}</span>
+                {/* Origen */}
+                <div className="px-2 pt-2">
+                  <CityCombobox
+                    value={origin}
+                    onChange={setOrigin}
+                    placeholder={t('weMove.hero.selectOrigin')}
+                    pinColor="text-primary"
+                    disabled={locLoading}
+                  />
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Columna derecha: search box — sin cambios internos */}
-          <div>
-            <div className="bg-card rounded-2xl overflow-visible shadow-lg border border-border/40">
+                <div className="mx-4 border-t border-border/50" />
 
-              {/* Origen */}
-              <div className="px-2 pt-2">
-                <CityCombobox
-                  value={origin}
-                  onChange={setOrigin}
-                  placeholder={t('weMove.hero.selectOrigin')}
-                  pinColor="text-primary"
-                  disabled={locLoading}
-                />
-              </div>
+                {/* Destino */}
+                <div className="px-2">
+                  <CityCombobox
+                    value={destination}
+                    onChange={setDestination}
+                    placeholder={t('weMove.hero.selectDestination')}
+                    excludeId={origin}
+                    pinColor="text-destructive"
+                    disabled={locLoading}
+                  />
+                </div>
 
-              <div className="mx-4 border-t border-border/50" />
+                <div className="mx-4 border-t border-border/50" />
 
-              {/* Destino */}
-              <div className="px-2">
-                <CityCombobox
-                  value={destination}
-                  onChange={setDestination}
-                  placeholder={t('weMove.hero.selectDestination')}
-                  excludeId={origin}
-                  pinColor="text-destructive"
-                  disabled={locLoading}
-                />
-              </div>
+                {/* Fecha */}
+                <div className="px-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className={cn(
+                          'w-full h-12 flex items-center gap-3 px-4 text-sm font-medium',
+                          'text-left rounded-xl transition-colors hover:bg-muted/50',
+                          !date && 'text-muted-foreground'
+                        )}
+                      >
+                        <CalendarIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
+                        {date ? format(date, 'PP', { locale: es }) : t('weMove.hero.anyDay')}
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 border border-border rounded-xl" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={setDate}
+                        disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
 
-              <div className="mx-4 border-t border-border/50" />
-
-              {/* Fecha */}
-              <div className="px-2">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button
-                      type="button"
-                      className={cn(
-                        'w-full h-12 flex items-center gap-3 px-4 text-sm font-medium',
-                        'text-left rounded-xl transition-colors hover:bg-muted/50',
-                        !date && 'text-muted-foreground'
-                      )}
-                    >
-                      <CalendarIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
-                      {date ? format(date, 'PP', { locale: es }) : t('weMove.hero.anyDay')}
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 border border-border rounded-xl" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              {/* Botón buscar */}
-              <div className="px-3 pb-3">
-                <Button
-                  size="lg"
-                  onClick={handleSearch}
-                  className="w-full h-12 rounded-xl font-black text-sm gap-2"
-                >
-                  <Search className="h-4 w-4" />
-                  {t('weMove.searchTransport')}
-                </Button>
+                {/* Botón buscar */}
+                <div className="px-3 pb-3">
+                  <Button
+                    size="lg"
+                    onClick={handleSearch}
+                    className="w-full h-12 rounded-xl font-black text-sm gap-2"
+                  >
+                    <Search className="h-4 w-4" />
+                    {t('weMove.searchTransport')}
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
 
+          </div>
         </div>
-        {/* ── FIN CAMBIO LAYOUT ── */}
       </div>
 
       {/* Transporter CTA bar — sin cambios */}
