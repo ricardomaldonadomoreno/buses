@@ -167,13 +167,15 @@
     },
     "cta": {
       "eyebrow": "For transporters",
-      "title": "Transport, EARN<br/>and grow without<br/><span class='text-primary'>being a company</span>",
-      "desc": "WeMove is the platform for real people who want to transport people. No middlemen, with verified identity and digital reputation.",
+      "titleLine1": "Transport, EARN",
+      "titleLine2": "and grow without",
+      "titleAccent": "being a company",
+      "title": "Be part of the Community Fleet",
+      "desc": "WeMove is the platform for real people who want to transport others. No middlemen, with verified identity and digital reputation.",
       "btn": "Join free",
-      "howBtn": "See how it works",
       "perk1": "Publish your route, manage seats and collect payments from the app",
       "perk2": "See who booked, manage payments and communicate with passengers",
-      "perk3": "Direct communication with your transporter through the app",
+      "perk3": "Direct communication with your transporter from the app",
       "perk4": "Build your reputation in the community"
     },
     "whyWeMove": {
