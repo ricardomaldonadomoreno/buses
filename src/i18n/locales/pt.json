@@ -307,7 +307,6 @@
   "errorInvalidSeats": "Insira um número válido de assentos",
   "errorInvalidPrice": "Insira um preço válido",
   "errorSelectUnit": "Selecione uma unidade de transporte"
-}
     "errorPublishing": "Erro ao publicar a rota",
     "errorSelectLocations": "Selecione origem e destino",
     "errorSameLocation": "Origem e destino não podem ser iguais",
