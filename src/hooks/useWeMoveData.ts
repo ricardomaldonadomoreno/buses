@@ -23,6 +23,7 @@ export interface WeMoveRoute {
   available_seats: number;
   price: number;
   status: 'active' | 'completed' | 'cancelled';
+  vehicle_type?: string; // CAMBIO 1: agregado
   transporter?: { full_name: string; rating: number };
   route?: { origin: Location; destination: Location };
 }
@@ -55,6 +56,7 @@ export function useWeMoveRoutes(originId?: string, destinationId?: string, date?
         .select(`
           *,
           profiles:transporter_id (full_name, rating),
+          transport_units:transport_unit_id (type),
           routes:route_id (
             id,
             origin_location_id,
@@ -95,6 +97,7 @@ export function useWeMoveRoutes(originId?: string, destinationId?: string, date?
           available_seats: item.available_seats,
           price: item.price,
           status: item.status,
+          vehicle_type: (item.transport_units as any)?.type ?? undefined, // CAMBIO 2: mapeado
           transporter: (item.profiles as any)
             ? { full_name: (item.profiles as any).full_name || 'Transportador', rating: (item.profiles as any).rating || 0 }
             : undefined,
