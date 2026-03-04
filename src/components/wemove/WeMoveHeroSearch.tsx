@@ -156,7 +156,7 @@ export function WeMoveHeroSearch({ onSearch }: WeMoveHeroSearchProps) {
       />
 
       {/* CAMBIO 5: agregado max-w-5xl mx-auto para centrar */}
-      <div className="relative container pt-16 pb-12 md:pt-20 md:pb-20">
+      <div className="relative container pt-24 pb-12 md:pt-28 md:pb-20">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
 
