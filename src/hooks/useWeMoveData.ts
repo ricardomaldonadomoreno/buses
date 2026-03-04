@@ -23,13 +23,16 @@ export interface WeMoveRoute {
   available_seats: number;
   price: number;
   status: 'active' | 'completed' | 'cancelled';
-  vehicle_type?: string; // CAMBIO 1: agregado
+  // NUEVO
+  vehicle_type?:  string;
+  vehicle_brand?: string;
+  vehicle_model?: string;
+  vehicle_year?:  number;
+  vehicle_photo?: string;
   transporter?: { full_name: string; rating: number };
   route?: { origin: Location; destination: Location };
 }
 
-// Ya no se usa para el buscador — se usa LocationSearch con RPC search_locations
-// Pero se mantiene para compatibilidad con formularios que la necesiten
 export function useLocations() {
   return useQuery({
     queryKey: ['locations'],
@@ -56,7 +59,7 @@ export function useWeMoveRoutes(originId?: string, destinationId?: string, date?
         .select(`
           *,
           profiles:transporter_id (full_name, rating),
-          transport_units:transport_unit_id (type),
+          transport_units:transport_unit_id (type, brand, model, year, photo_url),
           routes:route_id (
             id,
             origin_location_id,
@@ -97,7 +100,12 @@ export function useWeMoveRoutes(originId?: string, destinationId?: string, date?
           available_seats: item.available_seats,
           price: item.price,
           status: item.status,
-          vehicle_type: (item.transport_units as any)?.type ?? undefined, // CAMBIO 2: mapeado
+          // NUEVO: mapear campos del vehículo
+          vehicle_type:  (item.transport_units as any)?.type      ?? undefined,
+          vehicle_brand: (item.transport_units as any)?.brand     ?? undefined,
+          vehicle_model: (item.transport_units as any)?.model     ?? undefined,
+          vehicle_year:  (item.transport_units as any)?.year      ?? undefined,
+          vehicle_photo: (item.transport_units as any)?.photo_url ?? undefined,
           transporter: (item.profiles as any)
             ? { full_name: (item.profiles as any).full_name || 'Transportador', rating: (item.profiles as any).rating || 0 }
             : undefined,
