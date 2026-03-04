@@ -51,9 +51,10 @@ function useTransporterDocs(userId?: string) {
 }
 
 // ── Doc upload component ─────────────────────────────────────
-function DocUpload({ label, icon: Icon, docKey, userId, currentUrl, onUploaded }: {
+function DocUpload({ label, icon: Icon, docKey, userId, currentUrl, onUploaded, bucket = 'transporter-docs', pathPrefix }: {
   label: string; icon: React.ElementType; docKey: string;
   userId: string; currentUrl?: string | null; onUploaded: (url: string) => void;
+  bucket?: string; pathPrefix?: string;
 }) {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview]     = useState<string | null>(currentUrl ?? null);
@@ -68,19 +69,22 @@ function DocUpload({ label, icon: Icon, docKey, userId, currentUrl, onUploaded }
     setUploading(true);
     try {
       const ext  = file.name.split('.').pop();
-      const path = `${userId}/${docKey}.${ext}`;
+      const prefix = pathPrefix ?? userId;
+      const path = `${prefix}/${docKey}.${ext}`;
       const { error: uploadError } = await supabase.storage
-        .from('transporter-docs').upload(path, file, { upsert: true });
+        .from(bucket).upload(path, file, { upsert: true });
       if (uploadError) throw uploadError;
       const { data: { publicUrl } } = supabase.storage
-        .from('transporter-docs').getPublicUrl(path);
-      await supabase.from('wemove_transporters')
-        .update({ [`${docKey}_url`]: publicUrl }).eq('user_id', userId);
+        .from(bucket).getPublicUrl(path);
+      if (bucket === 'transporter-docs') {
+        await supabase.from('wemove_transporters')
+          .update({ [`${docKey}_url`]: publicUrl }).eq('user_id', userId);
+      }
       setPreview(URL.createObjectURL(file));
       onUploaded(publicUrl);
-      toast({ title: 'Documento subido correctamente' });
+      toast({ title: 'Foto subida correctamente' });
     } catch (err: any) {
-      toast({ title: 'Error al subir documento', description: err.message, variant: 'destructive' });
+      toast({ title: 'Error al subir archivo', description: err.message, variant: 'destructive' });
     } finally {
       setUploading(false);
     }
@@ -105,7 +109,7 @@ function DocUpload({ label, icon: Icon, docKey, userId, currentUrl, onUploaded }
           <div className="flex items-center gap-3">
             <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />
             <div className="flex-1 text-left">
-              <p className="text-xs font-medium text-green-700">Documento subido</p>
+              <p className="text-xs font-medium text-green-700">Archivo subido</p>
               <p className="text-xs text-muted-foreground">Clic para reemplazar</p>
             </div>
             <a href={preview} target="_blank" rel="noopener noreferrer"
@@ -117,12 +121,12 @@ function DocUpload({ label, icon: Icon, docKey, userId, currentUrl, onUploaded }
         ) : (
           <div className="flex flex-col items-center gap-1.5 py-2">
             <Upload className="h-6 w-6 text-muted-foreground/50" />
-            <p className="text-xs text-muted-foreground">JPG, PNG o PDF · máx. 10MB</p>
-            <p className="text-xs font-medium text-primary">Subir archivo</p>
+            <p className="text-xs text-muted-foreground">JPG, PNG · máx. 10MB</p>
+            <p className="text-xs font-medium text-primary">Subir foto</p>
           </div>
         )}
         <input ref={inputRef} type="file"
-          accept="image/jpeg,image/png,image/webp,application/pdf"
+          accept="image/jpeg,image/png,image/webp"
           className="hidden"
           onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
         />
@@ -159,6 +163,11 @@ export default function WeMoveCompleteProfile() {
   const [unitCapacity, setUnitCapacity] = useState('');
   const [unitPlate, setUnitPlate]       = useState('');
   const [unitColor, setUnitColor]       = useState('');
+  // NUEVO: campos adicionales
+  const [unitBrand, setUnitBrand]       = useState('');
+  const [unitModel, setUnitModel]       = useState('');
+  const [unitYear, setUnitYear]         = useState('');
+  const [unitPhotoUrl, setUnitPhotoUrl] = useState('');
   const [savingUnit, setSavingUnit]     = useState(false);
 
   // Seat layout editor
@@ -203,6 +212,9 @@ export default function WeMoveCompleteProfile() {
     setShowUnit(false); setEditUnit(null);
     setUnitType(''); setUnitCapacity('');
     setUnitPlate(''); setUnitColor('');
+    // NUEVO: limpiar campos adicionales
+    setUnitBrand(''); setUnitModel('');
+    setUnitYear(''); setUnitPhotoUrl('');
   };
 
   const handleEditUnit = (unit: any) => {
@@ -211,6 +223,11 @@ export default function WeMoveCompleteProfile() {
     setUnitCapacity(String(unit.capacity));
     setUnitPlate(unit.plate ?? '');
     setUnitColor(unit.color ?? '');
+    // NUEVO: cargar campos adicionales
+    setUnitBrand(unit.brand ?? '');
+    setUnitModel(unit.model ?? '');
+    setUnitYear(unit.year ? String(unit.year) : '');
+    setUnitPhotoUrl(unit.photo_url ?? '');
     setShowUnit(true);
   };
 
@@ -223,12 +240,17 @@ export default function WeMoveCompleteProfile() {
     setSavingUnit(true);
     try {
       await upsertUnit.mutateAsync({
-        unitId:       editingUnitId ?? undefined,
+        unitId:        editingUnitId ?? undefined,
         transporterId: user.id,
-        type:         unitType,
-        capacity:     cap,
-        plate:        unitPlate.trim() || undefined,
-        color:        unitColor.trim() || undefined,
+        type:          unitType,
+        capacity:      cap,
+        plate:         unitPlate.trim()    || undefined,
+        color:         unitColor.trim()    || undefined,
+        // NUEVO
+        brand:         unitBrand.trim()    || undefined,
+        model:         unitModel.trim()    || undefined,
+        year:          unitYear ? parseInt(unitYear) : undefined,
+        photo_url:     unitPhotoUrl        || undefined,
       });
       toast({ title: editingUnitId ? 'Unidad actualizada' : 'Unidad agregada' });
       resetUnitForm();
@@ -461,11 +483,19 @@ export default function WeMoveCompleteProfile() {
                     {/* Fila principal */}
                     <div className="flex items-center justify-between p-3.5">
                       <div className="flex items-center gap-3">
-                        <span className="text-2xl">{VEHICLE_EMOJI[unit.type] ?? '🚐'}</span>
+                        {/* NUEVO: mostrar foto si existe, si no emoji */}
+                        {unit.photo_url ? (
+                          <img src={unit.photo_url} alt={unit.type}
+                            className="w-12 h-12 rounded-lg object-cover border border-border/40" />
+                        ) : (
+                          <span className="text-2xl">{VEHICLE_EMOJI[unit.type] ?? '🚐'}</span>
+                        )}
                         <div>
                           <p className="text-sm font-semibold capitalize">{VEHICLE_LABELS[unit.type] ?? unit.type}</p>
                           <p className="text-xs text-muted-foreground">
-                            {unit.capacity} asientos
+                            {/* NUEVO: mostrar brand/model/year si existen */}
+                            {[unit.brand, unit.model, unit.year].filter(Boolean).join(' ')}
+                            {unit.capacity ? ` · ${unit.capacity} asientos` : ''}
                             {unit.plate ? ` · ${unit.plate}` : ''}
                             {unit.color ? ` · ${unit.color}` : ''}
                           </p>
@@ -546,19 +576,50 @@ export default function WeMoveCompleteProfile() {
                       placeholder="Ej: 15"
                       className="mt-1.5 rounded-xl border-border/60" />
                   </div>
+                  {/* NUEVO: Marca, Modelo, Año */}
                   <div>
-                    <Label className="text-xs text-muted-foreground">Placa del vehículo</Label>
+                    <Label className="text-xs text-muted-foreground">Marca</Label>
+                    <Input value={unitBrand} onChange={e => setUnitBrand(e.target.value)}
+                      placeholder="Ej: Toyota, Changan"
+                      className="mt-1.5 rounded-xl border-border/60" />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Modelo</Label>
+                    <Input value={unitModel} onChange={e => setUnitModel(e.target.value)}
+                      placeholder="Ej: Hiace, Minivan"
+                      className="mt-1.5 rounded-xl border-border/60" />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Año</Label>
+                    <Input type="number" min="1990" max="2030" value={unitYear}
+                      onChange={e => setUnitYear(e.target.value)}
+                      placeholder="Ej: 2022"
+                      className="mt-1.5 rounded-xl border-border/60" />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Placa</Label>
                     <Input value={unitPlate} onChange={e => setUnitPlate(e.target.value)}
                       placeholder="Ej: 1234-ABC"
                       className="mt-1.5 rounded-xl border-border/60" />
                   </div>
-                  <div>
-                    <Label className="text-xs text-muted-foreground">Color del vehículo</Label>
+                  <div className="col-span-2">
+                    <Label className="text-xs text-muted-foreground">Color</Label>
                     <Input value={unitColor} onChange={e => setUnitColor(e.target.value)}
                       placeholder="Ej: Blanco, Azul marino"
                       className="mt-1.5 rounded-xl border-border/60" />
                   </div>
                 </div>
+                {/* NUEVO: subida de foto del vehículo */}
+                <DocUpload
+                  label="Foto del vehículo (se mostrará a los pasajeros)"
+                  icon={Camera}
+                  docKey={`unit_${editingUnitId ?? 'new'}_photo`}
+                  userId={user.id}
+                  bucket="transporter-docs"
+                  pathPrefix={`${user.id}/units`}
+                  currentUrl={unitPhotoUrl || null}
+                  onUploaded={(url) => setUnitPhotoUrl(url)}
+                />
                 <button onClick={handleUnitSubmit}
                   disabled={savingUnit || !unitType || !unitCapacity}
                   className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2">
