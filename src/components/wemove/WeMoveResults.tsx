@@ -85,7 +85,8 @@ function RouteCard({ route }: { route: WeMoveRoute }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const departure = new Date(route.departure_time);
-  const vehicle = getVehicle(undefined); // vehicle type not yet in WeMoveRoute interface — graceful fallback
+  // CAMBIO: usar route.vehicle_type en lugar de undefined
+  const vehicle = getVehicle(route.vehicle_type);
   const seatsLeft = route.available_seats;
   const isAlmostFull = seatsLeft > 0 && seatsLeft <= 3;
   const isFull = seatsLeft === 0;
@@ -229,7 +230,7 @@ function RouteCard({ route }: { route: WeMoveRoute }) {
                 {t('weMove.results.reserve')}
               </Link>
             )}
-          </Button>          
+          </Button>
         </div>
       </div>
     </article>
