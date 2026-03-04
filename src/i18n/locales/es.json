@@ -212,7 +212,11 @@
       "noSeats": "Sin asientos",
       "almostFull": "¡Últimos {{seats}} asientos!",
       "full": "Unidad llena",
-      "tryOtherDate": "Prueba otra fecha o revisa otros destinos disponibles."
+      "tryOtherDate": "Prueba otra fecha o revisa otros destinos disponibles.",
+      "tripFound": "viaje encontrado",
+      "tripsFound": "viajes encontrados",
+      "trip": "viaje",
+      "trips": "viajes"
     },
     "fleet": {
       "eyebrow": "Plataforma global de movilidad",
