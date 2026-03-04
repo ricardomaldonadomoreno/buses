@@ -1,10 +1,6 @@
 // src/hooks/useWeMoveTransporter.ts
-// ARCHIVO COMPLETO — reemplazar el existente
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-
-// ── Tipos ──────────────────────────────────────────────────────
 
 export interface TransportUnit {
   id:           string;
@@ -16,6 +12,11 @@ export interface TransportUnit {
   color?:       string | null;
   seat_layout?: any | null;
   created_at:   string;
+  // NUEVO
+  brand?:       string | null;
+  model?:       string | null;
+  year?:        number | null;
+  photo_url?:   string | null;
 }
 
 export interface MyProfile {
@@ -54,8 +55,6 @@ export interface MyWeMoveRoute {
     seat_layout?: any | null;
   };
 }
-
-// ── Hooks ──────────────────────────────────────────────────────
 
 export function useMyProfile(userId?: string) {
   return useQuery({
@@ -115,7 +114,8 @@ export function useMyTransportUnits(userId?: string) {
       if (!userId) return [];
       const { data, error } = await supabase
         .from('transport_units')
-        .select('id, transporter_id, type, capacity, verified, plate, color, seat_layout, created_at')
+        // NUEVO: brand, model, year, photo_url agregados
+        .select('id, transporter_id, type, capacity, verified, plate, color, seat_layout, created_at, brand, model, year, photo_url')
         .eq('transporter_id', userId)
         .order('created_at', { ascending: false });
       if (error) throw error;
@@ -190,23 +190,38 @@ export function useUpsertTransportUnit() {
       capacity,
       plate,
       color,
+      // NUEVO
+      brand,
+      model,
+      year,
+      photo_url,
     }: {
-      unitId?:      string;
+      unitId?:       string;
       transporterId: string;
-      type:         string;
-      capacity:     number;
-      plate?:       string;
-      color?:       string;
+      type:          string;
+      capacity:      number;
+      plate?:        string;
+      color?:        string;
+      brand?:        string;
+      model?:        string;
+      year?:         number;
+      photo_url?:    string;
     }) => {
+      const fields = {
+        type,
+        capacity,
+        plate:     plate     ?? null,
+        color:     color     ?? null,
+        brand:     brand     ?? null,
+        model:     model     ?? null,
+        year:      year      ?? null,
+        photo_url: photo_url ?? null,
+      };
+
       if (unitId) {
         const { data, error } = await supabase
           .from('transport_units')
-          .update({
-            type,
-            capacity,
-            plate:  plate ?? null,
-            color:  color ?? null,
-          })
+          .update(fields)
           .eq('id', unitId)
           .select()
           .single();
@@ -215,14 +230,7 @@ export function useUpsertTransportUnit() {
       } else {
         const { data, error } = await supabase
           .from('transport_units')
-          .insert({
-            transporter_id: transporterId,
-            type,
-            capacity,
-            plate:    plate ?? null,
-            color:    color ?? null,
-            verified: false,
-          })
+          .insert({ transporter_id: transporterId, ...fields, verified: false })
           .select()
           .single();
         if (error) throw error;
@@ -272,7 +280,6 @@ export function usePublishWeMoveRoute() {
       availableSeats:  number;
       price:           number;
     }) => {
-      // Buscar o crear la ruta base
       const { data: existingRoute, error: routeError } = await supabase
         .from('routes')
         .select('id')
@@ -326,7 +333,6 @@ export function useCancelWeMoveRoute() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ routeId, userId }: { routeId: string; userId: string }) => {
-      // Usar la función SQL que decide soft vs hard delete
       const { data, error } = await supabase
         .rpc('can_delete_route', {
           p_route_id: routeId,
