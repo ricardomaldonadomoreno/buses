@@ -20,6 +20,15 @@ const VEHICLE_MAP: Record<string, { emoji: string; label: string }> = {
   plane:    { emoji: '✈️', label: 'Avioneta' },
 };
 
+// NUEVO: mapa de símbolos por moneda
+const CURRENCY_SYMBOL: Record<string, string> = {
+  BOB: 'Bs.',
+  USD: '$',
+  PEN: 'S/.',
+  ARS: '$',
+  BRL: 'R$',
+};
+
 function getVehicle(type?: string) {
   if (!type) return { emoji: '🚐', label: 'Vehículo' };
   return VEHICLE_MAP[type.toLowerCase()] ?? { emoji: '🚐', label: type };
@@ -38,8 +47,8 @@ function StarRating({ value }: { value: number }) {
 
 export default function WeMoveViaje() {
   const { routeId } = useParams<{ routeId: string }>();
-  const [route, setRoute]   = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [route, setRoute]       = useState<any>(null);
+  const [loading, setLoading]   = useState(true);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
@@ -81,17 +90,19 @@ export default function WeMoveViaje() {
     </div>
   );
 
-  const unit        = route.transport_units as any;
-  const transporter = route.profiles as any;
-  const origin      = route.routes?.origin?.name ?? '—';
-  const destination = route.routes?.destination?.name ?? '—';
-  const vehicle     = getVehicle(unit?.type);
-  const departure   = new Date(route.departure_time);
-  const seatsLeft   = route.available_seats;
+  const unit         = route.transport_units as any;
+  const transporter  = route.profiles as any;
+  const origin       = route.routes?.origin?.name ?? '—';
+  const destination  = route.routes?.destination?.name ?? '—';
+  const vehicle      = getVehicle(unit?.type);
+  const departure    = new Date(route.departure_time);
+  const seatsLeft    = route.available_seats;
   const isAlmostFull = seatsLeft > 0 && seatsLeft <= 3;
-  const isFull      = seatsLeft === 0;
-  const isCancelled = route.status === 'cancelled';
-  const isPast      = departure < new Date();
+  const isFull       = seatsLeft === 0;
+  const isCancelled  = route.status === 'cancelled';
+  const isPast       = departure < new Date();
+  // NUEVO: símbolo de moneda correcto
+  const currencySymbol = CURRENCY_SYMBOL[route.currency ?? 'BOB'] ?? 'Bs.';
 
   const vehicleDesc = [unit?.brand, unit?.model, unit?.year]
     .filter(Boolean).join(' ') || vehicle.label;
@@ -122,7 +133,6 @@ export default function WeMoveViaje() {
 
       <main className="flex-1 container max-w-lg py-8 space-y-4">
 
-        {/* Banda de alerta */}
         {isCancelled && (
           <div className="bg-red-500 text-white px-4 py-2 rounded-xl flex items-center gap-2 font-bold text-sm">
             <AlertCircle className="h-4 w-4" /> Este viaje fue cancelado
@@ -144,14 +154,12 @@ export default function WeMoveViaje() {
           </div>
         )}
 
-        {/* Card principal */}
         <div className="bg-card border-2 border-foreground/10 rounded-2xl overflow-hidden">
 
           {/* Foto del vehículo */}
           <div className="w-full h-48 bg-muted flex items-center justify-center overflow-hidden">
             {unit?.photo_url ? (
-              <img src={unit.photo_url} alt={vehicleDesc}
-                className="w-full h-full object-cover" />
+              <img src={unit.photo_url} alt={vehicleDesc} className="w-full h-full object-cover" />
             ) : (
               <span className="text-7xl">{vehicle.emoji}</span>
             )}
@@ -188,7 +196,6 @@ export default function WeMoveViaje() {
               </div>
             </div>
 
-            {/* Separador */}
             <div className="border-t border-border/40" />
 
             {/* Transportador */}
@@ -212,8 +219,9 @@ export default function WeMoveViaje() {
             <div className="flex items-end justify-between pt-2 border-t border-border/40">
               <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Por asiento</p>
+                {/* CAMBIO: currencySymbol en lugar de $ hardcodeado */}
                 <p className="text-4xl font-black text-primary leading-none">
-                  ${route.price.toFixed(0)}
+                  {currencySymbol}{route.price.toFixed(0)}
                   <span className="text-base font-bold text-muted-foreground">
                     .{String(Math.round((route.price % 1) * 100)).padStart(2, '0')}
                   </span>
@@ -239,7 +247,6 @@ export default function WeMoveViaje() {
           </div>
         </div>
 
-        {/* Footer info */}
         <p className="text-center text-xs text-muted-foreground px-4">
           Este viaje es ofrecido por un transportador independiente verificado en{' '}
           <Link to="/wemove" className="text-primary font-bold hover:underline">WeMove</Link>.
