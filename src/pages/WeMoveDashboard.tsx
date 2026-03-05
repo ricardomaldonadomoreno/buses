@@ -1,4 +1,4 @@
-// src/pages/WeMoveDashboard.tsx — REESCRITO COMPLETO
+// src/pages/WeMoveDashboard.tsx
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -38,7 +38,6 @@ function useRouteBookings(routeId: string | null) {
       .order('created_at', { ascending: true })
       .then(({ data }) => { setBookings(data ?? []); setLoading(false); });
 
-    // Realtime
     const ch = supabase
       .channel(`bookings-${routeId}`)
       .on('postgres_changes', {
@@ -60,13 +59,13 @@ function useRouteBookings(routeId: string | null) {
   return { bookings, loading };
 }
 
-// ── Componente: lista de pasajeros de una ruta ────────────────
+// ── Componente: manifiesto de pasajeros ───────────────────────
 function RouteManifest({ route, units }: { route: any; units: any[] }) {
-  const { toast }              = useToast();
-  const qc                     = useQueryClient();
-  const { bookings, loading }  = useRouteBookings(route.id);
-  const [marking, setMarking]  = useState<string | null>(null);
-  const { user }               = useWeMoveAuth();
+  const { toast }             = useToast();
+  const qc                    = useQueryClient();
+  const { bookings, loading } = useRouteBookings(route.id);
+  const [marking, setMarking] = useState<string | null>(null);
+  const { user }              = useWeMoveAuth();
 
   const unit       = units.find(u => u.id === route.transport_unit_id);
   const layout     = unit?.seat_layout ?? null;
@@ -115,10 +114,13 @@ Total: ${bookings.length} reservas · ${paid} pagadas · ${confirmed} pendientes
   };
 
   return (
-    <div className="space-y-4">
-      {/* Mapa de asientos */}
+    // CAMBIO: en lg, layout horizontal — mapa izquierda, lista derecha
+    <div className="flex flex-col lg:flex-row gap-6">
+
+      {/* ── Mapa del vehículo — columna izquierda en escritorio ── */}
       {(layout || (unit?.capacity ?? 0) > 0) && (
-        <div className="bg-muted/20 rounded-2xl p-4">
+        // CAMBIO: w-fit para que se ajuste al contenido del vehículo
+        <div className="bg-muted/20 rounded-2xl p-4 w-fit shrink-0 self-start">
           <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-3">
             Mapa del vehículo
           </p>
@@ -133,125 +135,125 @@ Total: ${bookings.length} reservas · ${paid} pagadas · ${confirmed} pendientes
         </div>
       )}
 
-      {/* Estadísticas */}
-      <div className="grid grid-cols-3 gap-2 text-center">
-        <StatBadge label="Pagadas" value={paid} color="text-green-600 bg-green-50 border-green-200" />
-        <StatBadge label="Pendientes" value={confirmed} color="text-amber-600 bg-amber-50 border-amber-200" />
-        <StatBadge label="Expiradas" value={expired} color="text-muted-foreground bg-muted/40 border-border" />
-      </div>
+      {/* ── Columna derecha: estadísticas + lista de pasajeros ── */}
+      <div className="flex-1 min-w-0 space-y-4">
 
-      {/* Lista pasajeros */}
-      {loading ? (
-        <div className="h-16 bg-muted/30 rounded-xl animate-pulse" />
-      ) : bookings.length === 0 ? (
-        <div className="text-center py-8 border-2 border-dashed border-border rounded-xl">
-          <Users className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground">Sin reservas aún</p>
+        {/* Estadísticas */}
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <StatBadge label="Pagadas"    value={paid}      color="text-green-600 bg-green-50 border-green-200" />
+          <StatBadge label="Pendientes" value={confirmed} color="text-amber-600 bg-amber-50 border-amber-200" />
+          <StatBadge label="Expiradas"  value={expired}   color="text-muted-foreground bg-muted/40 border-border" />
         </div>
-      ) : (
-        <div className="space-y-2">
-          {bookings.map(b => {
-            const isPaid     = b.status === 'paid';
-            const isExpired  = b.status === 'expired';
-            const isOverdue  = !isPaid && !isExpired && b.payment_deadline &&
-              new Date(b.payment_deadline) < new Date();
-            return (
-              <div key={b.id} className={cn(
-                'rounded-xl border-2 p-3.5 space-y-2 transition-colors',
-                isPaid    ? 'border-green-200 bg-green-50/30' :
-                isExpired ? 'border-border bg-muted/20 opacity-60' :
-                isOverdue ? 'border-red-200 bg-red-50/30' :
-                            'border-foreground/20 bg-background'
-              )}>
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-2.5">
-                    <div className={cn(
-                      'w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black border-2 shrink-0',
-                      isPaid ? 'bg-green-100 border-green-300 text-green-700' :
-                      isExpired ? 'bg-muted border-border text-muted-foreground' :
-                      'bg-primary/10 border-primary/30 text-primary'
-                    )}>
-                      {b.seat_label ?? '?'}
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold leading-tight">{b.passenger_name}</p>
-                      <div className="flex flex-wrap gap-2 mt-0.5 text-xs text-muted-foreground">
-                        {b.passenger_phone && <span>📞 {b.passenger_phone}</span>}
-                        {b.passenger_email && <span>✉ {b.passenger_email}</span>}
-                        {b.has_pet && <span>🐾 Mascota</span>}
-                        {b.has_extra_luggage && <span>🧳 Equipaje extra</span>}
+
+        {/* Lista pasajeros */}
+        {loading ? (
+          <div className="h-16 bg-muted/30 rounded-xl animate-pulse" />
+        ) : bookings.length === 0 ? (
+          <div className="text-center py-8 border-2 border-dashed border-border rounded-xl">
+            <Users className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">Sin reservas aún</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {bookings.map(b => {
+              const isPaid    = b.status === 'paid';
+              const isExpired = b.status === 'expired';
+              const isOverdue = !isPaid && !isExpired && b.payment_deadline &&
+                new Date(b.payment_deadline) < new Date();
+              return (
+                <div key={b.id} className={cn(
+                  'rounded-xl border-2 p-3.5 space-y-2 transition-colors',
+                  isPaid    ? 'border-green-200 bg-green-50/30' :
+                  isExpired ? 'border-border bg-muted/20 opacity-60' :
+                  isOverdue ? 'border-red-200 bg-red-50/30' :
+                              'border-foreground/20 bg-background'
+                )}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className={cn(
+                        'w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black border-2 shrink-0',
+                        isPaid    ? 'bg-green-100 border-green-300 text-green-700' :
+                        isExpired ? 'bg-muted border-border text-muted-foreground' :
+                                    'bg-primary/10 border-primary/30 text-primary'
+                      )}>
+                        {b.seat_label ?? '?'}
                       </div>
-                      {b.passenger_notes && (
-                        <p className="text-xs text-muted-foreground italic mt-0.5">"{b.passenger_notes}"</p>
+                      <div>
+                        <p className="text-sm font-bold leading-tight">{b.passenger_name}</p>
+                        <div className="flex flex-wrap gap-2 mt-0.5 text-xs text-muted-foreground">
+                          {b.passenger_phone && <span>📞 {b.passenger_phone}</span>}
+                          {b.passenger_email && <span>✉ {b.passenger_email}</span>}
+                          {b.has_pet && <span>🐾 Mascota</span>}
+                          {b.has_extra_luggage && <span>🧳 Equipaje extra</span>}
+                        </div>
+                        {b.passenger_notes && (
+                          <p className="text-xs text-muted-foreground italic mt-0.5">"{b.passenger_notes}"</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      {isPaid ? (
+                        <span className="text-xs font-bold text-green-700 flex items-center gap-1">
+                          <CheckCircle className="h-3.5 w-3.5" /> Pagado
+                        </span>
+                      ) : isExpired ? (
+                        <span className="text-xs text-muted-foreground">Expirado</span>
+                      ) : (
+                        <span className={cn('text-xs font-bold', isOverdue ? 'text-red-600' : 'text-amber-600')}>
+                          {isOverdue ? '⚠ Vencido' : 'Pendiente'}
+                        </span>
                       )}
                     </div>
                   </div>
-                  <div className="text-right shrink-0">
-                    {isPaid ? (
-                      <span className="text-xs font-bold text-green-700 flex items-center gap-1">
-                        <CheckCircle className="h-3.5 w-3.5" /> Pagado
-                      </span>
-                    ) : isExpired ? (
-                      <span className="text-xs text-muted-foreground">Expirado</span>
-                    ) : (
-                      <span className={cn(
-                        'text-xs font-bold',
-                        isOverdue ? 'text-red-600' : 'text-amber-600'
-                      )}>
-                        {isOverdue ? '⚠ Vencido' : 'Pendiente'}
+
+                  <div className="flex items-center justify-between pt-1 border-t border-foreground/8">
+                    <span className="text-xs text-muted-foreground font-mono">
+                      Código: <span className="font-black text-foreground">{b.boarding_code ?? '—'}</span>
+                    </span>
+                    {!isPaid && !isExpired && (
+                      <button
+                        onClick={() => handleMarkPaid(b.id)}
+                        disabled={!!marking}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500 text-white text-xs font-bold hover:bg-green-600 disabled:opacity-50 transition-colors"
+                      >
+                        {marking === b.id
+                          ? <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          : <CheckCircle className="h-3.5 w-3.5" />
+                        }
+                        Marcar pagado
+                      </button>
+                    )}
+                    {isPaid && b.commission_amount && (
+                      <span className="text-xs text-muted-foreground">
+                        Comisión: <span className="font-bold text-foreground">Bs.{b.commission_amount}</span>
                       </span>
                     )}
                   </div>
                 </div>
+              );
+            })}
+          </div>
+        )}
 
-                {/* Boarding code + acciones */}
-                <div className="flex items-center justify-between pt-1 border-t border-foreground/8">
-                  <span className="text-xs text-muted-foreground font-mono">
-                    Código: <span className="font-black text-foreground">{b.boarding_code ?? '—'}</span>
-                  </span>
-                  {!isPaid && !isExpired && (
-                    <button
-                      onClick={() => handleMarkPaid(b.id)}
-                      disabled={!!marking}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500 text-white text-xs font-bold hover:bg-green-600 disabled:opacity-50 transition-colors"
-                    >
-                      {marking === b.id
-                        ? <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        : <CheckCircle className="h-3.5 w-3.5" />
-                      }
-                      Marcar pagado
-                    </button>
-                  )}
-                  {isPaid && b.commission_amount && (
-                    <span className="text-xs text-muted-foreground">
-                      Comisión: <span className="font-bold text-foreground">Bs.{b.commission_amount}</span>
-                    </span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Acciones pie */}
-      {bookings.length > 0 && (
-        <div className="flex gap-2 pt-2">
-          <button onClick={handlePrint}
-            className="flex items-center gap-1.5 px-4 py-2 border-2 border-foreground rounded-xl text-xs font-bold hover:bg-muted transition-colors">
-            <Printer className="h-3.5 w-3.5" /> Imprimir manifiesto
-          </button>
-          <button
-            onClick={() => {
-              const url = `${window.location.origin}/wemove/booking/${route.id}`;
-              navigator.clipboard.writeText(url);
-              toast({ title: '✓ Enlace copiado al portapapeles' });
-            }}
-            className="flex items-center gap-1.5 px-4 py-2 border-2 border-primary/40 text-primary rounded-xl text-xs font-bold hover:bg-primary/10 transition-colors">
-            <Share2 className="h-3.5 w-3.5" /> Compartir viaje
-          </button>
-        </div>
-      )}
+        {/* Acciones pie */}
+        {bookings.length > 0 && (
+          <div className="flex gap-2 pt-2">
+            <button onClick={handlePrint}
+              className="flex items-center gap-1.5 px-4 py-2 border-2 border-foreground rounded-xl text-xs font-bold hover:bg-muted transition-colors">
+              <Printer className="h-3.5 w-3.5" /> Imprimir manifiesto
+            </button>
+            <button
+              onClick={() => {
+                const url = `${window.location.origin}/wemove/booking/${route.id}`;
+                navigator.clipboard.writeText(url);
+                toast({ title: '✓ Enlace copiado al portapapeles' });
+              }}
+              className="flex items-center gap-1.5 px-4 py-2 border-2 border-primary/40 text-primary rounded-xl text-xs font-bold hover:bg-primary/10 transition-colors">
+              <Share2 className="h-3.5 w-3.5" /> Compartir viaje
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -267,20 +269,20 @@ function StatBadge({ label, value, color }: { label: string; value: number; colo
 
 // ── Dashboard principal ───────────────────────────────────────
 export default function WeMoveDashboard() {
-  const navigate        = useNavigate();
-  const { toast }       = useToast();
+  const navigate  = useNavigate();
+  const { toast } = useToast();
   const { user, loading, signOut } = useWeMoveAuth();
-  const qc              = useQueryClient();
+  const qc        = useQueryClient();
 
-  const { data: profile }             = useMyProfile(user?.id);
-  const { data: transporter }         = useMyWeMoveTransporter(user?.id);
-  const { data: units = [] }          = useMyTransportUnits(user?.id);
+  const { data: profile }     = useMyProfile(user?.id);
+  const { data: transporter } = useMyWeMoveTransporter(user?.id);
+  const { data: units = [] }  = useMyTransportUnits(user?.id);
   const { data: routes = [], isLoading: routesLoading } = useMyWeMoveRoutes(user?.id);
-  const cancelRoute                   = useCancelWeMoveRoute();
+  const cancelRoute           = useCancelWeMoveRoute();
 
-  const [activeTab, setActiveTab]   = useState<string | null>(null);
+  const [activeTab, setActiveTab]     = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
-  const [editorUnit, setEditorUnit] = useState<{
+  const [editorUnit, setEditorUnit]   = useState<{
     id: string; type: string; capacity: number; layout: SeatLayout | null;
   } | null>(null);
 
@@ -288,7 +290,6 @@ export default function WeMoveDashboard() {
     if (!loading && !user) navigate('/wemove/register');
   }, [user, loading, navigate]);
 
-  // Auto-seleccionar primera ruta activa
   useEffect(() => {
     if (routes.length > 0 && !activeTab) {
       const first = routes.find(r => r.status === 'active') ?? routes[0];
@@ -314,11 +315,11 @@ export default function WeMoveDashboard() {
   );
   if (!user) return null;
 
-  const displayName    = profile?.full_name || user.email?.split('@')[0] || 'Transportador';
-  const isVerified     = transporter?.verification_status === 'verified';
-  const activeRoutes   = routes.filter(r => r.status === 'active');
-  const pastRoutes     = routes.filter(r => r.status !== 'active');
-  const selectedRoute  = routes.find(r => r.id === activeTab) ?? null;
+  const displayName  = profile?.full_name || user.email?.split('@')[0] || 'Transportador';
+  const isVerified   = transporter?.verification_status === 'verified';
+  const activeRoutes = routes.filter(r => r.status === 'active');
+  const pastRoutes   = routes.filter(r => r.status !== 'active');
+  const selectedRoute = routes.find(r => r.id === activeTab) ?? null;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -350,7 +351,6 @@ export default function WeMoveDashboard() {
 
             {/* Perfil */}
             <div className="bg-card border border-border/60 rounded-2xl p-5 text-center space-y-3">
-              {/* Avatar */}
               <div className="w-16 h-16 rounded-full bg-primary/10 border-4 border-primary/20 flex items-center justify-center mx-auto text-2xl font-black text-primary">
                 {displayName.charAt(0).toUpperCase()}
               </div>
@@ -358,7 +358,6 @@ export default function WeMoveDashboard() {
                 <p className="font-bold text-sm">{displayName}</p>
                 <p className="text-xs text-muted-foreground">{user.email}</p>
               </div>
-              {/* Rating */}
               {profile?.rating ? (
                 <div className="flex items-center justify-center gap-1">
                   {[1,2,3,4,5].map(i => (
@@ -373,7 +372,6 @@ export default function WeMoveDashboard() {
               ) : (
                 <p className="text-xs text-muted-foreground">Sin calificaciones aún</p>
               )}
-              {/* Badge verificado */}
               {isVerified ? (
                 <span className="inline-flex items-center gap-1 text-xs text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full font-semibold">
                   <CheckCircle className="h-3 w-3" /> Verificado
@@ -409,94 +407,53 @@ export default function WeMoveDashboard() {
               </div>
             </div>
 
-            {/* Mis unidades con editor de asientos */}
-            <div className="bg-card border border-border/60 rounded-2xl overflow-hidden">
-              <div className="px-4 py-3 border-b border-border/40 flex items-center justify-between">
-                <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">Mis unidades</p>
-                <Link to="/wemove/profile"
-                  className="text-xs text-primary font-bold hover:underline">
-                  + Agregar
-                </Link>
+            {/* CAMBIO: Mis unidades simplificado — solo botón a /wemove/profile */}
+            <div className="bg-card border border-border/60 rounded-2xl p-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Bus className="h-4 w-4 text-primary" />
+                <div>
+                  <p className="text-xs font-bold">Mis unidades</p>
+                  <p className="text-xs text-muted-foreground">{units.length} registradas</p>
+                </div>
               </div>
-              <div className="divide-y divide-border/40">
-                {units.length === 0 ? (
-                  <div className="px-4 py-4 text-center">
-                    <p className="text-xs text-muted-foreground">Sin unidades</p>
-                    <Link to="/wemove/profile" className="text-xs text-primary font-bold mt-1 block">
-                      Registrar vehículo →
-                    </Link>
-                  </div>
-                ) : units.map(unit => (
-                  <div key={unit.id} className="px-4 py-3 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-bold capitalize">
-                          {unit.type === 'sedan' ? '🚗' : unit.type === 'suv' ? '🚙' :
-                           unit.type === 'boat' ? '⛵' : unit.type === 'plane' ? '✈️' : '🚐'
-                          } {unit.type}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {unit.capacity} asientos
-                          {(unit as any).plate ? ` · ${(unit as any).plate}` : ''}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setEditorUnit({
-                        id:       unit.id,
-                        type:     unit.type,
-                        capacity: unit.capacity,
-                        layout:   (unit as any).seat_layout ?? null,
-                      })}
-                      className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline w-full"
-                    >
-                      <Layout className="h-3 w-3" />
-                      {(unit as any).seat_layout
-                        ? '✓ Plantilla guardada — editar'
-                        : 'Diseñar asientos'
-                      }
-                    </button>
-                  </div>
-                ))}
-              </div>
+              <Link to="/wemove/profile"
+                className="flex items-center gap-1.5 px-3 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-xl hover:bg-primary/90 transition-colors shrink-0">
+                <Plus className="h-3.5 w-3.5" /> Ver / Agregar
+              </Link>
             </div>
+
           </aside>
 
           {/* ── COLUMNA DERECHA ────────────────────────────── */}
           <main className="flex-1 min-w-0 space-y-4">
 
             {/* Tabs de rutas activas */}
-            <div>
-              <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none">
-                {routesLoading ? (
-                  <div className="h-10 w-48 bg-muted/30 rounded-xl animate-pulse" />
-                ) : activeRoutes.length === 0 ? null :
-                  activeRoutes.map(route => (
-                    <button
-                      key={route.id}
-                      onClick={() => setActiveTab(route.id)}
-                      className={cn(
-                        'shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 text-xs font-bold transition-all whitespace-nowrap',
-                        activeTab === route.id
-                          ? 'border-primary bg-primary text-primary-foreground shadow-sm'
-                          : 'border-border bg-card text-foreground hover:border-primary/50'
-                      )}
-                    >
-                      <span className="font-mono text-[10px] opacity-70">{route.trip_code ?? '—'}</span>
-                      <span>{route.route?.origin?.name ?? '—'}</span>
-                      <ArrowRight className="h-3 w-3 opacity-60" />
-                      <span>{route.route?.destination?.name ?? '—'}</span>
-                    </button>
-                  ))
-                }
-                {/* Botón nueva ruta */}
-                {activeRoutes.length < 10 && (
-                  <Link to="/wemove/publish-route"
-                    className="shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-xl border-2 border-dashed border-primary/40 text-primary text-xs font-bold hover:bg-primary/5 transition-colors whitespace-nowrap">
-                    <Plus className="h-3.5 w-3.5" /> Nuevo viaje
-                  </Link>
-                )}
-              </div>
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none">
+              {routesLoading ? (
+                <div className="h-10 w-48 bg-muted/30 rounded-xl animate-pulse" />
+              ) : activeRoutes.map(route => (
+                <button
+                  key={route.id}
+                  onClick={() => setActiveTab(route.id)}
+                  className={cn(
+                    'shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 text-xs font-bold transition-all whitespace-nowrap',
+                    activeTab === route.id
+                      ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+                      : 'border-border bg-card text-foreground hover:border-primary/50'
+                  )}
+                >
+                  <span className="font-mono text-[10px] opacity-70">{route.trip_code ?? '—'}</span>
+                  <span>{route.route?.origin?.name ?? '—'}</span>
+                  <ArrowRight className="h-3 w-3 opacity-60" />
+                  <span>{route.route?.destination?.name ?? '—'}</span>
+                </button>
+              ))}
+              {activeRoutes.length < 10 && (
+                <Link to="/wemove/publish-route"
+                  className="shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-xl border-2 border-dashed border-primary/40 text-primary text-xs font-bold hover:bg-primary/5 transition-colors whitespace-nowrap">
+                  <Plus className="h-3.5 w-3.5" /> Nuevo viaje
+                </Link>
+              )}
             </div>
 
             {/* Ficha de la ruta seleccionada */}
@@ -517,7 +474,7 @@ export default function WeMoveDashboard() {
               </div>
             )}
 
-            {/* Historial de viajes pasados */}
+            {/* Historial */}
             {pastRoutes.length > 0 && (
               <div className="bg-card border border-border/60 rounded-2xl overflow-hidden">
                 <button
@@ -597,37 +554,26 @@ function RouteCard({ route, units, onCancel }: {
 
   return (
     <div className="bg-card border border-border/60 rounded-2xl overflow-hidden">
-      {/* Header de la ficha */}
+      {/* Header */}
       <div className="bg-primary/5 border-b border-border/40 px-5 py-4">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div className="space-y-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-black text-lg">
-                {route.route?.origin?.name ?? '—'}
-              </span>
+              <span className="font-black text-lg">{route.route?.origin?.name ?? '—'}</span>
               <ArrowRight className="h-4 w-4 text-muted-foreground" />
-              <span className="font-black text-lg">
-                {route.route?.destination?.name ?? '—'}
-              </span>
+              <span className="font-black text-lg">{route.route?.destination?.name ?? '—'}</span>
               <span className={cn(
                 'text-xs px-2 py-0.5 rounded-full font-bold border',
-                route.status === 'active'
-                  ? 'text-green-700 bg-green-50 border-green-200'
-                  : route.status === 'completed'
-                  ? 'text-blue-700 bg-blue-50 border-blue-200'
-                  : 'text-red-600 bg-red-50 border-red-200'
+                route.status === 'active'    ? 'text-green-700 bg-green-50 border-green-200' :
+                route.status === 'completed' ? 'text-blue-700 bg-blue-50 border-blue-200' :
+                                               'text-red-600 bg-red-50 border-red-200'
               )}>
-                {route.status === 'active' ? 'Activo'
-                  : route.status === 'completed' ? 'Completado' : 'Cancelado'}
+                {route.status === 'active' ? 'Activo' : route.status === 'completed' ? 'Completado' : 'Cancelado'}
               </span>
             </div>
             <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <Calendar className="h-3 w-3" /> {departure}
-              </span>
-              <span className="flex items-center gap-1">
-                <DollarSign className="h-3 w-3" /> Bs. {route.price} / asiento
-              </span>
+              <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {departure}</span>
+              <span className="flex items-center gap-1"><DollarSign className="h-3 w-3" /> Bs. {route.price} / asiento</span>
               {unit && (
                 <span className="flex items-center gap-1">
                   <Bus className="h-3 w-3" /> {unit.type}
@@ -635,13 +581,9 @@ function RouteCard({ route, units, onCancel }: {
                   {unit.color ? ` · ${unit.color}` : ''}
                 </span>
               )}
-              <span className="flex items-center gap-1">
-                <Users className="h-3 w-3" /> {route.available_seats} asientos libres
-              </span>
+              <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {route.available_seats} asientos libres</span>
             </div>
-            {route.notes && (
-              <p className="text-xs text-muted-foreground italic">📌 {route.notes}</p>
-            )}
+            {route.notes && <p className="text-xs text-muted-foreground italic">📌 {route.notes}</p>}
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             {route.trip_code && (
