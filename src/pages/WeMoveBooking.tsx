@@ -7,12 +7,14 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ArrowLeft, ArrowRight, Check, Clock, MapPin, Calendar, DollarSign, Bus, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getCurrencySymbol } from '@/lib/currencies';
 
 // ── Tipos ──
 interface RouteData {
   id:              string;
   trip_code:       string | null;
   price:           number;
+  currency:        string | null;
   available_seats: number;
   departure_time:  string;
   transporter_id:  string;
@@ -307,7 +309,7 @@ export default function WeMoveBooking() {
               </div>
               <div>
                 <p className="text-muted-foreground">Precio</p>
-                <p className="font-black text-primary">Bs. {route.price.toFixed(0)}</p>
+                <p className="font-black text-primary">{getCurrencySymbol(route.currency)}{route.price.toFixed(0)}</p>
               </div>
               {route.transporter?.full_name && (
                 <div>
@@ -427,7 +429,7 @@ export default function WeMoveBooking() {
           </div>
           <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{departure}</span>
-            <span className="flex items-center gap-1"><DollarSign className="h-3 w-3" />Bs. {route.price.toFixed(0)} / asiento</span>
+            <span className="flex items-center gap-1"><DollarSign className="h-3 w-3" />{getCurrencySymbol(route.currency)}{route.price.toFixed(0)} / asiento</span>
             {route.transport_unit && (
               <span className="flex items-center gap-1">
                 <Bus className="h-3 w-3" />
@@ -504,7 +506,7 @@ export default function WeMoveBooking() {
           <div className="space-y-5">
             <div>
               <h2 className="text-xl font-black">Tus datos</h2>
-              <p className="text-sm text-muted-foreground">Asiento {selectedSeat} · Bs. {route.price.toFixed(0)}</p>
+              <p className="text-sm text-muted-foreground">Asiento {selectedSeat} · {getCurrencySymbol(route.currency)}{route.price.toFixed(0)}</p>
             </div>
 
             <div className="space-y-3">
