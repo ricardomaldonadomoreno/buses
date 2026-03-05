@@ -9,6 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { WeMoveRoute } from '@/hooks/useWeMoveData';
 import { Link } from 'react-router-dom';
+import { getCurrencySymbol } from '@/lib/currencies';
 
 interface WeMoveResultsProps {
   routes: WeMoveRoute[] | undefined;
@@ -162,7 +163,7 @@ function RouteCard({ route }: { route: WeMoveRoute }) {
               {t('weMove.results.perSeat')}
             </p>
             <p className="text-3xl font-black text-primary leading-none">
-              ${route.price.toFixed(0)}
+              {getCurrencySymbol(route.currency)}{route.price.toFixed(0)}
               <span className="text-sm font-bold text-muted-foreground">
                 .{String(Math.round((route.price % 1) * 100)).padStart(2, '0')}
               </span>
