@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { getCurrencySymbol } from '@/lib/currencies';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
@@ -18,15 +19,6 @@ const VEHICLE_MAP: Record<string, { emoji: string; label: string }> = {
   suv:      { emoji: '🚙', label: 'SUV' },
   boat:     { emoji: '⛵', label: 'Lancha' },
   plane:    { emoji: '✈️', label: 'Avioneta' },
-};
-
-// NUEVO: mapa de símbolos por moneda
-const CURRENCY_SYMBOL: Record<string, string> = {
-  BOB: 'Bs.',
-  USD: '$',
-  PEN: 'S/.',
-  ARS: '$',
-  BRL: 'R$',
 };
 
 function getVehicle(type?: string) {
@@ -102,7 +94,7 @@ export default function WeMoveViaje() {
   const isCancelled  = route.status === 'cancelled';
   const isPast       = departure < new Date();
   // NUEVO: símbolo de moneda correcto
-  const currencySymbol = CURRENCY_SYMBOL[route.currency ?? 'BOB'] ?? 'Bs.';
+  const currencySymbol = getCurrencySymbol(route.currency);
 
   const vehicleDesc = [unit?.brand, unit?.model, unit?.year]
     .filter(Boolean).join(' ') || vehicle.label;
