@@ -114,12 +114,10 @@ Total: ${bookings.length} reservas · ${paid} pagadas · ${confirmed} pendientes
   };
 
   return (
-    // CAMBIO: en lg, layout horizontal — mapa izquierda, lista derecha
     <div className="flex flex-col lg:flex-row gap-6">
 
-      {/* ── Mapa del vehículo — columna izquierda en escritorio ── */}
+      {/* Mapa del vehículo */}
       {(layout || (unit?.capacity ?? 0) > 0) && (
-        // CAMBIO: w-fit para que se ajuste al contenido del vehículo
         <div className="bg-muted/20 rounded-2xl p-4 w-fit shrink-0 self-start">
           <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-3">
             Mapa del vehículo
@@ -135,17 +133,15 @@ Total: ${bookings.length} reservas · ${paid} pagadas · ${confirmed} pendientes
         </div>
       )}
 
-      {/* ── Columna derecha: estadísticas + lista de pasajeros ── */}
+      {/* Columna derecha: estadísticas + lista */}
       <div className="flex-1 min-w-0 space-y-4">
 
-        {/* Estadísticas */}
         <div className="grid grid-cols-3 gap-2 text-center">
           <StatBadge label="Pagadas"    value={paid}      color="text-green-600 bg-green-50 border-green-200" />
           <StatBadge label="Pendientes" value={confirmed} color="text-amber-600 bg-amber-50 border-amber-200" />
           <StatBadge label="Expiradas"  value={expired}   color="text-muted-foreground bg-muted/40 border-border" />
         </div>
 
-        {/* Lista pasajeros */}
         {loading ? (
           <div className="h-16 bg-muted/30 rounded-xl animate-pulse" />
         ) : bookings.length === 0 ? (
@@ -235,21 +231,12 @@ Total: ${bookings.length} reservas · ${paid} pagadas · ${confirmed} pendientes
           </div>
         )}
 
-        {/* Acciones pie */}
+        {/* CAMBIO: solo queda imprimir aquí, compartir se movió al header */}
         {bookings.length > 0 && (
           <div className="flex gap-2 pt-2">
             <button onClick={handlePrint}
               className="flex items-center gap-1.5 px-4 py-2 border-2 border-foreground rounded-xl text-xs font-bold hover:bg-muted transition-colors">
               <Printer className="h-3.5 w-3.5" /> Imprimir manifiesto
-            </button>
-            <button
-              onClick={() => {
-                const url = `${window.location.origin}/wemove/booking/${route.id}`;
-                navigator.clipboard.writeText(url);
-                toast({ title: '✓ Enlace copiado al portapapeles' });
-              }}
-              className="flex items-center gap-1.5 px-4 py-2 border-2 border-primary/40 text-primary rounded-xl text-xs font-bold hover:bg-primary/10 transition-colors">
-              <Share2 className="h-3.5 w-3.5" /> Compartir viaje
             </button>
           </div>
         )}
@@ -315,20 +302,22 @@ export default function WeMoveDashboard() {
   );
   if (!user) return null;
 
-  const displayName  = profile?.full_name || user.email?.split('@')[0] || 'Transportador';
-  const isVerified   = transporter?.verification_status === 'verified';
-  const activeRoutes = routes.filter(r => r.status === 'active');
-  const pastRoutes   = routes.filter(r => r.status !== 'active');
+  const displayName   = profile?.full_name || user.email?.split('@')[0] || 'Transportador';
+  const isVerified    = transporter?.verification_status === 'verified';
+  const activeRoutes  = routes.filter(r => r.status === 'active');
+  const pastRoutes    = routes.filter(r => r.status !== 'active');
   const selectedRoute = routes.find(r => r.id === activeTab) ?? null;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
+      {/* CAMBIO 1: Header con logo imagen */}
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/50">
         <div className="h-px w-full bg-gradient-to-r from-transparent via-primary to-transparent" />
         <div className="container flex h-14 items-center justify-between">
-          <Link to="/wemove" className="font-serif text-lg font-semibold">
-            We<span className="text-primary">Move</span>
+          <Link to="/wemove" className="flex items-center gap-3 group">
+            <img src="/logo.png" alt="BUSES" className="h-9 w-auto object-contain group-hover:opacity-80 transition-opacity"
+              onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+            <span className="font-serif text-lg font-semibold">We<span className="text-primary">Move</span></span>
           </Link>
           <div className="flex items-center gap-2">
             <Link to="/wemove/publish-route"
@@ -349,7 +338,6 @@ export default function WeMoveDashboard() {
           {/* ── COLUMNA IZQUIERDA ─────────────────────────── */}
           <aside className="lg:w-64 shrink-0 space-y-4">
 
-            {/* Perfil */}
             <div className="bg-card border border-border/60 rounded-2xl p-5 text-center space-y-3">
               <div className="w-16 h-16 rounded-full bg-primary/10 border-4 border-primary/20 flex items-center justify-center mx-auto text-2xl font-black text-primary">
                 {displayName.charAt(0).toUpperCase()}
@@ -387,7 +375,6 @@ export default function WeMoveDashboard() {
               </Link>
             </div>
 
-            {/* Estadísticas */}
             <div className="bg-card border border-border/60 rounded-2xl p-4 grid grid-cols-2 gap-3">
               <div className="text-center">
                 <p className="text-2xl font-black text-primary">{activeRoutes.length}</p>
@@ -407,7 +394,6 @@ export default function WeMoveDashboard() {
               </div>
             </div>
 
-            {/* CAMBIO: Mis unidades simplificado — solo botón a /wemove/profile */}
             <div className="bg-card border border-border/60 rounded-2xl p-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Bus className="h-4 w-4 text-primary" />
@@ -427,7 +413,6 @@ export default function WeMoveDashboard() {
           {/* ── COLUMNA DERECHA ────────────────────────────── */}
           <main className="flex-1 min-w-0 space-y-4">
 
-            {/* Tabs de rutas activas */}
             <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none">
               {routesLoading ? (
                 <div className="h-10 w-48 bg-muted/30 rounded-xl animate-pulse" />
@@ -456,7 +441,6 @@ export default function WeMoveDashboard() {
               )}
             </div>
 
-            {/* Ficha de la ruta seleccionada */}
             {selectedRoute ? (
               <RouteCard
                 route={selectedRoute}
@@ -474,7 +458,6 @@ export default function WeMoveDashboard() {
               </div>
             )}
 
-            {/* Historial */}
             {pastRoutes.length > 0 && (
               <div className="bg-card border border-border/60 rounded-2xl overflow-hidden">
                 <button
@@ -525,7 +508,6 @@ export default function WeMoveDashboard() {
         </div>
       </div>
 
-      {/* Modal editor de asientos */}
       {editorUnit && (
         <SeatLayoutEditor
           unitId={editorUnit.id}
@@ -548,9 +530,10 @@ export default function WeMoveDashboard() {
 function RouteCard({ route, units, onCancel }: {
   route: any; units: any[]; onCancel: (id: string) => void;
 }) {
-  const departure = format(new Date(route.departure_time), "d 'de' MMMM · HH:mm", { locale: es });
-  const unit      = units.find(u => u.id === route.transport_unit_id);
-  const isPast    = new Date(route.departure_time) < new Date();
+  const { toast }  = useToast();
+  const departure  = format(new Date(route.departure_time), "d 'de' MMMM · HH:mm", { locale: es });
+  const unit       = units.find(u => u.id === route.transport_unit_id);
+  const isPast     = new Date(route.departure_time) < new Date();
 
   return (
     <div className="bg-card border border-border/60 rounded-2xl overflow-hidden">
@@ -585,12 +568,23 @@ function RouteCard({ route, units, onCancel }: {
             </div>
             {route.notes && <p className="text-xs text-muted-foreground italic">📌 {route.notes}</p>}
           </div>
+
+          {/* CAMBIO 2: botones con compartir siempre visible */}
           <div className="flex items-center gap-2 flex-wrap">
             {route.trip_code && (
               <span className="text-xs font-black text-primary bg-primary/10 border border-primary/30 px-2.5 py-1 rounded-full">
                 {route.trip_code}
               </span>
             )}
+            <button
+              onClick={() => {
+                const url = `${window.location.origin}/wemove/viaje/${route.id}`;
+                navigator.clipboard.writeText(url);
+                toast({ title: '✓ Enlace copiado al portapapeles' });
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 border-2 border-primary/40 text-primary rounded-xl text-xs font-bold hover:bg-primary/10 transition-colors">
+              <Share2 className="h-3.5 w-3.5" /> Compartir viaje
+            </button>
             {route.status === 'active' && !isPast && (
               <button onClick={() => onCancel(route.id)}
                 className="flex items-center gap-1.5 px-3 py-1.5 border-2 border-red-200 text-red-600 rounded-xl text-xs font-bold hover:bg-red-50 transition-colors">
