@@ -1,4 +1,5 @@
 import WeMoveBooking from './pages/WeMoveBooking';
+import WeMoveViaje from './pages/WeMoveViaje';
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -17,7 +18,6 @@ import WeMoveVerifyEmail from "./pages/WeMoveVerifyEmail";
 import WeMoveDashboard from "./pages/WeMoveDashboard";
 import WeMoveCompleteProfile from "./pages/WeMoveCompleteProfile";
 import WeMovePublishRoute from "./pages/WeMovePublishRoute";
-import WeMoveBooking from "./pages/WeMoveBooking";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
@@ -27,30 +27,30 @@ const App = () => (
   <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/trips" element={<Trips />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/admin/*" element={<Admin />} />
-          <Route path="/packservice" element={<PackService />} />
-          <Route path="/wemove" element={<WeMove />} />
-          <Route path="/wemove/register" element={<WeMoveRegister />} />
-          <Route path="/wemove/auth/callback" element={<WeMoveAuthCallback />} />
-          <Route path="/wemove/verify-email" element={<WeMoveVerifyEmail />} />
-          <Route path="/wemove/dashboard" element={<WeMoveDashboard />} />
-          <Route path="/wemove/booking/:routeId" element={<WeMoveBooking />} />
-          <Route path="/wemove/profile" element={<WeMoveCompleteProfile />} />
-          <Route path="/wemove/publish-route" element={<WeMovePublishRoute />} />
-          <Route path="/wemove/booking/:routeId" element={<WeMoveBooking />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/auth" element={<NotFound />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/trips" element={<Trips />} />
+            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/admin/*" element={<Admin />} />
+            <Route path="/packservice" element={<PackService />} />
+            <Route path="/wemove" element={<WeMove />} />
+            <Route path="/wemove/register" element={<WeMoveRegister />} />
+            <Route path="/wemove/auth/callback" element={<WeMoveAuthCallback />} />
+            <Route path="/wemove/verify-email" element={<WeMoveVerifyEmail />} />
+            <Route path="/wemove/dashboard" element={<WeMoveDashboard />} />
+            <Route path="/wemove/booking/:routeId" element={<WeMoveBooking />} />
+            <Route path="/wemove/viaje/:routeId" element={<WeMoveViaje />} />
+            <Route path="/wemove/profile" element={<WeMoveCompleteProfile />} />
+            <Route path="/wemove/publish-route" element={<WeMovePublishRoute />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/auth" element={<NotFound />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
     </QueryClientProvider>
   </ThemeProvider>
 );
