@@ -91,6 +91,7 @@ export default function WeMoveBooking() {
           id,
           trip_code,
           price,
+          currency,
           available_seats,
           departure_time,
           transporter_id,
