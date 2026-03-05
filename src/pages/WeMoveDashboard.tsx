@@ -21,6 +21,7 @@ import {
   ChevronDown, ChevronUp, Printer, Share2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getCurrencySymbol } from '@/lib/currencies';
 
 // ── Hook: bookings por ruta ───────────────────────────────────
 function useRouteBookings(routeId: string | null) {
@@ -556,7 +557,7 @@ function RouteCard({ route, units, onCancel }: {
             </div>
             <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
               <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {departure}</span>
-              <span className="flex items-center gap-1"><DollarSign className="h-3 w-3" /> Bs. {route.price} / asiento</span>
+              <span className="flex items-center gap-1"><DollarSign className="h-3 w-3" /> {getCurrencySymbol(route.currency)}{route.price} / asiento</span>
               {unit && (
                 <span className="flex items-center gap-1">
                   <Bus className="h-3 w-3" /> {unit.type}
