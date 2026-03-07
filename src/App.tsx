@@ -19,6 +19,7 @@ import WeMoveDashboard from "./pages/WeMoveDashboard";
 import WeMoveCompleteProfile from "./pages/WeMoveCompleteProfile";
 import WeMovePublishRoute from "./pages/WeMovePublishRoute";
 import Contact from "./pages/Contact";
+import WeMoveCartera from './pages/WeMoveCartera';
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/wemove/viaje/:routeId" element={<WeMoveViaje />} />
             <Route path="/wemove/profile" element={<WeMoveCompleteProfile />} />
             <Route path="/wemove/publish-route" element={<WeMovePublishRoute />} />
+            <Route path="/wemove/cartera" element={<WeMoveCartera />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/auth" element={<NotFound />} />
             <Route path="*" element={<NotFound />} />
