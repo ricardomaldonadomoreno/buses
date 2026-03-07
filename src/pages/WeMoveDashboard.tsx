@@ -18,7 +18,7 @@ import {
   ArrowLeft, Plus, Star, Bus, MapPin, ArrowRight,
   Calendar, Users, Clock, XCircle, LogOut, User,
   DollarSign, CheckCircle, AlertCircle, Layout,
-  ChevronDown, ChevronUp, Printer, Share2
+  ChevronDown, ChevronUp, Printer, Share2, Wallet
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getCurrencySymbol } from '@/lib/currencies';
@@ -232,7 +232,6 @@ Total: ${bookings.length} reservas · ${paid} pagadas · ${confirmed} pendientes
           </div>
         )}
 
-        {/* CAMBIO: solo queda imprimir aquí, compartir se movió al header */}
         {bookings.length > 0 && (
           <div className="flex gap-2 pt-2">
             <button onClick={handlePrint}
@@ -311,7 +310,6 @@ export default function WeMoveDashboard() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* CAMBIO 1: Header con logo imagen */}
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/50">
         <div className="h-px w-full bg-gradient-to-r from-transparent via-primary to-transparent" />
         <div className="container flex h-14 items-center justify-between">
@@ -373,6 +371,11 @@ export default function WeMoveDashboard() {
               <Link to="/wemove/profile"
                 className="flex items-center justify-center gap-1.5 w-full py-2 border-2 border-foreground/20 rounded-xl text-xs font-bold hover:bg-muted transition-colors">
                 <User className="h-3.5 w-3.5" /> Mi perfil y documentos
+              </Link>
+              {/* NUEVO: botón Mi Cartera */}
+              <Link to="/wemove/cartera"
+                className="flex items-center justify-center gap-1.5 w-full py-2 border-2 border-primary/30 text-primary rounded-xl text-xs font-bold hover:bg-primary/10 transition-colors">
+                <Wallet className="h-3.5 w-3.5" /> Mi cartera
               </Link>
             </div>
 
@@ -495,9 +498,12 @@ export default function WeMoveDashboard() {
                           'text-xs px-2 py-0.5 rounded-full font-bold border',
                           route.status === 'completed'
                             ? 'text-green-700 bg-green-50 border-green-200'
+                            : route.status === 'departed'
+                            ? 'text-blue-700 bg-blue-50 border-blue-200'
                             : 'text-red-600 bg-red-50 border-red-200'
                         )}>
-                          {route.status === 'completed' ? 'Completado' : 'Cancelado'}
+                          {route.status === 'completed' ? 'Completado' :
+                           route.status === 'departed'  ? 'En camino' : 'Cancelado'}
                         </span>
                       </div>
                     ))}
@@ -538,7 +544,6 @@ function RouteCard({ route, units, onCancel }: {
 
   return (
     <div className="bg-card border border-border/60 rounded-2xl overflow-hidden">
-      {/* Header */}
       <div className="bg-primary/5 border-b border-border/40 px-5 py-4">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div className="space-y-1">
@@ -549,10 +554,13 @@ function RouteCard({ route, units, onCancel }: {
               <span className={cn(
                 'text-xs px-2 py-0.5 rounded-full font-bold border',
                 route.status === 'active'    ? 'text-green-700 bg-green-50 border-green-200' :
-                route.status === 'completed' ? 'text-blue-700 bg-blue-50 border-blue-200' :
+                route.status === 'departed'  ? 'text-blue-700 bg-blue-50 border-blue-200' :
+                route.status === 'completed' ? 'text-purple-700 bg-purple-50 border-purple-200' :
                                                'text-red-600 bg-red-50 border-red-200'
               )}>
-                {route.status === 'active' ? 'Activo' : route.status === 'completed' ? 'Completado' : 'Cancelado'}
+                {route.status === 'active'    ? 'Activo' :
+                 route.status === 'departed'  ? 'En camino' :
+                 route.status === 'completed' ? 'Completado' : 'Cancelado'}
               </span>
             </div>
             <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
@@ -570,7 +578,6 @@ function RouteCard({ route, units, onCancel }: {
             {route.notes && <p className="text-xs text-muted-foreground italic">📌 {route.notes}</p>}
           </div>
 
-          {/* CAMBIO 2: botones con compartir siempre visible */}
           <div className="flex items-center gap-2 flex-wrap">
             {route.trip_code && (
               <span className="text-xs font-black text-primary bg-primary/10 border border-primary/30 px-2.5 py-1 rounded-full">
@@ -596,7 +603,6 @@ function RouteCard({ route, units, onCancel }: {
         </div>
       </div>
 
-      {/* Manifiesto */}
       <div className="p-5">
         <RouteManifest route={route} units={units} />
       </div>
