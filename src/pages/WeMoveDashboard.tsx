@@ -100,7 +100,8 @@ function RouteManifest({ route, units }: { route: any; units: any[] }) {
     if (error) {
       toast({ title: t('dashboard.errorConfirmPay'), description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: `✓ ${t('dashboard.payConfirmed')} · Bs.${data?.commission ?? '—'}` });
+      // CAMBIO 3: quitado "· Bs.X" de comisión del toast
+      toast({ title: `✓ ${t('dashboard.payConfirmed')}` });
       qc.invalidateQueries({ queryKey: ['my-wemove-routes', user.id] });
     }
   };
@@ -210,6 +211,7 @@ ${t('dashboard.total')}: ${bookings.length} · ${paid} ${t('dashboard.paid')} ·
                     </div>
                   </div>
 
+                  {/* CAMBIO 3: eliminada la línea de comisión — solo código + botón */}
                   <div className="flex items-center justify-between pt-1 border-t border-foreground/8">
                     <span className="text-xs text-muted-foreground font-mono">
                       {t('dashboard.code')}: <span className="font-black text-foreground">{b.boarding_code ?? '—'}</span>
@@ -226,11 +228,6 @@ ${t('dashboard.total')}: ${bookings.length} · ${paid} ${t('dashboard.paid')} ·
                         }
                         {t('dashboard.markPaid')}
                       </button>
-                    )}
-                    {isPaid && b.commission_amount && (
-                      <span className="text-xs text-muted-foreground">
-                        {t('dashboard.commission')}: <span className="font-bold text-foreground">Bs.{b.commission_amount}</span>
-                      </span>
                     )}
                   </div>
                 </div>
@@ -313,12 +310,12 @@ export default function WeMoveDashboard() {
   );
   if (!user) return null;
 
-  const displayName  = profile?.full_name || user.email?.split('@')[0] || 'Transportador';
-  const isVerified   = transporter?.verification_status === 'verified';
-  const liveRoutes   = routes.filter(r => r.status === 'active' || r.status === 'departed');
-  const pastRoutes   = routes.filter(r => r.status !== 'active' && r.status !== 'departed');
+  const displayName   = profile?.full_name || user.email?.split('@')[0] || 'Transportador';
+  const isVerified    = transporter?.verification_status === 'verified';
+  const liveRoutes    = routes.filter(r => r.status === 'active' || r.status === 'departed');
+  const pastRoutes    = routes.filter(r => r.status !== 'active' && r.status !== 'departed');
   const selectedRoute = routes.find(r => r.id === activeTab) ?? null;
-  const currentLang  = LANGUAGES.find(l => l.code === i18n.language) ?? LANGUAGES[0];
+  const currentLang   = LANGUAGES.find(l => l.code === i18n.language) ?? LANGUAGES[0];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -334,8 +331,6 @@ export default function WeMoveDashboard() {
           </Link>
 
           <div className="flex items-center gap-2">
-
-            {/* Selector de idioma */}
             <div className="relative">
               <button
                 onClick={() => setShowLangMenu(v => !v)}
@@ -465,32 +460,36 @@ export default function WeMoveDashboard() {
           {/* ── COLUMNA DERECHA ────────────────────────────── */}
           <main className="flex-1 min-w-0 space-y-4">
 
-            {/* Tabs: active + departed */}
+            {/* CAMBIO 1: tabs — active+past se muestra azul/pulsante igual que departed */}
             <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none">
               {routesLoading ? (
                 <div className="h-10 w-48 bg-muted/30 rounded-xl animate-pulse" />
-              ) : liveRoutes.map(route => (
-                <button
-                  key={route.id}
-                  onClick={() => setActiveTab(route.id)}
-                  className={cn(
-                    'shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 text-xs font-bold transition-all whitespace-nowrap',
-                    activeTab === route.id
-                      ? 'border-primary bg-primary text-primary-foreground shadow-sm'
-                      : route.status === 'departed'
-                      ? 'border-blue-300 bg-blue-50 text-blue-700 hover:border-blue-400'
-                      : 'border-border bg-card text-foreground hover:border-primary/50'
-                  )}
-                >
-                  {route.status === 'departed' && (
-                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse shrink-0" />
-                  )}
-                  <span className="font-mono text-[10px] opacity-70">{route.trip_code ?? '—'}</span>
-                  <span>{route.route?.origin?.name ?? '—'}</span>
-                  <ArrowRight className="h-3 w-3 opacity-60" />
-                  <span>{route.route?.destination?.name ?? '—'}</span>
-                </button>
-              ))}
+              ) : liveRoutes.map(route => {
+                const tabIsPast = new Date(route.departure_time) < new Date();
+                const tabEffectivelyDeparted = route.status === 'departed' || (route.status === 'active' && tabIsPast);
+                return (
+                  <button
+                    key={route.id}
+                    onClick={() => setActiveTab(route.id)}
+                    className={cn(
+                      'shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 text-xs font-bold transition-all whitespace-nowrap',
+                      activeTab === route.id
+                        ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+                        : tabEffectivelyDeparted
+                        ? 'border-blue-300 bg-blue-50 text-blue-700 hover:border-blue-400'
+                        : 'border-border bg-card text-foreground hover:border-primary/50'
+                    )}
+                  >
+                    {tabEffectivelyDeparted && (
+                      <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse shrink-0" />
+                    )}
+                    <span className="font-mono text-[10px] opacity-70">{route.trip_code ?? '—'}</span>
+                    <span>{route.route?.origin?.name ?? '—'}</span>
+                    <ArrowRight className="h-3 w-3 opacity-60" />
+                    <span>{route.route?.destination?.name ?? '—'}</span>
+                  </button>
+                );
+              })}
               {liveRoutes.filter(r => r.status === 'active').length < 10 && (
                 <Link to="/wemove/publish-route"
                   className="shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-xl border-2 border-dashed border-primary/40 text-primary text-xs font-bold hover:bg-primary/5 transition-colors whitespace-nowrap">
@@ -593,11 +592,13 @@ function RouteCard({ route, units, onCancel }: {
   const { user }    = useWeMoveAuth();
   const qc          = useQueryClient();
 
-  const dateLocale  = DATE_LOCALES[i18n.language] ?? es;
-  const departure   = format(new Date(route.departure_time), "d 'de' MMMM · HH:mm", { locale: dateLocale });
-  const unit        = units.find(u => u.id === route.transport_unit_id);
-  const isPast      = new Date(route.departure_time) < new Date();
-  const isDeparted  = route.status === 'departed';
+  const dateLocale = DATE_LOCALES[i18n.language] ?? es;
+  const departure  = format(new Date(route.departure_time), "d 'de' MMMM · HH:mm", { locale: dateLocale });
+  const unit       = units.find(u => u.id === route.transport_unit_id);
+  const isPast     = new Date(route.departure_time) < new Date();
+
+  // CAMBIO 2: departed real O active que ya pasó su hora → mismo tratamiento
+  const isDeparted = route.status === 'departed' || (route.status === 'active' && isPast);
 
   const [confirming, setConfirming] = useState(false);
 
@@ -625,6 +626,17 @@ function RouteCard({ route, units, onCancel }: {
     }
   };
 
+  // Badge de estado coherente con isDeparted
+  const statusLabel = isDeparted        ? t('dashboard.statusOnTheWay')
+    : route.status === 'completed'      ? t('dashboard.statusCompleted')
+    : route.status === 'cancelled'      ? t('dashboard.statusCancelled')
+    :                                     t('dashboard.statusActive');
+
+  const statusColor = isDeparted        ? 'text-blue-700 bg-blue-50 border-blue-200'
+    : route.status === 'completed'      ? 'text-purple-700 bg-purple-50 border-purple-200'
+    : route.status === 'cancelled'      ? 'text-red-600 bg-red-50 border-red-200'
+    :                                     'text-green-700 bg-green-50 border-green-200';
+
   return (
     <div className="bg-card border border-border/60 rounded-2xl overflow-hidden">
       <div className="bg-primary/5 border-b border-border/40 px-5 py-4">
@@ -634,17 +646,8 @@ function RouteCard({ route, units, onCancel }: {
               <span className="font-black text-lg">{route.route?.origin?.name ?? '—'}</span>
               <ArrowRight className="h-4 w-4 text-muted-foreground" />
               <span className="font-black text-lg">{route.route?.destination?.name ?? '—'}</span>
-              <span className={cn(
-                'text-xs px-2 py-0.5 rounded-full font-bold border',
-                route.status === 'active'    ? 'text-green-700 bg-green-50 border-green-200' :
-                route.status === 'departed'  ? 'text-blue-700 bg-blue-50 border-blue-200' :
-                route.status === 'completed' ? 'text-purple-700 bg-purple-50 border-purple-200' :
-                                               'text-red-600 bg-red-50 border-red-200'
-              )}>
-                {route.status === 'active'    ? t('dashboard.statusActive') :
-                 route.status === 'departed'  ? t('dashboard.statusOnTheWay') :
-                 route.status === 'completed' ? t('dashboard.statusCompleted') :
-                                               t('dashboard.statusCancelled')}
+              <span className={cn('text-xs px-2 py-0.5 rounded-full font-bold border', statusColor)}>
+                {statusLabel}
               </span>
             </div>
             <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
@@ -678,6 +681,7 @@ function RouteCard({ route, units, onCancel }: {
               <Share2 className="h-3.5 w-3.5" /> {t('dashboard.shareTrip')}
             </button>
 
+            {/* CAMBIO 2: Cancelar solo antes de la hora de salida */}
             {route.status === 'active' && !isPast && (
               <button onClick={() => onCancel(route.id)}
                 className="flex items-center gap-1.5 px-3 py-1.5 border-2 border-red-200 text-red-600 rounded-xl text-xs font-bold hover:bg-red-50 transition-colors">
@@ -685,7 +689,7 @@ function RouteCard({ route, units, onCancel }: {
               </button>
             )}
 
-            {/* NUEVO: Confirmar llegada — solo cuando departed */}
+            {/* CAMBIO 2: Finalizar viaje si ya salió (departed o active+past) */}
             {isDeparted && (
               <button
                 onClick={handleConfirmArrival}
@@ -696,7 +700,7 @@ function RouteCard({ route, units, onCancel }: {
                   ? <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   : <CheckCircle className="h-3.5 w-3.5" />
                 }
-                {t('dashboard.confirmArrival')}
+                {t('dashboard.finalizeTrip')}
               </button>
             )}
           </div>
