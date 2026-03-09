@@ -18,7 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import {
   ArrowLeft, Plus, Pencil, Trash2, Bus, CheckCircle, Clock,
   Upload, FileText, Camera, Car, Shield, AlertCircle, Loader2,
-  X, Eye, Layout
+  X, Eye, Layout, Share2, MapPin, Star, AlertTriangle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -51,14 +51,17 @@ function useTransporterDocs(userId?: string) {
 }
 
 // ── Doc upload component ─────────────────────────────────────
-function DocUpload({ label, icon: Icon, docKey, userId, currentUrl, onUploaded, bucket = 'transporter-docs', pathPrefix }: {
+// CAMBIO: acepta useCamera para abrir cámara directamente en móvil
+function DocUpload({ label, icon: Icon, docKey, userId, currentUrl, onUploaded,
+  bucket = 'transporter-docs', pathPrefix, useCamera = false }: {
   label: string; icon: React.ElementType; docKey: string;
   userId: string; currentUrl?: string | null; onUploaded: (url: string) => void;
-  bucket?: string; pathPrefix?: string;
+  bucket?: string; pathPrefix?: string; useCamera?: boolean;
 }) {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview]     = useState<string | null>(currentUrl ?? null);
-  const inputRef                  = useRef<HTMLInputElement>(null);
+  const inputFileRef              = useRef<HTMLInputElement>(null);
+  const inputCamRef               = useRef<HTMLInputElement>(null);
   const { toast }                 = useToast();
 
   const handleFile = async (file: File) => {
@@ -68,9 +71,9 @@ function DocUpload({ label, icon: Icon, docKey, userId, currentUrl, onUploaded, 
     }
     setUploading(true);
     try {
-      const ext  = file.name.split('.').pop();
+      const ext    = file.name.split('.').pop() ?? 'jpg';
       const prefix = pathPrefix ?? userId;
-      const path = `${prefix}/${docKey}.${ext}`;
+      const path   = `${prefix}/${docKey}.${ext}`;
       const { error: uploadError } = await supabase.storage
         .from(bucket).upload(path, file, { upsert: true });
       if (uploadError) throw uploadError;
@@ -82,7 +85,7 @@ function DocUpload({ label, icon: Icon, docKey, userId, currentUrl, onUploaded, 
       }
       setPreview(URL.createObjectURL(file));
       onUploaded(publicUrl);
-      toast({ title: 'Foto subida correctamente' });
+      toast({ title: '✓ Foto subida correctamente' });
     } catch (err: any) {
       toast({ title: 'Error al subir archivo', description: err.message, variant: 'destructive' });
     } finally {
@@ -95,43 +98,232 @@ function DocUpload({ label, icon: Icon, docKey, userId, currentUrl, onUploaded, 
       <p className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
         <Icon className="h-3.5 w-3.5" /> {label}
       </p>
-      <div onClick={() => !uploading && inputRef.current?.click()}
-        className={cn(
-          'relative border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-all',
-          preview ? 'border-green-400 bg-green-50/5' : 'border-border/60 hover:border-primary/50 hover:bg-muted/30'
-        )}>
+      <div className={cn(
+        'relative border-2 border-dashed rounded-xl p-4 text-center transition-all',
+        preview ? 'border-green-400 bg-green-50/5' : 'border-border/60 bg-muted/10'
+      )}>
         {uploading ? (
           <div className="flex flex-col items-center gap-2 py-2">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
             <p className="text-xs text-muted-foreground">Subiendo…</p>
           </div>
         ) : preview ? (
-          <div className="flex items-center gap-3">
-            <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />
-            <div className="flex-1 text-left">
-              <p className="text-xs font-medium text-green-700">Archivo subido</p>
-              <p className="text-xs text-muted-foreground">Clic para reemplazar</p>
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />
+              <div className="flex-1 text-left">
+                <p className="text-xs font-medium text-green-700">Archivo subido</p>
+              </div>
+              <a href={preview} target="_blank" rel="noopener noreferrer"
+                className="text-xs text-primary underline flex items-center gap-1">
+                <Eye className="h-3 w-3" /> Ver
+              </a>
             </div>
-            <a href={preview} target="_blank" rel="noopener noreferrer"
-              onClick={e => e.stopPropagation()}
-              className="text-xs text-primary underline flex items-center gap-1">
-              <Eye className="h-3 w-3" /> Ver
-            </a>
+            {/* Botones reemplazar */}
+            <div className="flex gap-2 justify-center">
+              <button onClick={() => inputFileRef.current?.click()}
+                className="flex items-center gap-1 px-3 py-1.5 border border-border rounded-lg text-xs text-muted-foreground hover:bg-muted transition-colors">
+                <Upload className="h-3 w-3" /> Galería
+              </button>
+              <button onClick={() => inputCamRef.current?.click()}
+                className="flex items-center gap-1 px-3 py-1.5 border border-border rounded-lg text-xs text-muted-foreground hover:bg-muted transition-colors">
+                <Camera className="h-3 w-3" /> Cámara
+              </button>
+            </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-1.5 py-2">
+          <div className="flex flex-col items-center gap-3 py-2">
             <Upload className="h-6 w-6 text-muted-foreground/50" />
             <p className="text-xs text-muted-foreground">JPG, PNG · máx. 10MB</p>
-            <p className="text-xs font-medium text-primary">Subir foto</p>
+            {/* CAMBIO: dos botones — galería y cámara */}
+            <div className="flex gap-2">
+              <button onClick={() => inputFileRef.current?.click()}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-muted border border-border rounded-lg text-xs font-medium hover:bg-muted/80 transition-colors">
+                <Upload className="h-3 w-3" /> Galería
+              </button>
+              <button onClick={() => inputCamRef.current?.click()}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 border border-primary/30 text-primary rounded-lg text-xs font-medium hover:bg-primary/20 transition-colors">
+                <Camera className="h-3 w-3" /> Cámara
+              </button>
+            </div>
           </div>
         )}
-        <input ref={inputRef} type="file"
+
+        {/* Input galería */}
+        <input ref={inputFileRef} type="file"
           accept="image/jpeg,image/png,image/webp"
+          className="hidden"
+          onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
+        />
+        {/* CAMBIO: Input cámara con capture="environment" */}
+        <input ref={inputCamRef} type="file"
+          accept="image/jpeg,image/png,image/webp"
+          capture="environment"
           className="hidden"
           onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
         />
       </div>
     </div>
+  );
+}
+
+// ── Avatar upload component ──────────────────────────────────
+function AvatarUpload({ userId, currentUrl, displayName, onUploaded }: {
+  userId: string; currentUrl?: string | null;
+  displayName: string; onUploaded: (url: string) => void;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [preview, setPreview]     = useState<string | null>(currentUrl ?? null);
+  const inputRef                  = useRef<HTMLInputElement>(null);
+  const { toast }                 = useToast();
+
+  const handleFile = async (file: File) => {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: 'Máximo 5MB', variant: 'destructive' }); return;
+    }
+    setUploading(true);
+    try {
+      const ext  = file.name.split('.').pop() ?? 'jpg';
+      const path = `${userId}/avatar.${ext}`;
+      const { error } = await supabase.storage
+        .from('transporter-docs').upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data: { publicUrl } } = supabase.storage
+        .from('transporter-docs').getPublicUrl(path);
+      await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', userId);
+      setPreview(URL.createObjectURL(file));
+      onUploaded(publicUrl);
+      toast({ title: '✓ Foto de perfil actualizada' });
+    } catch (err: any) {
+      toast({ title: 'Error al subir foto', description: err.message, variant: 'destructive' });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const initials = displayName
+    ? displayName.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
+    : '?';
+
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <div className="relative group">
+        <div
+          onClick={() => !uploading && inputRef.current?.click()}
+          className="w-20 h-20 rounded-full border-4 border-primary/20 overflow-hidden cursor-pointer
+            bg-primary/10 flex items-center justify-center text-2xl font-black text-primary
+            hover:border-primary/50 transition-all"
+        >
+          {uploading ? (
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          ) : preview ? (
+            <img src={preview} alt="avatar" className="w-full h-full object-cover" />
+          ) : (
+            <span>{initials}</span>
+          )}
+        </div>
+        {/* Overlay cámara */}
+        <div
+          onClick={() => !uploading && inputRef.current?.click()}
+          className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center
+            opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+        >
+          <Camera className="h-5 w-5 text-white" />
+        </div>
+      </div>
+      <p className="text-xs text-muted-foreground">Toca para cambiar foto</p>
+      <input ref={inputRef} type="file"
+        accept="image/jpeg,image/png,image/webp"
+        capture="user"
+        className="hidden"
+        onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
+      />
+    </div>
+  );
+}
+
+// ── Sección "Cómo funciona" ──────────────────────────────────
+function HowItWorksSection() {
+  const steps = [
+    {
+      icon: Plus,
+      color: 'bg-green-100 text-green-700',
+      title: 'Crea y comparte tu viaje',
+      desc: 'Publica tu ruta con el botón "Nuevo viaje". Una vez publicada, usa el botón Compartir para difundirla en tus redes y llenar tus asientos más rápido.',
+    },
+    {
+      icon: MapPin,
+      color: 'bg-blue-100 text-blue-700',
+      title: 'Gestiona tus pasajeros',
+      desc: 'Desde tu panel verás quién reservó cada asiento. Márcalos como pagados cuando recibas el dinero directamente. Al partir, la ruta pasa a "En camino".',
+    },
+    {
+      icon: CheckCircle,
+      color: 'bg-primary/10 text-primary',
+      title: 'Finaliza y recibe reseñas',
+      desc: 'Al llegar a destino, presiona "Finalizar viaje". Esto cierra la ruta y activa el enlace para que los pasajeros te dejen su calificación.',
+    },
+    {
+      icon: Star,
+      color: 'bg-yellow-100 text-yellow-700',
+      title: 'Construye tu reputación',
+      desc: 'Cada viaje completado suma a tu historial. Más reseñas positivas = más pasajeros. Tu perfil verificado genera confianza automáticamente.',
+    },
+  ];
+
+  const warnings = [
+    'Tu nombre, número, correo y cédula quedan registrados. WeMove los usa para prevenir estafas y situaciones peligrosas.',
+    'Más de 2 cancelaciones injustificadas pueden resultar en bloqueo de cuenta. Contacta a soporte si tienes una emergencia.',
+    'Respeta siempre a tus pasajeros y cumple los horarios publicados. Tu reputación depende de ello.',
+    'No publiques rutas que no puedas cumplir. Los pasajeros confían en ti.',
+  ];
+
+  return (
+    <section className="bg-card rounded-2xl border border-border/60 overflow-hidden">
+      <div className="px-5 py-4 border-b border-border/40 flex items-center gap-2.5">
+        <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+          <Share2 className="h-3.5 w-3.5 text-primary" />
+        </div>
+        <div>
+          <h2 className="text-sm font-semibold">¿Cómo funciona WeMove?</h2>
+          <p className="text-xs text-muted-foreground">Guía rápida para transportadores</p>
+        </div>
+      </div>
+
+      <div className="p-5 space-y-5">
+        {/* Pasos */}
+        <div className="space-y-3">
+          {steps.map((step, i) => (
+            <div key={i} className="flex gap-3">
+              <div className={cn('w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5', step.color)}>
+                <step.icon className="h-4 w-4" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">{step.title}</p>
+                <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{step.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Aviso de responsabilidad */}
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
+            <p className="text-xs font-bold text-amber-800 uppercase tracking-wide">Cuida tu cuenta</p>
+          </div>
+          <ul className="space-y-1.5">
+            {warnings.map((w, i) => (
+              <li key={i} className="text-xs text-amber-800 flex gap-2">
+                <span className="shrink-0 mt-0.5">·</span>
+                <span>{w}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -153,8 +345,9 @@ export default function WeMoveCompleteProfile() {
   const deleteUnit    = useDeleteTransportUnit();
 
   // Profile state
-  const [fullName, setFullName]   = useState('');
-  const [savingProfile, setSaving] = useState(false);
+  const [fullName, setFullName]     = useState('');
+  const [avatarUrl, setAvatarUrl]   = useState<string | null>(null);
+  const [savingProfile, setSaving]  = useState(false);
 
   // Unit form state
   const [showUnitForm, setShowUnit]     = useState(false);
@@ -163,7 +356,6 @@ export default function WeMoveCompleteProfile() {
   const [unitCapacity, setUnitCapacity] = useState('');
   const [unitPlate, setUnitPlate]       = useState('');
   const [unitColor, setUnitColor]       = useState('');
-  // NUEVO: campos adicionales
   const [unitBrand, setUnitBrand]       = useState('');
   const [unitModel, setUnitModel]       = useState('');
   const [unitYear, setUnitYear]         = useState('');
@@ -188,6 +380,7 @@ export default function WeMoveCompleteProfile() {
     } else if (userData) {
       setFullName([userData.first_name, userData.last_name].filter(Boolean).join(' '));
     }
+    if (profile?.avatar_url) setAvatarUrl(profile.avatar_url);
   }, [profile, userData]);
 
   const handleSaveProfile = async () => {
@@ -200,7 +393,7 @@ export default function WeMoveCompleteProfile() {
         first_name: parts[0] ?? null,
         last_name:  parts.slice(1).join(' ') || null,
       }).eq('id', user.id);
-      toast({ title: 'Perfil actualizado' });
+      toast({ title: '✓ Perfil actualizado' });
     } catch {
       toast({ title: 'Error al guardar perfil', variant: 'destructive' });
     } finally {
@@ -212,7 +405,6 @@ export default function WeMoveCompleteProfile() {
     setShowUnit(false); setEditUnit(null);
     setUnitType(''); setUnitCapacity('');
     setUnitPlate(''); setUnitColor('');
-    // NUEVO: limpiar campos adicionales
     setUnitBrand(''); setUnitModel('');
     setUnitYear(''); setUnitPhotoUrl('');
   };
@@ -223,7 +415,6 @@ export default function WeMoveCompleteProfile() {
     setUnitCapacity(String(unit.capacity));
     setUnitPlate(unit.plate ?? '');
     setUnitColor(unit.color ?? '');
-    // NUEVO: cargar campos adicionales
     setUnitBrand(unit.brand ?? '');
     setUnitModel(unit.model ?? '');
     setUnitYear(unit.year ? String(unit.year) : '');
@@ -244,15 +435,14 @@ export default function WeMoveCompleteProfile() {
         transporterId: user.id,
         type:          unitType,
         capacity:      cap,
-        plate:         unitPlate.trim()    || undefined,
-        color:         unitColor.trim()    || undefined,
-        // NUEVO
-        brand:         unitBrand.trim()    || undefined,
-        model:         unitModel.trim()    || undefined,
+        plate:         unitPlate.trim()  || undefined,
+        color:         unitColor.trim()  || undefined,
+        brand:         unitBrand.trim()  || undefined,
+        model:         unitModel.trim()  || undefined,
         year:          unitYear ? parseInt(unitYear) : undefined,
-        photo_url:     unitPhotoUrl        || undefined,
+        photo_url:     unitPhotoUrl      || undefined,
       });
-      toast({ title: editingUnitId ? 'Unidad actualizada' : 'Unidad agregada' });
+      toast({ title: editingUnitId ? '✓ Unidad actualizada' : '✓ Unidad agregada' });
       resetUnitForm();
     } catch {
       toast({ title: 'Error al guardar unidad', variant: 'destructive' });
@@ -280,7 +470,7 @@ export default function WeMoveCompleteProfile() {
     try {
       await supabase.from('wemove_transporters').update({
         documents_submitted: true,
-        submitted_at: new Date().toISOString(),
+        submitted_at:        new Date().toISOString(),
         verification_status: 'pending',
       }).eq('user_id', user.id);
       qc.invalidateQueries({ queryKey: ['my-wemove-transporter'] });
@@ -302,6 +492,7 @@ export default function WeMoveCompleteProfile() {
 
   const isVerified  = transporter?.verification_status === 'verified';
   const isSubmitted = docs?.documents_submitted;
+  const displayName = fullName || user.email?.split('@')[0] || '';
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -367,6 +558,20 @@ export default function WeMoveCompleteProfile() {
             <h2 className="text-sm font-semibold">Información personal</h2>
           </div>
           <div className="p-5 space-y-4">
+
+            {/* NUEVO: Avatar de perfil centrado arriba */}
+            <div className="flex justify-center pb-2">
+              <AvatarUpload
+                userId={user.id}
+                currentUrl={avatarUrl}
+                displayName={displayName}
+                onUploaded={url => {
+                  setAvatarUrl(url);
+                  qc.invalidateQueries({ queryKey: ['my-profile', user.id] });
+                }}
+              />
+            </div>
+
             <div>
               <Label className="text-xs text-muted-foreground">Correo electrónico</Label>
               <Input value={user.email ?? ''} disabled className="mt-1.5 rounded-xl border-border/40 bg-muted/30 text-muted-foreground" />
@@ -425,7 +630,7 @@ export default function WeMoveCompleteProfile() {
                 userId={user.id} currentUrl={docs?.license_url}
                 onUploaded={() => qc.invalidateQueries({ queryKey: ['transporter-docs'] })} />
               <DocUpload label="Selfie sosteniendo tu carnet" icon={Camera} docKey="selfie"
-                userId={user.id} currentUrl={docs?.selfie_url}
+                userId={user.id} currentUrl={docs?.selfie_url} useCamera
                 onUploaded={() => qc.invalidateQueries({ queryKey: ['transporter-docs'] })} />
               <DocUpload label="Foto del vehículo (exterior)" icon={Car} docKey="vehicle_photo"
                 userId={user.id} currentUrl={docs?.vehicle_photo_url}
@@ -480,10 +685,8 @@ export default function WeMoveCompleteProfile() {
               <div className="space-y-2">
                 {units.map(unit => (
                   <div key={unit.id} className="rounded-xl border border-border/60 bg-background overflow-hidden">
-                    {/* Fila principal */}
                     <div className="flex items-center justify-between p-3.5">
                       <div className="flex items-center gap-3">
-                        {/* NUEVO: mostrar foto si existe, si no emoji */}
                         {unit.photo_url ? (
                           <img src={unit.photo_url} alt={unit.type}
                             className="w-12 h-12 rounded-lg object-cover border border-border/40" />
@@ -493,7 +696,6 @@ export default function WeMoveCompleteProfile() {
                         <div>
                           <p className="text-sm font-semibold capitalize">{VEHICLE_LABELS[unit.type] ?? unit.type}</p>
                           <p className="text-xs text-muted-foreground">
-                            {/* NUEVO: mostrar brand/model/year si existen */}
                             {[unit.brand, unit.model, unit.year].filter(Boolean).join(' ')}
                             {unit.capacity ? ` · ${unit.capacity} asientos` : ''}
                             {unit.plate ? ` · ${unit.plate}` : ''}
@@ -511,18 +713,15 @@ export default function WeMoveCompleteProfile() {
                             </span>
                         }
                         <button onClick={() => handleEditUnit(unit)}
-                          className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                          title="Editar datos">
+                          className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
                           <Pencil className="h-3.5 w-3.5" />
                         </button>
                         <button onClick={() => handleDeleteUnit(unit.id)}
-                          className="w-8 h-8 rounded-lg border border-red-200 flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors"
-                          title="Eliminar">
+                          className="w-8 h-8 rounded-lg border border-red-200 flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors">
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     </div>
-                    {/* Botón diseñar asientos */}
                     <div className="border-t border-border/40 px-3.5 py-2.5 bg-muted/20">
                       <button
                         onClick={() => setEditorUnit({
@@ -576,17 +775,16 @@ export default function WeMoveCompleteProfile() {
                       placeholder="Ej: 15"
                       className="mt-1.5 rounded-xl border-border/60" />
                   </div>
-                  {/* NUEVO: Marca, Modelo, Año */}
                   <div>
                     <Label className="text-xs text-muted-foreground">Marca</Label>
                     <Input value={unitBrand} onChange={e => setUnitBrand(e.target.value)}
-                      placeholder="Ej: Toyota, Changan"
+                      placeholder="Ej: Toyota"
                       className="mt-1.5 rounded-xl border-border/60" />
                   </div>
                   <div>
                     <Label className="text-xs text-muted-foreground">Modelo</Label>
                     <Input value={unitModel} onChange={e => setUnitModel(e.target.value)}
-                      placeholder="Ej: Hiace, Minivan"
+                      placeholder="Ej: Hiace"
                       className="mt-1.5 rounded-xl border-border/60" />
                   </div>
                   <div>
@@ -609,7 +807,6 @@ export default function WeMoveCompleteProfile() {
                       className="mt-1.5 rounded-xl border-border/60" />
                   </div>
                 </div>
-                {/* NUEVO: subida de foto del vehículo */}
                 <DocUpload
                   label="Foto del vehículo (se mostrará a los pasajeros)"
                   icon={Camera}
@@ -632,16 +829,19 @@ export default function WeMoveCompleteProfile() {
             )}
           </div>
         </section>
+
+        {/* NUEVO: Sección cómo funciona */}
+        <HowItWorksSection />
+
       </main>
 
-      {/* Modal editor de asientos */}
       {editorUnit && (
         <SeatLayoutEditor
           unitId={editorUnit.id}
           unitType={editorUnit.type}
           unitCapacity={editorUnit.capacity}
           initialLayout={editorUnit.layout}
-          onSave={(layout) => {
+          onSave={() => {
             setEditorUnit(null);
             qc.invalidateQueries({ queryKey: ['my-transport-units', user.id] });
             toast({ title: '✓ Plantilla de asientos guardada' });
