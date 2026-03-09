@@ -13,7 +13,7 @@ import {
 import { cn } from '@/lib/utils';
 
 const SUPPORT_WHATSAPP = '59172632220';
-const HOTMART_CHECKOUT = 'https://pay.hotmart.com/XXXXXXXX'; // ← pega aquí tu enlace de Hotmart
+const HOTMART_CHECKOUT = 'https://pay.hotmart.com/F104823282N?off=4j6coj0m'; // ← pega aquí tu enlace de Hotmart
 
 export default function WeMoveCartera() {
   const navigate = useNavigate();
