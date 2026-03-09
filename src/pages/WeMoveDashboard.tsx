@@ -603,7 +603,7 @@ function RouteCard({ route, units, onCancel }: {
   const [confirming, setConfirming] = useState(false);
 
   const handleConfirmArrival = async () => {
-    if (!user || !confirm(t('dashboard.confirmArrivalPrompt'))) return;
+    if (!user || !confirm(t('dashboard.finalizeConfirm'))) return;
     setConfirming(true);
     const { data, error } = await supabase.rpc('fn_confirm_arrival', {
       p_route_id:       route.id,
