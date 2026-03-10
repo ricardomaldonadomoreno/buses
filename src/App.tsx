@@ -18,6 +18,7 @@ import WeMoveVerifyEmail from "./pages/WeMoveVerifyEmail";
 import WeMoveDashboard from "./pages/WeMoveDashboard";
 import WeMoveCompleteProfile from "./pages/WeMoveCompleteProfile";
 import WeMovePublishRoute from "./pages/WeMovePublishRoute";
+import WeMoveAdmin from "./pages/WeMoveAdmin";
 import Contact from "./pages/Contact";
 import WeMoveCartera from './pages/WeMoveCartera';
 import NotFound from "./pages/NotFound";
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="/wemove/profile" element={<WeMoveCompleteProfile />} />
             <Route path="/wemove/publish-route" element={<WeMovePublishRoute />} />
             <Route path="/wemove/cartera" element={<WeMoveCartera />} />
+            <Route path="/wemove/admin" element={<WeMoveAdmin />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/auth" element={<NotFound />} />
             <Route path="*" element={<NotFound />} />
