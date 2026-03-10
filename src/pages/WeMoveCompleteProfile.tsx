@@ -1,6 +1,7 @@
 // src/pages/WeMoveCompleteProfile.tsx — ARCHIVO COMPLETO
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useWeMoveAuth } from '@/hooks/useWeMoveAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -22,27 +23,14 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const VEHICLE_TYPES  = ['bus','microbus','van','minibus','coaster','sedan','suv','boat','plane'];
-const VEHICLE_LABELS: Record<string,string> = {
-  bus:'Bus', microbus:'Microbus', van:'Van', minibus:'Minibus',
-  coaster:'Coaster', sedan:'Sedan', suv:'SUV', boat:'Lancha/Bote', plane:'Avioneta'
-};
-const VEHICLE_EMOJI: Record<string,string> = {
-  bus:'🚌', microbus:'🚐', van:'🚐', minibus:'🚐',
-  coaster:'🚌', sedan:'🚗', suv:'🚙', boat:'⛵', plane:'✈️'
-};
+const VEHICLE_TYPES = ['bus','microbus','van','minibus','coaster','sedan','suv','boat','plane'];
 
 // ── MIME validation ──────────────────────────────────────────
-const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp'];
-
-function validateImage(file: File, toast: (o: any) => void): boolean {
-  if (!ALLOWED_MIME.includes(file.type)) {
-    toast({ title: 'Solo se permiten imágenes JPG, PNG o WEBP', variant: 'destructive' });
-    return false;
-  }
+const ALLOWED_MIME = ['image/jpeg','image/png','image/webp'];
+function validateImage(file: File, onError: (msg: string) => void): boolean {
+  if (!ALLOWED_MIME.includes(file.type)) { onError('onlyImages'); return false; }
   return true;
 }
-
 function mimeToExt(mime: string) {
   if (mime === 'image/png')  return 'png';
   if (mime === 'image/webp') return 'webp';
@@ -57,10 +45,8 @@ function Accordion({ title, subtitle, icon: Icon, defaultOpen = false, badge, ch
   const [open, setOpen] = useState(defaultOpen);
   return (
     <section className="bg-card rounded-2xl border border-border/60 overflow-hidden">
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="w-full px-5 py-4 flex items-center justify-between hover:bg-muted/20 transition-colors text-left"
-      >
+      <button onClick={() => setOpen(o => !o)}
+        className="w-full px-5 py-4 flex items-center justify-between hover:bg-muted/20 transition-colors text-left">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
             <Icon className="h-3.5 w-3.5 text-primary" />
@@ -102,6 +88,7 @@ function DocUpload({ label, icon: Icon, docKey, userId, currentUrl, onUploaded,
   currentUrl?: string | null; onUploaded: (url: string) => void;
   bucket?: string; pathPrefix?: string;
 }) {
+  const { t }                     = useTranslation();
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview]     = useState<string | null>(currentUrl ?? null);
   const fileRef                   = useRef<HTMLInputElement>(null);
@@ -109,9 +96,9 @@ function DocUpload({ label, icon: Icon, docKey, userId, currentUrl, onUploaded,
   const { toast }                 = useToast();
 
   const handleFile = async (file: File) => {
-    if (!validateImage(file, toast)) return;
+    if (!validateImage(file, (k) => toast({ title: t(`wemoveProfile.${k}`), variant: 'destructive' }))) return;
     if (file.size > 10 * 1024 * 1024) {
-      toast({ title: 'Máximo 10MB', variant: 'destructive' }); return;
+      toast({ title: t('wemoveProfile.maxDoc'), variant: 'destructive' }); return;
     }
     setUploading(true);
     try {
@@ -126,9 +113,9 @@ function DocUpload({ label, icon: Icon, docKey, userId, currentUrl, onUploaded,
       }
       setPreview(URL.createObjectURL(file));
       onUploaded(publicUrl);
-      toast({ title: '✓ Foto subida correctamente' });
+      toast({ title: t('wemoveProfile.uploadedOk') });
     } catch (err: any) {
-      toast({ title: 'Error al subir', description: err.message, variant: 'destructive' });
+      toast({ title: t('wemoveProfile.errorUpload'), description: err.message, variant: 'destructive' });
     } finally {
       setUploading(false);
     }
@@ -148,41 +135,41 @@ function DocUpload({ label, icon: Icon, docKey, userId, currentUrl, onUploaded,
         {uploading ? (
           <div className="flex flex-col items-center gap-2 py-2">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            <p className="text-xs text-muted-foreground">Subiendo…</p>
+            <p className="text-xs text-muted-foreground">{t('common.loading')}</p>
           </div>
         ) : preview ? (
           <div className="space-y-2">
             <div className="flex items-center gap-3">
               <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />
-              <p className="text-xs font-medium text-green-700 flex-1 text-left">Archivo subido</p>
+              <p className="text-xs font-medium text-green-700 flex-1 text-left">{t('wemoveProfile.fileUploaded')}</p>
               <a href={preview} target="_blank" rel="noopener noreferrer"
                 className="text-xs text-primary underline flex items-center gap-1">
-                <Eye className="h-3 w-3" /> Ver
+                <Eye className="h-3 w-3" /> {t('wemoveProfile.viewFile')}
               </a>
             </div>
             <div className="flex gap-2 justify-center">
               <button type="button" onClick={() => fileRef.current?.click()}
                 className="flex items-center gap-1 px-3 py-1.5 border border-border rounded-lg text-xs text-muted-foreground hover:bg-muted transition-colors">
-                <Upload className="h-3 w-3" /> Galería
+                <Upload className="h-3 w-3" /> {t('wemoveProfile.gallery')}
               </button>
               <button type="button" onClick={() => camRef.current?.click()}
                 className="flex items-center gap-1 px-3 py-1.5 border border-border rounded-lg text-xs text-muted-foreground hover:bg-muted transition-colors">
-                <Camera className="h-3 w-3" /> Cámara
+                <Camera className="h-3 w-3" /> {t('wemoveProfile.camera')}
               </button>
             </div>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-3 py-2">
             <Upload className="h-6 w-6 text-muted-foreground/40" />
-            <p className="text-xs text-muted-foreground">Solo imágenes JPG · PNG · WEBP · máx. 10MB</p>
+            <p className="text-xs text-muted-foreground">{t('wemoveProfile.uploadHint')}</p>
             <div className="flex gap-2">
               <button type="button" onClick={() => fileRef.current?.click()}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-muted border border-border rounded-lg text-xs font-medium hover:bg-muted/80 transition-colors">
-                <Upload className="h-3 w-3" /> Galería
+                <Upload className="h-3 w-3" /> {t('wemoveProfile.gallery')}
               </button>
               <button type="button" onClick={() => camRef.current?.click()}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 border border-primary/30 text-primary rounded-lg text-xs font-medium hover:bg-primary/20 transition-colors">
-                <Camera className="h-3 w-3" /> Cámara
+                <Camera className="h-3 w-3" /> {t('wemoveProfile.camera')}
               </button>
             </div>
           </div>
@@ -198,15 +185,16 @@ function DocUpload({ label, icon: Icon, docKey, userId, currentUrl, onUploaded,
 function AvatarUpload({ userId, currentUrl, displayName, onUploaded }: {
   userId: string; currentUrl?: string | null; displayName: string; onUploaded: (url: string) => void;
 }) {
+  const { t }                     = useTranslation();
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview]     = useState<string | null>(currentUrl ?? null);
   const inputRef                  = useRef<HTMLInputElement>(null);
   const { toast }                 = useToast();
 
   const handleFile = async (file: File) => {
-    if (!validateImage(file, toast)) return;
+    if (!validateImage(file, (k) => toast({ title: t(`wemoveProfile.${k}`), variant: 'destructive' }))) return;
     if (file.size > 5 * 1024 * 1024) {
-      toast({ title: 'Máximo 5MB para foto de perfil', variant: 'destructive' }); return;
+      toast({ title: t('wemoveProfile.maxPhoto'), variant: 'destructive' }); return;
     }
     setUploading(true);
     try {
@@ -216,15 +204,12 @@ function AvatarUpload({ userId, currentUrl, displayName, onUploaded }: {
         .from('transporter-docs').upload(path, file, { upsert: true, contentType: file.type });
       if (upErr) throw upErr;
       const { data: { publicUrl } } = supabase.storage.from('transporter-docs').getPublicUrl(path);
-      // FIX RLS: actualizar en wemove_transporters (el usuario tiene RLS write aquí)
-      // Si la tabla tiene columna avatar_url, úsala; si no, la ignoramos silenciosamente
-      await supabase.from('wemove_transporters')
-        .update({ avatar_url: publicUrl }).eq('user_id', userId);
+      await supabase.from('wemove_transporters').update({ avatar_url: publicUrl }).eq('user_id', userId);
       setPreview(URL.createObjectURL(file));
       onUploaded(publicUrl);
-      toast({ title: '✓ Foto de perfil actualizada' });
+      toast({ title: t('wemoveProfile.avatarUpdated') });
     } catch (err: any) {
-      toast({ title: 'Error al subir foto', description: err.message, variant: 'destructive' });
+      toast({ title: t('wemoveProfile.errorUploadPhoto'), description: err.message, variant: 'destructive' });
     } finally {
       setUploading(false);
     }
@@ -252,7 +237,7 @@ function AvatarUpload({ userId, currentUrl, displayName, onUploaded }: {
           <Camera className="h-5 w-5 text-white" />
         </div>
       </div>
-      <p className="text-xs text-muted-foreground">Toca para cambiar foto</p>
+      <p className="text-xs text-muted-foreground">{t('wemoveProfile.changePhoto')}</p>
       <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
         onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ''; }} />
     </div>
@@ -261,18 +246,14 @@ function AvatarUpload({ userId, currentUrl, displayName, onUploaded }: {
 
 // ── Cómo funciona ────────────────────────────────────────────
 function HowItWorksContent() {
+  const { t } = useTranslation();
   const steps = [
-    { icon: Plus,        color: 'bg-green-100 text-green-700',   title: 'Crea y comparte tu viaje',  desc: 'Publica tu ruta con "Nuevo viaje". Usa el botón Compartir para difundirla en tus redes y llenar tus asientos más rápido.' },
-    { icon: MapPin,      color: 'bg-blue-100 text-blue-700',     title: 'Gestiona tus pasajeros',    desc: 'Desde tu panel verás quién reservó. Márcalos como pagados cuando recibas el dinero. Al partir, la ruta pasa a "En camino".' },
-    { icon: CheckCircle, color: 'bg-primary/10 text-primary',    title: 'Finaliza y recibe reseñas', desc: 'Al llegar, presiona "Finalizar viaje". Esto cierra la ruta y activa el enlace para que los pasajeros te califiquen.' },
-    { icon: Star,        color: 'bg-yellow-100 text-yellow-700', title: 'Construye tu reputación',   desc: 'Cada viaje completado suma a tu historial. Más reseñas positivas = más pasajeros. El perfil verificado genera confianza.' },
+    { icon: Plus,        color: 'bg-green-100 text-green-700',   titleKey: 'step1Title', descKey: 'step1Desc' },
+    { icon: MapPin,      color: 'bg-blue-100 text-blue-700',     titleKey: 'step2Title', descKey: 'step2Desc' },
+    { icon: CheckCircle, color: 'bg-primary/10 text-primary',    titleKey: 'step3Title', descKey: 'step3Desc' },
+    { icon: Star,        color: 'bg-yellow-100 text-yellow-700', titleKey: 'step4Title', descKey: 'step4Desc' },
   ];
-  const warnings = [
-    'Tu nombre, número, correo y cédula quedan registrados para prevenir estafas y situaciones peligrosas.',
-    'Más de 2 cancelaciones injustificadas pueden resultar en bloqueo. Contacta soporte si tienes una emergencia.',
-    'Respeta a tus pasajeros y cumple los horarios publicados. Tu reputación depende de ello.',
-    'No publiques rutas que no puedas cumplir. Los pasajeros confían en ti.',
-  ];
+  const warnKeys = ['warn1','warn2','warn3','warn4'];
   return (
     <div className="p-5 space-y-5">
       <div className="space-y-3">
@@ -282,8 +263,8 @@ function HowItWorksContent() {
               <s.icon className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-sm font-semibold">{s.title}</p>
-              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{s.desc}</p>
+              <p className="text-sm font-semibold">{t(`wemoveProfile.${s.titleKey}`)}</p>
+              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{t(`wemoveProfile.${s.descKey}`)}</p>
             </div>
           </div>
         ))}
@@ -291,12 +272,12 @@ function HowItWorksContent() {
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2">
         <div className="flex items-center gap-2">
           <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
-          <p className="text-xs font-bold text-amber-800 uppercase tracking-wide">Cuida tu cuenta</p>
+          <p className="text-xs font-bold text-amber-800 uppercase tracking-wide">{t('wemoveProfile.careAccount')}</p>
         </div>
         <ul className="space-y-1.5">
-          {warnings.map((w, i) => (
-            <li key={i} className="text-xs text-amber-800 flex gap-2">
-              <span className="shrink-0 mt-0.5">·</span><span>{w}</span>
+          {warnKeys.map(k => (
+            <li key={k} className="text-xs text-amber-800 flex gap-2">
+              <span className="shrink-0 mt-0.5">·</span><span>{t(`wemoveProfile.${k}`)}</span>
             </li>
           ))}
         </ul>
@@ -307,6 +288,7 @@ function HowItWorksContent() {
 
 // ── Main ─────────────────────────────────────────────────────
 export default function WeMoveCompleteProfile() {
+  const { t }      = useTranslation();
   const navigate   = useNavigate();
   const { toast }  = useToast();
   const { user, loading, signOut } = useWeMoveAuth();
@@ -355,9 +337,9 @@ export default function WeMoveCompleteProfile() {
     setSaving(true);
     try {
       await updateProfile.mutateAsync({ userId: user.id, fullName: fullName.trim() });
-      toast({ title: '✓ Perfil actualizado' });
+      toast({ title: t('wemoveProfile.profileSaved') });
     } catch {
-      toast({ title: 'Error al guardar perfil', variant: 'destructive' });
+      toast({ title: t('wemoveProfile.errorSavingProfile'), variant: 'destructive' });
     } finally { setSaving(false); }
   };
 
@@ -378,7 +360,7 @@ export default function WeMoveCompleteProfile() {
   const handleUnitSubmit = async () => {
     if (!user || !unitType || !unitCapacity) return;
     const cap = parseInt(unitCapacity);
-    if (isNaN(cap) || cap < 1) { toast({ title: 'Capacidad inválida', variant: 'destructive' }); return; }
+    if (isNaN(cap) || cap < 1) { toast({ title: t('wemoveProfile.invalidCapacity'), variant: 'destructive' }); return; }
     setSavingUnit(true);
     try {
       await upsertUnit.mutateAsync({
@@ -388,23 +370,23 @@ export default function WeMoveCompleteProfile() {
         brand: unitBrand.trim() || undefined, model: unitModel.trim() || undefined,
         year: unitYear ? parseInt(unitYear) : undefined, photo_url: unitPhotoUrl || undefined,
       });
-      toast({ title: editingUnitId ? '✓ Unidad actualizada' : '✓ Unidad agregada' });
+      toast({ title: editingUnitId ? t('wemoveProfile.unitUpdated') : t('wemoveProfile.unitAdded') });
       resetUnitForm();
-    } catch { toast({ title: 'Error al guardar unidad', variant: 'destructive' }); }
+    } catch { toast({ title: t('wemoveProfile.errorUnit'), variant: 'destructive' }); }
     finally { setSavingUnit(false); }
   };
 
   const handleDeleteUnit = async (unitId: string) => {
-    if (!user || !confirm('¿Eliminar esta unidad?')) return;
+    if (!user || !confirm(t('wemoveProfile.confirmDelete'))) return;
     try {
       await deleteUnit.mutateAsync({ unitId, userId: user.id });
-      toast({ title: 'Unidad eliminada' });
-    } catch { toast({ title: 'Error al eliminar', variant: 'destructive' }); }
+      toast({ title: t('wemoveProfile.unitDeleted') });
+    } catch { toast({ title: t('wemoveProfile.errorDelete'), variant: 'destructive' }); }
   };
 
   const handleSubmitDocs = async () => {
     if (!user) return;
-    if (!docs?.id_card_url) { toast({ title: 'Sube tu carnet antes de enviar', variant: 'destructive' }); return; }
+    if (!docs?.id_card_url) { toast({ title: t('wemoveProfile.mustUploadIdFirst'), variant: 'destructive' }); return; }
     setSubmDocs(true);
     try {
       await supabase.from('wemove_transporters').update({
@@ -412,9 +394,9 @@ export default function WeMoveCompleteProfile() {
       }).eq('user_id', user.id);
       qc.invalidateQueries({ queryKey: ['my-wemove-transporter'] });
       qc.invalidateQueries({ queryKey: ['transporter-docs'] });
-      toast({ title: '✅ Documentos enviados para verificación' });
+      toast({ title: t('wemoveProfile.docsSubmitted') });
     } catch (err: any) {
-      toast({ title: 'Error al enviar', description: err.message, variant: 'destructive' });
+      toast({ title: t('wemoveProfile.errorSubmit'), description: err.message, variant: 'destructive' });
     } finally { setSubmDocs(false); }
   };
 
@@ -429,14 +411,23 @@ export default function WeMoveCompleteProfile() {
   const isSubmitted = docs?.documents_submitted;
   const displayName = fullName || user.email?.split('@')[0] || '';
 
+  // Tipos de vehículo traducidos
+  const vehicleLabel = (type: string) => t(`wemoveProfile.vehicleTypes.${type}`, { defaultValue: type });
+
+  // Badge de verificación (visible en header del acordeón)
   const verBadge = isVerified
-    ? <span className="text-xs text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full flex items-center gap-1"><CheckCircle className="h-3 w-3" />Verificado</span>
+    ? <span className="text-xs text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full flex items-center gap-1"><CheckCircle className="h-3 w-3" />{t('wemoveProfile.badgeVerified')}</span>
     : isSubmitted
-      ? <span className="text-xs text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full flex items-center gap-1"><Clock className="h-3 w-3" />En revisión</span>
-      : <span className="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1"><AlertCircle className="h-3 w-3" />Pendiente</span>;
+      ? <span className="text-xs text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full flex items-center gap-1"><Clock className="h-3 w-3" />{t('wemoveProfile.badgeUnderReview')}</span>
+      : <span className="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1"><AlertCircle className="h-3 w-3" />{t('wemoveProfile.badgePending')}</span>;
+
+  const unitsSubtitle = units.length > 0
+    ? t(units.length === 1 ? 'wemoveProfile.unitsCount' : 'wemoveProfile.unitsCountPlural', { count: units.length })
+    : t('wemoveProfile.noUnitsYet');
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Header */}
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/50">
         <div className="h-px w-full bg-gradient-to-r from-transparent via-primary to-transparent" />
         <div className="container flex h-16 items-center justify-between">
@@ -450,7 +441,7 @@ export default function WeMoveCompleteProfile() {
             <button onClick={async () => { await signOut(); navigate('/wemove'); }}
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-2">
               <ArrowLeft className="h-4 w-4" />
-              <span className="hidden sm:inline">Volver</span>
+              <span className="hidden sm:inline">{t('wemoveProfile.back')}</span>
             </button>
           </div>
         </div>
@@ -458,69 +449,69 @@ export default function WeMoveCompleteProfile() {
 
       <main className="flex-1 container py-8 max-w-2xl space-y-4">
         <div>
-          <h1 className="font-serif text-2xl font-semibold">Mi perfil WeMove</h1>
-          <p className="text-sm text-muted-foreground mt-1">Gestiona tu información y unidades de transporte</p>
+          <h1 className="font-serif text-2xl font-semibold">{t('wemoveProfile.title')}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t('wemoveProfile.subtitle')}</p>
         </div>
 
-        {/* Información personal — abierta por defecto */}
-        <Accordion title="Información personal" icon={FileText} defaultOpen>
+        {/* ── Información personal ── */}
+        <Accordion title={t('wemoveProfile.personalInfo')} icon={FileText} defaultOpen>
           <div className="p-5 space-y-4">
             <div className="flex justify-center pb-2">
               <AvatarUpload userId={user.id} currentUrl={avatarUrl} displayName={displayName}
                 onUploaded={url => { setAvatarUrl(url); qc.invalidateQueries({ queryKey: ['my-profile', user.id] }); }} />
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">Correo electrónico</Label>
+              <Label className="text-xs text-muted-foreground">{t('wemoveProfile.email')}</Label>
               <Input value={user.email ?? ''} disabled className="mt-1.5 rounded-xl border-border/40 bg-muted/30 text-muted-foreground" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs text-muted-foreground">Nombre</Label>
+                <Label className="text-xs text-muted-foreground">{t('wemoveProfile.firstName')}</Label>
                 <Input value={userData?.first_name ?? ''} disabled className="mt-1.5 rounded-xl border-border/40 bg-muted/30 text-muted-foreground text-sm" placeholder="—" />
               </div>
               <div>
-                <Label className="text-xs text-muted-foreground">Apellido</Label>
+                <Label className="text-xs text-muted-foreground">{t('wemoveProfile.lastName')}</Label>
                 <Input value={userData?.last_name ?? ''} disabled className="mt-1.5 rounded-xl border-border/40 bg-muted/30 text-muted-foreground text-sm" placeholder="—" />
               </div>
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">Documento</Label>
+              <Label className="text-xs text-muted-foreground">{t('wemoveProfile.document')}</Label>
               <Input value={userData?.document_number ?? ''} disabled className="mt-1.5 rounded-xl border-border/40 bg-muted/30 text-muted-foreground text-sm" placeholder="—" />
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">Teléfono</Label>
+              <Label className="text-xs text-muted-foreground">{t('wemoveProfile.phone')}</Label>
               <Input value={userData?.phone_full ?? ''} disabled className="mt-1.5 rounded-xl border-border/40 bg-muted/30 text-muted-foreground text-sm" placeholder="—" />
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">Nombre visible para pasajeros</Label>
+              <Label className="text-xs text-muted-foreground">{t('wemoveProfile.displayName')}</Label>
               <div className="flex gap-2 mt-1.5">
                 <Input value={fullName} onChange={e => setFullName(e.target.value)}
-                  placeholder="Como quieres que te vean los pasajeros"
+                  placeholder={t('wemoveProfile.displayNamePlaceholder')}
                   className="rounded-xl border-border/60 flex-1" />
                 <button onClick={handleSaveProfile} disabled={savingProfile}
                   className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 disabled:opacity-60 shrink-0">
-                  {savingProfile ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Guardar'}
+                  {savingProfile ? <Loader2 className="h-4 w-4 animate-spin" /> : t('wemoveProfile.save')}
                 </button>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Este nombre verán los pasajeros al buscar tu ruta</p>
+              <p className="text-xs text-muted-foreground mt-1">{t('wemoveProfile.displayNameHint')}</p>
             </div>
           </div>
         </Accordion>
 
-        {/* Documentos — cerrado, badge de estado visible */}
-        <Accordion title="Documentos de verificación" subtitle="Requeridos para operar" icon={Shield} badge={verBadge}>
+        {/* ── Documentos ── */}
+        <Accordion title={t('wemoveProfile.docs')} subtitle={t('wemoveProfile.docsSubtitle')} icon={Shield} badge={verBadge}>
           <div className="p-5 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <DocUpload label="Carnet de identidad *" icon={FileText} docKey="id_card"
+              <DocUpload label={t('wemoveProfile.idCard')} icon={FileText} docKey="id_card"
                 userId={user.id} currentUrl={docs?.id_card_url}
                 onUploaded={() => qc.invalidateQueries({ queryKey: ['transporter-docs'] })} />
-              <DocUpload label="Licencia de conducir" icon={Car} docKey="license"
+              <DocUpload label={t('wemoveProfile.driverLicense')} icon={Car} docKey="license"
                 userId={user.id} currentUrl={docs?.license_url}
                 onUploaded={() => qc.invalidateQueries({ queryKey: ['transporter-docs'] })} />
-              <DocUpload label="Selfie sosteniendo tu carnet" icon={Camera} docKey="selfie"
+              <DocUpload label={t('wemoveProfile.selfieCard')} icon={Camera} docKey="selfie"
                 userId={user.id} currentUrl={docs?.selfie_url}
                 onUploaded={() => qc.invalidateQueries({ queryKey: ['transporter-docs'] })} />
-              <DocUpload label="Foto del vehículo (exterior)" icon={Car} docKey="vehicle_photo"
+              <DocUpload label={t('wemoveProfile.vehiclePhotoDoc')} icon={Car} docKey="vehicle_photo"
                 userId={user.id} currentUrl={docs?.vehicle_photo_url}
                 onUploaded={() => qc.invalidateQueries({ queryKey: ['transporter-docs'] })} />
             </div>
@@ -528,31 +519,28 @@ export default function WeMoveCompleteProfile() {
               <button onClick={handleSubmitDocs} disabled={submittingDocs || !docs?.id_card_url}
                 className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2 mt-2">
                 {submittingDocs
-                  ? <><Loader2 className="h-4 w-4 animate-spin" />Enviando…</>
-                  : <><Shield className="h-4 w-4" />Enviar documentos para verificación</>}
+                  ? <><Loader2 className="h-4 w-4 animate-spin" />{t('wemoveProfile.sending')}</>
+                  : <><Shield className="h-4 w-4" />{t('wemoveProfile.submitDocs')}</>}
               </button>
             )}
             {isSubmitted && !isVerified && (
               <p className="text-xs text-blue-600 text-center flex items-center justify-center gap-1">
-                <Clock className="h-3 w-3" /> Enviado el {docs.submitted_at
-                  ? new Date(docs.submitted_at).toLocaleDateString('es-BO') : '—'} · En revisión
+                <Clock className="h-3 w-3" />
+                {t('wemoveProfile.submittedOn', {
+                  date: docs.submitted_at ? new Date(docs.submitted_at).toLocaleDateString() : '—'
+                })}
               </p>
             )}
           </div>
         </Accordion>
 
-        {/* Unidades — abierta si no tiene ninguna */}
-        <Accordion
-          title="Mis unidades de transporte"
-          subtitle={units.length > 0 ? `${units.length} registrada${units.length !== 1 ? 's' : ''}` : 'Sin unidades aún'}
-          icon={Bus}
-          defaultOpen={units.length === 0}
-        >
+        {/* ── Unidades ── */}
+        <Accordion title={t('wemoveProfile.myUnits')} subtitle={unitsSubtitle} icon={Bus} defaultOpen={units.length === 0}>
           <div className="p-5 space-y-3">
             <div className="flex justify-end">
               <button onClick={() => { resetUnitForm(); setShowUnit(true); }}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors">
-                <Plus className="h-3.5 w-3.5" /> Agregar unidad
+                <Plus className="h-3.5 w-3.5" /> {t('wemoveProfile.addUnit')}
               </button>
             </div>
 
@@ -561,7 +549,7 @@ export default function WeMoveCompleteProfile() {
             ) : units.length === 0 && !showUnitForm ? (
               <div className="text-center py-6">
                 <Bus className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">Sin unidades registradas</p>
+                <p className="text-sm text-muted-foreground">{t('wemoveProfile.noUnitsRegistered')}</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -571,13 +559,13 @@ export default function WeMoveCompleteProfile() {
                       <div className="flex items-center gap-3">
                         {unit.photo_url
                           ? <img src={unit.photo_url} alt={unit.type} className="w-12 h-12 rounded-lg object-cover border border-border/40" />
-                          : <span className="text-2xl">{VEHICLE_EMOJI[unit.type] ?? '🚐'}</span>
+                          : <span className="text-2xl">{{ bus:'🚌', microbus:'🚐', van:'🚐', minibus:'🚐', coaster:'🚌', sedan:'🚗', suv:'🚙', boat:'⛵', plane:'✈️' }[unit.type] ?? '🚐'}</span>
                         }
                         <div>
-                          <p className="text-sm font-semibold capitalize">{VEHICLE_LABELS[unit.type] ?? unit.type}</p>
+                          <p className="text-sm font-semibold">{vehicleLabel(unit.type)}</p>
                           <p className="text-xs text-muted-foreground">
                             {[unit.brand, unit.model, unit.year].filter(Boolean).join(' ')}
-                            {unit.capacity ? ` · ${unit.capacity} asientos` : ''}
+                            {unit.capacity ? ` · ${unit.capacity} ${t('wemoveProfile.capacity').toLowerCase()}` : ''}
                             {unit.plate ? ` · ${unit.plate}` : ''}
                             {unit.color ? ` · ${unit.color}` : ''}
                           </p>
@@ -585,8 +573,8 @@ export default function WeMoveCompleteProfile() {
                       </div>
                       <div className="flex items-center gap-2">
                         {unit.verified
-                          ? <span className="text-xs text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full flex items-center gap-1"><CheckCircle className="h-3 w-3" />Verificado</span>
-                          : <span className="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1"><Clock className="h-3 w-3" />Pendiente</span>
+                          ? <span className="text-xs text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full flex items-center gap-1"><CheckCircle className="h-3 w-3" />{t('wemoveProfile.verified')}</span>
+                          : <span className="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1"><Clock className="h-3 w-3" />{t('wemoveProfile.pendingVerification')}</span>
                         }
                         <button onClick={() => handleEditUnit(unit)}
                           className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors">
@@ -602,7 +590,7 @@ export default function WeMoveCompleteProfile() {
                       <button onClick={() => setEditorUnit({ id: unit.id, type: unit.type, capacity: unit.capacity, layout: unit.seat_layout ?? null })}
                         className="flex items-center gap-2 text-xs font-semibold text-primary hover:text-primary/80 transition-colors">
                         <Layout className="h-3.5 w-3.5" />
-                        {unit.seat_layout ? '✓ Plantilla guardada — clic para editar' : 'Diseñar plantilla de asientos'}
+                        {unit.seat_layout ? t('wemoveProfile.seatLayoutSaved') : t('wemoveProfile.seatLayout')}
                       </button>
                     </div>
                   </div>
@@ -613,61 +601,61 @@ export default function WeMoveCompleteProfile() {
             {showUnitForm && (
               <div className="border border-primary/20 bg-primary/5 rounded-xl p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold">{editingUnitId ? 'Editar unidad' : 'Nueva unidad'}</p>
+                  <p className="text-sm font-semibold">{editingUnitId ? t('wemoveProfile.editUnitLabel') : t('wemoveProfile.newUnit')}</p>
                   <button onClick={resetUnitForm} className="w-7 h-7 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80">
                     <X className="h-3.5 w-3.5" />
                   </button>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-xs text-muted-foreground">Tipo de vehículo</Label>
+                    <Label className="text-xs text-muted-foreground">{t('wemoveProfile.vehicleType')}</Label>
                     <Select value={unitType} onValueChange={setUnitType}>
                       <SelectTrigger className="mt-1.5 rounded-xl border-border/60">
-                        <SelectValue placeholder="Selecciona" />
+                        <SelectValue placeholder={t('wemoveProfile.selectVehicle')} />
                       </SelectTrigger>
                       <SelectContent>
-                        {VEHICLE_TYPES.map(t => <SelectItem key={t} value={t}>{VEHICLE_LABELS[t] ?? t}</SelectItem>)}
+                        {VEHICLE_TYPES.map(vt => <SelectItem key={vt} value={vt}>{vehicleLabel(vt)}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Capacidad (asientos)</Label>
+                    <Label className="text-xs text-muted-foreground">{t('wemoveProfile.capacity')}</Label>
                     <Input type="number" min="1" max="60" value={unitCapacity}
                       onChange={e => setUnitCapacity(e.target.value)} placeholder="Ej: 15"
                       className="mt-1.5 rounded-xl border-border/60" />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Marca</Label>
-                    <Input value={unitBrand} onChange={e => setUnitBrand(e.target.value)} placeholder="Ej: Toyota" className="mt-1.5 rounded-xl border-border/60" />
+                    <Label className="text-xs text-muted-foreground">{t('wemoveProfile.brand')}</Label>
+                    <Input value={unitBrand} onChange={e => setUnitBrand(e.target.value)} placeholder="Toyota" className="mt-1.5 rounded-xl border-border/60" />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Modelo</Label>
-                    <Input value={unitModel} onChange={e => setUnitModel(e.target.value)} placeholder="Ej: Hiace" className="mt-1.5 rounded-xl border-border/60" />
+                    <Label className="text-xs text-muted-foreground">{t('wemoveProfile.model')}</Label>
+                    <Input value={unitModel} onChange={e => setUnitModel(e.target.value)} placeholder="Hiace" className="mt-1.5 rounded-xl border-border/60" />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Año</Label>
+                    <Label className="text-xs text-muted-foreground">{t('wemoveProfile.year')}</Label>
                     <Input type="number" min="1990" max="2030" value={unitYear}
-                      onChange={e => setUnitYear(e.target.value)} placeholder="Ej: 2022"
+                      onChange={e => setUnitYear(e.target.value)} placeholder="2022"
                       className="mt-1.5 rounded-xl border-border/60" />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Placa</Label>
-                    <Input value={unitPlate} onChange={e => setUnitPlate(e.target.value)} placeholder="Ej: 1234-ABC" className="mt-1.5 rounded-xl border-border/60" />
+                    <Label className="text-xs text-muted-foreground">{t('wemoveProfile.plate')}</Label>
+                    <Input value={unitPlate} onChange={e => setUnitPlate(e.target.value)} placeholder="1234-ABC" className="mt-1.5 rounded-xl border-border/60" />
                   </div>
                   <div className="col-span-2">
-                    <Label className="text-xs text-muted-foreground">Color</Label>
-                    <Input value={unitColor} onChange={e => setUnitColor(e.target.value)} placeholder="Ej: Blanco, Azul marino" className="mt-1.5 rounded-xl border-border/60" />
+                    <Label className="text-xs text-muted-foreground">{t('wemoveProfile.color')}</Label>
+                    <Input value={unitColor} onChange={e => setUnitColor(e.target.value)} placeholder="Blanco" className="mt-1.5 rounded-xl border-border/60" />
                   </div>
                 </div>
-                <DocUpload label="Foto del vehículo (se mostrará a los pasajeros)" icon={Camera}
+                <DocUpload label={t('wemoveProfile.vehiclePhotoUnit')} icon={Camera}
                   docKey={`unit_${editingUnitId ?? 'new'}_photo`} userId={user.id}
                   bucket="transporter-docs" pathPrefix={`${user.id}/units`}
                   currentUrl={unitPhotoUrl || null} onUploaded={url => setUnitPhotoUrl(url)} />
                 <button onClick={handleUnitSubmit} disabled={savingUnit || !unitType || !unitCapacity}
                   className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2">
                   {savingUnit
-                    ? <><Loader2 className="h-4 w-4 animate-spin" />Guardando…</>
-                    : editingUnitId ? 'Actualizar unidad' : 'Agregar unidad'
+                    ? <><Loader2 className="h-4 w-4 animate-spin" />{t('wemoveProfile.saving')}</>
+                    : editingUnitId ? t('wemoveProfile.updateUnit') : t('wemoveProfile.addUnitBtn')
                   }
                 </button>
               </div>
@@ -675,8 +663,8 @@ export default function WeMoveCompleteProfile() {
           </div>
         </Accordion>
 
-        {/* Cómo funciona — cerrado por defecto */}
-        <Accordion title="¿Cómo funciona WeMove?" subtitle="Guía rápida para transportadores" icon={Share2}>
+        {/* ── Cómo funciona ── */}
+        <Accordion title={t('wemoveProfile.howItWorks')} subtitle={t('wemoveProfile.howSubtitle')} icon={Share2}>
           <HowItWorksContent />
         </Accordion>
 
@@ -689,7 +677,7 @@ export default function WeMoveCompleteProfile() {
           onSave={() => {
             setEditorUnit(null);
             qc.invalidateQueries({ queryKey: ['my-transport-units', user.id] });
-            toast({ title: '✓ Plantilla de asientos guardada' });
+            toast({ title: t('wemoveProfile.seatLayoutDone') });
           }}
           onClose={() => setEditorUnit(null)}
         />
