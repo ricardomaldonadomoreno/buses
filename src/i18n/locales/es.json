@@ -40,18 +40,9 @@
     "destination": "Destino",
     "results": "Resultados",
     "noResultsYet": "Busca viajes disponibles",
-    "packService": {
-      "title": "PackService",
-      "subtitle": "Transporte de Paquetes"
-    },
-    "advertising": {
-      "title": "Publica Tu Empresa Aquí",
-      "subtitle": "Buses.App"
-    },
-    "notifications": {
-      "title": "Notificaciones",
-      "empty": "No hay notificaciones"
-    },
+    "packService": { "title": "PackService", "subtitle": "Transporte de Paquetes" },
+    "advertising": { "title": "Publica Tu Empresa Aquí", "subtitle": "Buses.App" },
+    "notifications": { "title": "Notificaciones", "empty": "No hay notificaciones" },
     "hero": {
       "title": "Envíos seguros entre ciudades",
       "subtitle": "La plataforma que conecta remitentes con transportistas verificados.",
@@ -60,56 +51,23 @@
     },
     "howItWorks": {
       "title": "¿Cómo funciona?",
-      "step1": {
-        "title": "1. Publica o busca un viaje",
-        "description": "Los transportistas publican sus rutas. Los remitentes encuentran el viaje ideal."
-      },
-      "step2": {
-        "title": "2. Verificación del paquete",
-        "description": "El transportista verifica el paquete en una dirección certificada con fotos y reporte."
-      },
-      "step3": {
-        "title": "3. Depósito en garantía",
-        "description": "El receptor deposita los fondos. El dinero se libera solo tras la entrega confirmada."
-      },
-      "step4": {
-        "title": "4. Entrega segura",
-        "description": "El receptor confirma la entrega. Fondos liberados automáticamente."
-      }
+      "step1": { "title": "1. Publica o busca un viaje", "description": "Los transportistas publican sus rutas. Los remitentes encuentran el viaje ideal." },
+      "step2": { "title": "2. Verificación del paquete", "description": "El transportista verifica el paquete en una dirección certificada con fotos y reporte." },
+      "step3": { "title": "3. Depósito en garantía", "description": "El receptor deposita los fondos. El dinero se libera solo tras la entrega confirmada." },
+      "step4": { "title": "4. Entrega segura", "description": "El receptor confirma la entrega. Fondos liberados automáticamente." }
     },
     "features": {
       "title": "Características principales",
-      "escrow": {
-        "title": "Escrow seguro",
-        "description": "Fondos protegidos hasta confirmar la entrega"
-      },
-      "verification": {
-        "title": "Verificación obligatoria",
-        "description": "Cada paquete se verifica antes del transporte"
-      },
-      "tracking": {
-        "title": "Seguimiento completo",
-        "description": "Estado de la transacción en tiempo real"
-      },
-      "disputes": {
-        "title": "Resolución de disputas",
-        "description": "Sistema justo para resolver conflictos"
-      }
+      "escrow": { "title": "Escrow seguro", "description": "Fondos protegidos hasta confirmar la entrega" },
+      "verification": { "title": "Verificación obligatoria", "description": "Cada paquete se verifica antes del transporte" },
+      "tracking": { "title": "Seguimiento completo", "description": "Estado de la transacción en tiempo real" },
+      "disputes": { "title": "Resolución de disputas", "description": "Sistema justo para resolver conflictos" }
     },
     "roles": {
       "title": "Para todos los participantes",
-      "sender": {
-        "title": "Remitentes",
-        "description": "Envía paquetes de forma segura con garantía de pago"
-      },
-      "transporter": {
-        "title": "Transportistas",
-        "description": "Monetiza tus viajes transportando paquetes verificados"
-      },
-      "receiver": {
-        "title": "Receptores",
-        "description": "Recibe tus paquetes con protección de compra"
-      }
+      "sender": { "title": "Remitentes", "description": "Envía paquetes de forma segura con garantía de pago" },
+      "transporter": { "title": "Transportistas", "description": "Monetiza tus viajes transportando paquetes verificados" },
+      "receiver": { "title": "Receptores", "description": "Recibe tus paquetes con protección de compra" }
     }
   },
   "weMove": {
@@ -126,55 +84,27 @@
     "availableSeats": "asientos disponibles",
     "hero": {
       "tag": "Flota Comunitaria By Buses",
-      "from": "Desde",
-      "to": "Hasta",
-      "when": "Cuándo",
-      "selectOrigin": "Ciudad de origen...",
-      "selectDestination": "Ciudad de destino...",
-      "anyDay": "Cualquier día",
-      "searchLabel": "Busca tu transporte",
-      "trust1": "Identidad verificada",
-      "trust2": "Sistema de reputación",
-      "trust3": "Flota comunitaria",
+      "from": "Desde", "to": "Hasta", "when": "Cuándo",
+      "selectOrigin": "Ciudad de origen...", "selectDestination": "Ciudad de destino...",
+      "anyDay": "Cualquier día", "searchLabel": "Busca tu transporte",
+      "trust1": "Identidad verificada", "trust2": "Sistema de reputación", "trust3": "Flota comunitaria",
       "transporterCta": "¿Tienes algo que se mueve? Únete y publica viajes hoy",
       "registerFree": "Regístrate Gratis",
-      "statPassengers": "Pasajeros activos",
-      "statRoutes": "Rutas disponibles",
-      "statSatisfaction": "Satisfacción",
-      "statSupport": "Disponibilidad",
+      "statPassengers": "Pasajeros activos", "statRoutes": "Rutas disponibles",
+      "statSatisfaction": "Satisfacción", "statSupport": "Disponibilidad",
       "quote": "No definimos cómo transportas — solo conectamos"
     },
     "how": {
-      "eyebrow": "¿Cómo funciona?",
-      "title": "Tu viaje en 4 pasos",
-      "s1": {
-        "title": "Busca tu ruta",
-        "desc": "Ingresa origen, destino y fecha para ver los transportes disponibles."
-      },
-      "s2": {
-        "title": "Elige tu unidad",
-        "desc": "Ve el tipo de vehículo, horario, asientos disponibles y precio por asiento."
-      },
-      "s3": {
-        "title": "Reserva tu asiento",
-        "desc": "Elige tu asiento, paga en la plataforma y recibe tu confirmación al instante."
-      },
-      "s4": {
-        "title": "Viaja y califica",
-        "desc": "Viaja con confianza y deja tu calificación para construir la comunidad."
-      }
+      "eyebrow": "¿Cómo funciona?", "title": "Tu viaje en 4 pasos",
+      "s1": { "title": "Busca tu ruta", "desc": "Ingresa origen, destino y fecha para ver los transportes disponibles." },
+      "s2": { "title": "Elige tu unidad", "desc": "Ve el tipo de vehículo, horario, asientos disponibles y precio por asiento." },
+      "s3": { "title": "Reserva tu asiento", "desc": "Elige tu asiento, paga en la plataforma y recibe tu confirmación al instante." },
+      "s4": { "title": "Viaja y califica", "desc": "Viaja con confianza y deja tu calificación para construir la comunidad." }
     },
-    "trust": {
-      "id": "Identidad verificada",
-      "rep": "Reputación digital",
-      "safe": "Seguridad básica",
-      "trace": "Trazabilidad del viaje"
-    },
+    "trust": { "id": "Identidad verificada", "rep": "Reputación digital", "safe": "Seguridad básica", "trace": "Trazabilidad del viaje" },
     "cta": {
       "eyebrow": "Para transportadores",
-      "titleLine1": "Transporta, GANA",
-      "titleLine2": "y crece sin ser",
-      "titleAccent": "una empresa",
+      "titleLine1": "Transporta, GANA", "titleLine2": "y crece sin ser", "titleAccent": "una empresa",
       "title": "Sé parte de la Flota Comunitaria",
       "desc": "WeMove es la plataforma para personas reales que quieren transportar personas. Sin intermediarios, con identidad verificada y reputación digital.",
       "btn": "Únete gratis",
@@ -185,91 +115,39 @@
     },
     "whyWeMove": {
       "title": "¿Por qué WeMove?",
-      "realCommunity": {
-        "title": "Comunidad real",
-        "description": "Personas reales conectando con personas reales"
-      },
-      "verifiedPeople": {
-        "title": "Personas verificadas",
-        "description": "Identidad verificada para tu seguridad"
-      },
-      "visibleReputation": {
-        "title": "Reputación visible",
-        "description": "Sistema de calificación transparente"
-      },
-      "noBusiness": {
-        "title": "No empresas, personas",
-        "description": "Economía colaborativa persona a persona"
-      }
+      "realCommunity": { "title": "Comunidad real", "description": "Personas reales conectando con personas reales" },
+      "verifiedPeople": { "title": "Personas verificadas", "description": "Identidad verificada para tu seguridad" },
+      "visibleReputation": { "title": "Reputación visible", "description": "Sistema de calificación transparente" },
+      "noBusiness": { "title": "No empresas, personas", "description": "Economía colaborativa persona a persona" }
     },
     "results": {
-      "today": "Hoy",
-      "tomorrow": "Mañana",
-      "verified": "Verificado",
-      "unknown": "Transportador",
-      "perSeat": "por asiento",
-      "reserve": "Reservar",
-      "noSeats": "Sin asientos",
-      "almostFull": "¡Últimos {{seats}} asientos!",
-      "full": "Unidad llena",
+      "today": "Hoy", "tomorrow": "Mañana", "verified": "Verificado", "unknown": "Transportador",
+      "perSeat": "por asiento", "reserve": "Reservar", "noSeats": "Sin asientos",
+      "almostFull": "¡Últimos {{seats}} asientos!", "full": "Unidad llena",
       "tryOtherDate": "Prueba otra fecha o revisa otros destinos disponibles.",
-      "tripFound": "viaje encontrado",
-      "tripsFound": "viajes encontrados",
-      "trip": "viaje",
-      "trips": "viajes"
+      "tripFound": "viaje encontrado", "tripsFound": "viajes encontrados", "trip": "viaje", "trips": "viajes"
     },
     "fleet": {
-      "eyebrow": "Plataforma global de movilidad",
-      "title": "Si se mueve, conviértelo en",
-      "titleAccent": "NEGOCIO",
+      "eyebrow": "Plataforma global de movilidad", "title": "Si se mueve, conviértelo en", "titleAccent": "NEGOCIO",
       "subtitle": "No definimos cómo transportas — solo conectamos",
-      "car": "Auto",
-      "van": "Van",
-      "bus": "Bus",
-      "motorcycle": "Moto",
-      "boat": "Lancha",
-      "plane": "Avioneta",
-      "helicopter": "Helicóptero",
-      "drone": "Dron",
-      "balloon": "Globo",
-      "rv": "Casa rodante",
-      "truck": "Camión",
-      "anything": "Lo que sea",
-      "tagline": "Si tiene capacidad, tiene pasajeros."
+      "car": "Auto", "van": "Van", "bus": "Bus", "motorcycle": "Moto", "boat": "Lancha", "plane": "Avioneta",
+      "helicopter": "Helicóptero", "drone": "Dron", "balloon": "Globo", "rv": "Casa rodante",
+      "truck": "Camión", "anything": "Lo que sea", "tagline": "Si tiene capacidad, tiene pasajeros."
     }
   },
   "wemoveRegister": {
     "title": "Acceso Transportador WeMove",
     "subtitle": "Forma parte de la Flota Comunitaria",
-    "tabs": {
-      "signup": "Crear cuenta nueva",
-      "login": "Ya tengo cuenta"
-    },
-    "sections": {
-      "credentials": "Credenciales de acceso",
-      "phone": "Número de teléfono",
-      "identity": "Identidad personal"
-    },
+    "tabs": { "signup": "Crear cuenta nueva", "login": "Ya tengo cuenta" },
+    "sections": { "credentials": "Credenciales de acceso", "phone": "Número de teléfono", "identity": "Identidad personal" },
     "fields": {
-      "email": "Correo electrónico",
-      "password": "Contraseña",
-      "confirmPassword": "Confirmar contraseña",
-      "countryCode": "Código",
-      "phoneNumber": "Número de teléfono",
-      "firstName": "Nombre",
-      "lastName": "Apellido",
-      "documentType": "Tipo de documento",
-      "documentNumber": "Número de documento"
+      "email": "Correo electrónico", "password": "Contraseña", "confirmPassword": "Confirmar contraseña",
+      "countryCode": "Código", "phoneNumber": "Número de teléfono",
+      "firstName": "Nombre", "lastName": "Apellido",
+      "documentType": "Tipo de documento", "documentNumber": "Número de documento"
     },
-    "documentTypes": {
-      "idCard": "Cédula de identidad",
-      "driverLicense": "Licencia de conducir",
-      "passport": "Pasaporte"
-    },
-    "buttons": {
-      "createAccount": "Crear cuenta WeMove",
-      "login": "Iniciar sesión"
-    },
+    "documentTypes": { "idCard": "Cédula de identidad", "driverLicense": "Licencia de conducir", "passport": "Pasaporte" },
+    "buttons": { "createAccount": "Crear cuenta WeMove", "login": "Iniciar sesión" },
     "errors": {
       "passwordMismatch": "Las contraseñas no coinciden",
       "passwordTooShort": "La contraseña debe tener al menos 6 caracteres",
@@ -278,17 +156,10 @@
       "loginFailed": "Error al iniciar sesión",
       "notTransporter": "Esta cuenta no está registrada como transportador WeMove"
     },
-    "success": {
-      "accountCreated": "Cuenta creada exitosamente",
-      "checkEmail": "Revisa tu correo para confirmar tu cuenta"
-    }
+    "success": { "accountCreated": "Cuenta creada exitosamente", "checkEmail": "Revisa tu correo para confirmar tu cuenta" }
   },
   "wemoveAuth": {
-    "callback": {
-      "processing": "Verificando tu cuenta...",
-      "success": "Cuenta verificada correctamente",
-      "error": "Error al verificar la cuenta"
-    },
+    "callback": { "processing": "Verificando tu cuenta...", "success": "Cuenta verificada correctamente", "error": "Error al verificar la cuenta" },
     "verifyEmail": {
       "title": "Verifica tu correo",
       "message": "Te hemos enviado un correo de verificación. Haz clic en el enlace para activar tu cuenta.",
@@ -299,93 +170,143 @@
   "weMoveDashboard": {
     "welcome": "Bienvenido a WeMove",
     "verificationStatus": "Estado de verificación",
-    "statusPending": "Pendiente",
-    "statusActive": "Activo",
-    "statusCompleted": "Completado",
-    "statusCancelled": "Cancelado",
+    "statusPending": "Pendiente", "statusActive": "Activo", "statusCompleted": "Completado", "statusCancelled": "Cancelado",
     "verified": "Verificado",
     "infoText": "Completa tu perfil y publica tu primera ruta",
-    "activeRoutes": "Rutas activas",
-    "myUnits": "Mis unidades",
-    "totalTrips": "Viajes totales",
-    "myRoutes": "Mis rutas",
-    "myRoutesDesc": "Rutas que has publicado en WeMove",
+    "activeRoutes": "Rutas activas", "myUnits": "Mis unidades", "totalTrips": "Viajes totales",
+    "myRoutes": "Mis rutas", "myRoutesDesc": "Rutas que has publicado en WeMove",
     "noRoutes": "Aún no has publicado ninguna ruta",
-    "publishFirstRoute": "Publicar primera ruta",
-    "newRoute": "Nueva ruta",
-    "routeCancelled": "Ruta cancelada",
-    "errorCancelRoute": "Error al cancelar la ruta",
+    "publishFirstRoute": "Publicar primera ruta", "newRoute": "Nueva ruta",
+    "routeCancelled": "Ruta cancelada", "errorCancelRoute": "Error al cancelar la ruta",
     "backToDashboard": "Volver al panel",
     "buttons": {
-      "completeProfile": "Mi perfil y unidades",
-      "completeProfileDesc": "Gestiona tu perfil y vehículos",
-      "publishRoute": "Publicar ruta",
-      "publishRouteDesc": "Agrega un nuevo viaje disponible"
+      "completeProfile": "Mi perfil y unidades", "completeProfileDesc": "Gestiona tu perfil y vehículos",
+      "publishRoute": "Publicar ruta", "publishRouteDesc": "Agrega un nuevo viaje disponible"
     },
-    "comingSoon": "Próximamente",
-    "backToWeMove": "Volver a WeMove"
+    "comingSoon": "Próximamente", "backToWeMove": "Volver a WeMove"
   },
   "wemoveProfile": {
     "title": "Mi perfil WeMove",
-    "subtitle": "Gestiona tu información personal y tus unidades de transporte",
+    "subtitle": "Gestiona tu información y unidades de transporte",
+    "back": "Volver",
+
+    "changePhoto": "Toca para cambiar foto",
+    "onlyImages": "Solo se permiten imágenes JPG, PNG o WEBP",
+    "maxPhoto": "Máximo 5MB para foto de perfil",
+    "maxDoc": "Máximo 10MB",
+    "uploadedOk": "✓ Foto subida correctamente",
+    "avatarUpdated": "✓ Foto de perfil actualizada",
+    "errorUpload": "Error al subir",
+    "errorUploadPhoto": "Error al subir foto",
+    "fileUploaded": "Archivo subido",
+    "gallery": "Galería",
+    "camera": "Cámara",
+    "uploadHint": "Solo imágenes JPG · PNG · WEBP · máx. 10MB",
+    "viewFile": "Ver",
+
+    "verifiedTransporter": "Transportador verificado",
+    "verifiedDesc": "Tu identidad ha sido confirmada por el equipo de BUSES.",
+    "docsUnderReview": "Documentos en revisión",
+    "docsUnderReviewDesc": "El equipo de BUSES está revisando tu información.",
+    "verificationPending": "Verificación pendiente",
+    "verificationPendingDesc": "Sube tus documentos para ser verificado y generar confianza en los pasajeros.",
+    "badgeVerified": "Verificado",
+    "badgeUnderReview": "En revisión",
+    "badgePending": "Pendiente",
+
     "personalInfo": "Información personal",
-    "personalInfoDesc": "Datos registrados en la plataforma",
+    "email": "Correo electrónico",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "document": "Documento",
     "phone": "Teléfono",
-    "displayName": "Nombre visible",
-    "displayNamePlaceholder": "Ej: Juan Pérez",
+    "displayName": "Nombre visible para pasajeros",
+    "displayNamePlaceholder": "Como quieres que te vean los pasajeros",
     "displayNameHint": "Este nombre verán los pasajeros al buscar tu ruta",
+    "save": "Guardar",
+    "profileSaved": "✓ Perfil actualizado",
+    "errorSavingProfile": "Error al guardar perfil",
+
+    "docs": "Documentos de verificación",
+    "docsSubtitle": "Requeridos para operar",
+    "idCard": "Carnet de identidad *",
+    "driverLicense": "Licencia de conducir",
+    "selfieCard": "Selfie sosteniendo tu carnet",
+    "vehiclePhotoDoc": "Foto del vehículo (exterior)",
+    "submitDocs": "Enviar documentos para verificación",
+    "sending": "Enviando…",
+    "submittedOn": "Enviado el {{date}} · En revisión",
+    "mustUploadIdFirst": "Sube tu carnet antes de enviar",
+    "docsSubmitted": "✅ Documentos enviados para verificación",
+    "errorSubmit": "Error al enviar",
+
     "myUnits": "Mis unidades de transporte",
-    "myUnitsDesc": "Vehículos registrados para operar en WeMove",
+    "unitsCount": "{{count}} registrada",
+    "unitsCountPlural": "{{count}} registradas",
+    "noUnitsYet": "Sin unidades aún",
+    "noUnitsRegistered": "Sin unidades registradas",
     "addUnit": "Agregar unidad",
-    "noUnits": "No tienes unidades registradas",
-    "addFirstUnit": "Agregar mi primera unidad",
-    "editUnit": "Editar unidad",
+    "editUnitLabel": "Editar unidad",
     "newUnit": "Nueva unidad",
     "vehicleType": "Tipo de vehículo",
-    "selectVehicleType": "Selecciona el tipo",
-    "capacity": "Capacidad de pasajeros",
-    "capacityHint": "Número máximo de pasajeros que puede transportar",
-    "seats": "asientos",
-    "verified": "Verificado",
-    "pendingVerification": "Pendiente verificación",
-    "profileSaved": "Perfil actualizado",
-    "errorSavingProfile": "Error al guardar el perfil",
-    "unitAdded": "Unidad agregada exitosamente",
-    "unitUpdated": "Unidad actualizada",
+    "selectVehicle": "Selecciona",
+    "capacity": "Capacidad (asientos)",
+    "brand": "Marca",
+    "model": "Modelo",
+    "year": "Año",
+    "plate": "Placa",
+    "color": "Color",
+    "vehiclePhotoUnit": "Foto del vehículo (se mostrará a los pasajeros)",
+    "saving": "Guardando…",
+    "updateUnit": "Actualizar unidad",
+    "addUnitBtn": "Agregar unidad",
+    "confirmDelete": "¿Eliminar esta unidad?",
+    "unitAdded": "✓ Unidad agregada",
+    "unitUpdated": "✓ Unidad actualizada",
     "unitDeleted": "Unidad eliminada",
-    "errorSavingUnit": "Error al guardar la unidad",
-    "errorDeletingUnit": "Error al eliminar la unidad",
-    "invalidCapacity": "La capacidad debe ser un número válido mayor a 0",
+    "errorUnit": "Error al guardar unidad",
+    "errorDelete": "Error al eliminar",
+    "invalidCapacity": "Capacidad inválida",
+    "verified": "Verificado",
+    "pendingVerification": "Pendiente",
+
+    "seatLayout": "Diseñar plantilla de asientos",
+    "seatLayoutSaved": "✓ Plantilla guardada — clic para editar",
+    "seatLayoutDone": "✓ Plantilla de asientos guardada",
+
+    "howItWorks": "¿Cómo funciona WeMove?",
+    "howSubtitle": "Guía rápida para transportadores",
+    "step1Title": "Crea y comparte tu viaje",
+    "step1Desc": "Publica tu ruta con \"Nuevo viaje\". Usa el botón Compartir para difundirla en tus redes y llenar tus asientos más rápido.",
+    "step2Title": "Gestiona tus pasajeros",
+    "step2Desc": "Desde tu panel verás quién reservó. Márcalos como pagados cuando recibas el dinero. Al partir, la ruta pasa a \"En camino\".",
+    "step3Title": "Finaliza y recibe reseñas",
+    "step3Desc": "Al llegar, presiona \"Finalizar viaje\". Esto cierra la ruta y activa el enlace para que los pasajeros te califiquen.",
+    "step4Title": "Construye tu reputación",
+    "step4Desc": "Cada viaje completado suma a tu historial. Más reseñas positivas = más pasajeros. El perfil verificado genera confianza.",
+    "careAccount": "Cuida tu cuenta",
+    "warn1": "Tu nombre, número, correo y cédula quedan registrados para prevenir estafas y situaciones peligrosas.",
+    "warn2": "Más de 2 cancelaciones injustificadas pueden resultar en bloqueo. Contacta soporte si tienes una emergencia.",
+    "warn3": "Respeta a tus pasajeros y cumple los horarios publicados. Tu reputación depende de ello.",
+    "warn4": "No publiques rutas que no puedas cumplir. Los pasajeros confían en ti.",
+
     "vehicleTypes": {
-      "bus": "Bus",
-      "microbus": "Microbus",
-      "van": "Van",
-      "minibus": "Minibus",
-      "coaster": "Coaster",
-      "sedan": "Sedan",
-      "suv": "SUV"
+      "bus": "Bus", "microbus": "Microbus", "van": "Van", "minibus": "Minibus",
+      "coaster": "Coaster", "sedan": "Sedan", "suv": "SUV", "boat": "Lancha/Bote", "plane": "Avioneta"
     }
   },
   "wemovePublish": {
     "title": "Publicar ruta",
     "subtitle": "Define los detalles de tu próximo viaje",
     "sectionRoute": "Ruta",
-    "origin": "Ciudad de origen",
-    "selectOrigin": "Selecciona ciudad de origen",
-    "destination": "Ciudad de destino",
-    "selectDestination": "Selecciona ciudad de destino",
-    "sectionDateTime": "Fecha y hora",
-    "date": "Fecha de salida",
-    "time": "Hora de salida",
-    "sectionUnit": "Unidad de transporte",
-    "selectUnit": "Vehículo a usar",
-    "selectUnitPlaceholder": "Selecciona tu vehículo",
-    "pricePerSeat": "Precio por asiento",
-    "publishButton": "Publicar ruta",
+    "origin": "Ciudad de origen", "selectOrigin": "Selecciona ciudad de origen",
+    "destination": "Ciudad de destino", "selectDestination": "Selecciona ciudad de destino",
+    "sectionDateTime": "Fecha y hora", "date": "Fecha de salida", "time": "Hora de salida",
+    "sectionUnit": "Unidad de transporte", "selectUnit": "Vehículo a usar", "selectUnitPlaceholder": "Selecciona tu vehículo",
+    "pricePerSeat": "Precio por asiento", "publishButton": "Publicar ruta",
     "noUnitsTitle": "Sin unidades registradas",
     "noUnitsDesc": "Debes registrar al menos una unidad antes de publicar rutas",
-    "goToProfile": "Ir a Mi perfil",
-    "successPublished": "¡Ruta publicada exitosamente!",
+    "goToProfile": "Ir a Mi perfil", "successPublished": "¡Ruta publicada exitosamente!",
     "descriptionPlaceholder": "Ej: Viaje directo sin paradas, salida desde terminal",
     "descriptionLabel": "Descripción del viaje (opcional)",
     "sectionContact": "Punto de partida y contacto",
@@ -402,27 +323,18 @@
     "whatsappGroupStep1": "Abre WhatsApp y crea un grupo nuevo para este viaje",
     "whatsappGroupStep2": "Ve a Datos del grupo → Enlace de invitación",
     "whatsappGroupStep3": "Toca \"Copiar enlace\" y pégalo aquí",
-    "sectionPrice": "Precio",
-    "currency": "Moneda",
+    "sectionPrice": "Precio", "currency": "Moneda",
     "sectionOptions": "Opciones del viaje",
-    "optionPets": "Acepta mascotas",
-    "optionPetsDesc": "Perros, gatos u otros animales",
-    "optionLuggage": "Equipaje extra",
-    "optionLuggageDesc": "Maletas o bultos adicionales",
-    "optionAC": "Aire acondicionado",
-    "optionACDesc": "Vehículo con A/C",
-    "optionWifi": "WiFi a bordo",
-    "optionWifiDesc": "Conexión durante el viaje",
-    "optionDoorToDoor": "Puerta a puerta",
-    "optionDoorToDoorDesc": "Recojo y entrega en domicilio",
-    "notesLabel": "Notas adicionales (opcional)",
-    "notesPlaceholder": "Información adicional para los pasajeros",
-    "seatsLabel": "Asientos a vender",
-    "unitCapacityHint": "Capacidad de tu vehículo: {{max}}",
+    "optionPets": "Acepta mascotas", "optionPetsDesc": "Perros, gatos u otros animales",
+    "optionLuggage": "Equipaje extra", "optionLuggageDesc": "Maletas o bultos adicionales",
+    "optionAC": "Aire acondicionado", "optionACDesc": "Vehículo con A/C",
+    "optionWifi": "WiFi a bordo", "optionWifiDesc": "Conexión durante el viaje",
+    "optionDoorToDoor": "Puerta a puerta", "optionDoorToDoorDesc": "Recojo y entrega en domicilio",
+    "notesLabel": "Notas adicionales (opcional)", "notesPlaceholder": "Información adicional para los pasajeros",
+    "seatsLabel": "Asientos a vender", "unitCapacityHint": "Capacidad de tu vehículo: {{max}}",
     "noUnitsWarning": "Primero registra un vehículo",
     "noUnitsWarningDesc": "Necesitas al menos una unidad registrada para publicar viajes.",
-    "goToProfileLink": "Ir a Mi perfil →",
-    "previewTitle": "Vista previa del viaje",
+    "goToProfileLink": "Ir a Mi perfil →", "previewTitle": "Vista previa del viaje",
     "errorSelectLocations": "Selecciona ciudad de origen y destino",
     "errorSameLocation": "Origen y destino no pueden ser iguales",
     "errorSelectDateTime": "Selecciona fecha y hora de salida",
@@ -433,108 +345,52 @@
     "errorPastDate": "La fecha y hora de salida debe ser en el futuro"
   },
   "footer": {
-    "terms": "Términos y Condiciones",
-    "privacy": "Política de Privacidad",
-    "cookies": "Política de Cookies",
-    "about": "Sobre Buses.App",
-    "contact": "Contacto",
-    "copyright": "Todos los derechos reservados"
+    "terms": "Términos y Condiciones", "privacy": "Política de Privacidad", "cookies": "Política de Cookies",
+    "about": "Sobre Buses.App", "contact": "Contacto", "copyright": "Todos los derechos reservados"
   },
   "trips": {
-    "title": "Viajes disponibles",
-    "create": "Crear viaje",
-    "origin": "Origen",
-    "destination": "Destino",
-    "date": "Fecha",
-    "status": "Estado",
-    "scheduled": "Programado",
-    "inProgress": "En progreso",
-    "completed": "Completado"
+    "title": "Viajes disponibles", "create": "Crear viaje", "origin": "Origen", "destination": "Destino",
+    "date": "Fecha", "status": "Estado", "scheduled": "Programado", "inProgress": "En progreso", "completed": "Completado"
   },
   "transactions": {
-    "title": "Transacciones",
-    "create": "Crear transacción",
-    "package": "Paquete",
-    "description": "Descripción",
-    "value": "Valor declarado",
-    "fee": "Tarifa de transporte",
-    "total": "Total en garantía",
+    "title": "Transacciones", "create": "Crear transacción", "package": "Paquete",
+    "description": "Descripción", "value": "Valor declarado", "fee": "Tarifa de transporte", "total": "Total en garantía",
     "status": {
-      "created": "Creada",
-      "waitingVerification": "Esperando verificación",
-      "verified": "Verificada",
-      "waitingDeposit": "Esperando depósito",
-      "inTransit": "En tránsito",
-      "delivered": "Entregada",
-      "completed": "Completada",
-      "inDispute": "En disputa",
-      "canceled": "Cancelada"
+      "created": "Creada", "waitingVerification": "Esperando verificación", "verified": "Verificada",
+      "waitingDeposit": "Esperando depósito", "inTransit": "En tránsito", "delivered": "Entregada",
+      "completed": "Completada", "inDispute": "En disputa", "canceled": "Cancelada"
     }
   },
   "admin": {
-    "title": "Panel de administración",
-    "users": "Usuarios",
-    "trips": "Viajes",
-    "transactions": "Transacciones",
-    "escrow": "Garantía",
-    "disputes": "Disputas",
-    "settings": "Configuración"
+    "title": "Panel de administración", "users": "Usuarios", "trips": "Viajes",
+    "transactions": "Transacciones", "escrow": "Garantía", "disputes": "Disputas", "settings": "Configuración"
   },
   "dashboard": {
-    "newTrip": "Nuevo viaje",
-    "myProfile": "Mi perfil y documentos",
-    "myWallet": "Mi cartera",
-    "myUnits": "Mis unidades",
-    "registered": "registradas",
-    "viewAdd": "Ver / Agregar",
-    "active": "Activos",
-    "trips": "Viajes",
-    "units": "Unidades",
-    "slots": "Fichas",
-    "verified": "Verificado",
-    "pendingVerification": "Pendiente verificación",
-    "noRatings": "Sin calificaciones aún",
-    "noTrips": "No tienes viajes publicados",
-    "publishFirst": "Publicar primer viaje",
-    "tripHistory": "Historial de viajes",
-    "noBookings": "Sin reservas aún",
-    "vehicleMap": "Mapa del vehículo",
-    "printManifest": "Imprimir manifiesto",
-    "shareTrip": "Compartir viaje",
+    "newTrip": "Nuevo viaje", "myProfile": "Mi perfil y documentos", "myWallet": "Mi cartera",
+    "myUnits": "Mis unidades", "registered": "registradas", "viewAdd": "Ver / Agregar",
+    "active": "Activos", "trips": "Viajes", "units": "Unidades", "slots": "Fichas",
+    "verified": "Verificado", "pendingVerification": "Pendiente verificación",
+    "noRatings": "Sin calificaciones aún", "noTrips": "No tienes viajes publicados",
+    "publishFirst": "Publicar primer viaje", "tripHistory": "Historial de viajes",
+    "noBookings": "Sin reservas aún", "vehicleMap": "Mapa del vehículo",
+    "printManifest": "Imprimir manifiesto", "shareTrip": "Compartir viaje",
     "linkCopied": "Enlace copiado al portapapeles",
-    "cancel": "Cancelar",
-    "confirmCancel": "¿Cancelar este viaje?",
-    "tripCancelled": "Viaje cancelado",
-    "errorCancel": "Error al cancelar",
+    "cancel": "Cancelar", "confirmCancel": "¿Cancelar este viaje?",
+    "tripCancelled": "Viaje cancelado", "errorCancel": "Error al cancelar",
     "confirmArrival": "Confirmar llegada",
     "confirmArrivalPrompt": "¿Confirmar que el viaje llegó a destino? Se descontará 1 crédito.",
-    "arrivalConfirmed": "Llegada confirmada",
-    "creditsRemaining": "Créditos restantes",
+    "finalizeTrip": "Finalizar viaje", "finalizeConfirm": "¿Finalizar este viaje?",
+    "arrivalConfirmed": "Llegada confirmada", "creditsRemaining": "Créditos restantes",
     "errorArrival": "Error al confirmar llegada",
-    "statusActive": "Activo",
-    "statusOnTheWay": "En camino",
-    "statusCompleted": "Completado",
-    "statusCancelled": "Cancelado",
-    "paid": "Pagadas",
-    "pending": "Pendientes",
-    "expired": "Expiradas",
-    "overdue": "Vencido",
-    "code": "Código",
-    "markPaid": "Marcar pagado",
-    "commission": "Comisión",
-    "payConfirmed": "Pago confirmado",
-    "errorConfirmPay": "Error al confirmar pago",
-    "manifest": "MANIFIESTO DE PASAJEROS",
-    "seat": "Asiento",
-    "name": "Nombre",
-    "phone": "Teléfono",
-    "status": "Estado",
-    "total": "Total",
-    "completed": "Completado",
-    "cancelled": "Cancelado",
-    "pet": "Mascota",
-    "extraLuggage": "Equipaje extra",
-    "seatsLeft": "asientos libres",
-    "seatsSaved": "Plantilla de asientos guardada"
+    "statusActive": "Activo", "statusOnTheWay": "En camino",
+    "statusCompleted": "Completado", "statusCancelled": "Cancelado",
+    "paid": "Pagadas", "pending": "Pendientes", "expired": "Expiradas", "overdue": "Vencido",
+    "code": "Código", "markPaid": "Marcar pagado", "commission": "Comisión",
+    "payConfirmed": "Pago confirmado", "errorConfirmPay": "Error al confirmar pago",
+    "manifest": "MANIFIESTO DE PASAJEROS", "seat": "Asiento", "name": "Nombre",
+    "phone": "Teléfono", "status": "Estado", "total": "Total",
+    "completed": "Completado", "cancelled": "Cancelado",
+    "pet": "Mascota", "extraLuggage": "Equipaje extra",
+    "seatsLeft": "asientos libres", "seatsSaved": "Plantilla de asientos guardada"
   }
 }
