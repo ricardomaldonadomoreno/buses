@@ -9,7 +9,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Trips from "./pages/Trips";
 import Transactions from "./pages/Transactions";
-import Admin from "./pages/Admin";
 import PackService from "./pages/PackService";
 import WeMove from "./pages/WeMove";
 import WeMoveRegister from "./pages/WeMoveRegister";
@@ -18,10 +17,13 @@ import WeMoveVerifyEmail from "./pages/WeMoveVerifyEmail";
 import WeMoveDashboard from "./pages/WeMoveDashboard";
 import WeMoveCompleteProfile from "./pages/WeMoveCompleteProfile";
 import WeMovePublishRoute from "./pages/WeMovePublishRoute";
-import WeMoveAdmin from "./pages/WeMoveAdmin";
 import Contact from "./pages/Contact";
 import WeMoveCartera from './pages/WeMoveCartera';
 import NotFound from "./pages/NotFound";
+// Admin — backoffice
+import Admin             from "./pages/Admin";
+import AdminWeMove       from "./pages/AdminWeMove";
+import AdminPackService  from "./pages/AdminPackService";
 
 const queryClient = new QueryClient();
 
@@ -36,7 +38,6 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/trips" element={<Trips />} />
             <Route path="/transactions" element={<Transactions />} />
-            <Route path="/admin/*" element={<Admin />} />
             <Route path="/packservice" element={<PackService />} />
             <Route path="/wemove" element={<WeMove />} />
             <Route path="/wemove/register" element={<WeMoveRegister />} />
@@ -48,10 +49,13 @@ const App = () => (
             <Route path="/wemove/profile" element={<WeMoveCompleteProfile />} />
             <Route path="/wemove/publish-route" element={<WeMovePublishRoute />} />
             <Route path="/wemove/cartera" element={<WeMoveCartera />} />
-            <Route path="/wemove/admin" element={<WeMoveAdmin />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/auth" element={<NotFound />} />
             <Route path="*" element={<NotFound />} />
+              {/* ── ADMIN BACKOFFICE ── */}
+            <Route path="/admin"             element={<Admin />} />
+            <Route path="/admin/wemove"      element={<AdminWeMove />} />
+            <Route path="/admin/packservice" element={<AdminPackService />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
